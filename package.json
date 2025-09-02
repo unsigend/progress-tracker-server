@@ -3,9 +3,10 @@
     "version": "1.0.0",
     "description": "A server for progress tracker",
     "main": "dist/server.js",
+    "type": "module",
     "scripts": {
-        "dev": "nodemon src/server.ts",
-        "build": "tsc",
+        "dev": "nodemon --exec \"tsx src/server.ts\"",
+        "build": "tsc && tsc-alias",
         "start": "node dist/server.js"
     },
     "keywords": [
@@ -15,12 +16,14 @@
     ],
     "author": "Yixiang Qiu",
     "license": "MIT",
-    "type": "module",
     "devDependencies": {
         "@types/express": "^5.0.3",
         "@types/node": "^24.3.0",
         "nodemon": "^3.1.10",
         "ts-node": "^10.9.2",
+        "tsc-alias": "^1.8.16",
+        "tsconfig-paths": "^4.2.0",
+        "tsx": "^4.20.5",
         "typescript": "^5.9.2"
     },
     "dependencies": {

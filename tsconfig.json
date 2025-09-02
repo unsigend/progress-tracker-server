@@ -19,7 +19,6 @@
         /* Interop Constraints */
         "isolatedModules": true,
         "forceConsistentCasingInFileNames": true,
-        "verbatimModuleSyntax": true,
 
         /* Type Checking */
         "strict": true,
@@ -40,7 +39,13 @@
 
         /* Completeness */
         "skipLibCheck": true,
-        "noEmitOnError": true
+        "noEmitOnError": true,
+
+        /* Path Mapping */
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"]
+        }
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
