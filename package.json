@@ -1,0 +1,31 @@
+{
+    "name": "server",
+    "version": "1.0.0",
+    "description": "A server for progress tracker",
+    "main": "dist/server.js",
+    "scripts": {
+        "dev": "nodemon src/server.ts",
+        "build": "tsc",
+        "start": "node dist/server.js"
+    },
+    "keywords": [
+        "server",
+        "progress tracker",
+        "api"
+    ],
+    "author": "Yixiang Qiu",
+    "license": "MIT",
+    "type": "module",
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.3.0",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2"
+    },
+    "dependencies": {
+        "chalk": "^5.6.0",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0"
+    }
+}
