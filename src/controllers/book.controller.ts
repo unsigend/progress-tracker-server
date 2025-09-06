@@ -8,7 +8,7 @@ import bookService from "@/service/book.service";
 import AppError from "@/util/error";
 
 // import types
-import { BookType } from "@root/shared/types";
+import { BookQueryType, BookType } from "@root/shared/types";
 
 /**
  * Book controller
@@ -22,8 +22,9 @@ const bookController = {
      * @api public: GET /api/v1/book
      */
     getAllBooks: async (req: Request, res: Response, next: NextFunction) => {
+        const query: BookQueryType = req.query;
         try {
-            const allBooks = await bookService.getAllBooks();
+            const allBooks = await bookService.getAllBooks(query);
             res.status(200).json(allBooks);
         } catch (error) {
             next(error);
