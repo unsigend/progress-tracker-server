@@ -28,4 +28,13 @@ const connectDB = async () => {
     }
 };
 
-export { connectDB };
+/**
+ * Disconnect from MongoDB
+ * @returns {Promise<void>} void
+ */
+const disconnectDB = async () => {
+    await mongoose.disconnect();
+    logger.serverLog(logger.logType.SUCCESS, "Disconnected from MongoDB");
+};
+
+export { connectDB, disconnectDB };

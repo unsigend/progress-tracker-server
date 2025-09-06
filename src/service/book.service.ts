@@ -2,15 +2,20 @@
 import BookModel from "@/models/book.model";
 
 // import types
-import { BookType } from "@root/shared/types";
+import { BookType, BookQueryType } from "@root/shared/types";
 
 const bookService = {
     /**
      * Get all books
+     * @param query - the query object
      * @returns {BookType[]} the list of books
      */
-    getAllBooks: async (): Promise<BookType[]> => {
-        const books = await BookModel.find();
+    getAllBooks: async (query: BookQueryType): Promise<BookType[]> => {
+        const filters = {};
+        const projection = {};
+        const options = {};
+
+        const books = await BookModel.find(filters, projection, options);
         return books as BookType[];
     },
 
