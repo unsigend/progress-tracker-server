@@ -6,6 +6,7 @@ enum logType {
     SUCCESS = "SUCCESS",
     INFO = "INFO",
     WARNING = "WARNING",
+    ERROR = "ERROR",
 }
 
 // map for log type to color
@@ -14,6 +15,7 @@ const colorMap = {
     [logType.SUCCESS]: chalk.green,
     [logType.INFO]: chalk.blue,
     [logType.WARNING]: chalk.yellow,
+    [logType.ERROR]: chalk.red,
 };
 
 /**

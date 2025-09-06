@@ -11,6 +11,7 @@ import bookRouter from "@/routes/book.route.js";
 
 // import config
 import apiConfig from "@/config/api.js";
+import { connectDB } from "@/config/db.js";
 
 async function main() {
     // load environment variables
@@ -37,6 +38,9 @@ async function main() {
 
     // setup host
     const host = process.env.HOST || "localhost";
+
+    // connect to database
+    await connectDB();
 
     // start the server
     app.listen(port, () => {

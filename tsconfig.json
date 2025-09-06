@@ -10,7 +10,7 @@
 
         /* Emit */
         "outDir": "./dist",
-        "rootDir": "./src",
+        "rootDir": "..",
         "removeComments": true,
         "sourceMap": true,
         "declaration": true,
@@ -44,10 +44,11 @@
         /* Path Mapping */
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["src/*"],
+            "@root/*": ["../*"]
         }
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "../shared/**/*"],
     "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
     "ts-node": {
         "esm": true,
