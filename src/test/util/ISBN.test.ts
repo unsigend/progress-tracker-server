@@ -1,5 +1,5 @@
 // import dependencies
-import ISBNUtil from "../../util/ISBN";
+import ISBNUtil from "@/util/ISBN";
 
 // import test
 import { describe, it, expect } from "@jest/globals";

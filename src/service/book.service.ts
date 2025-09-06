@@ -26,7 +26,7 @@ const bookService = {
         const options: any = {};
 
         // handle search
-        if (query.search) {
+        if (query.search && query.search !== "") {
             if (ISBNUtil.isISBN(query.search)) {
                 filters["ISBN"] = ISBNUtil.normalizeISBN(query.search);
             } else {
@@ -83,7 +83,7 @@ const bookService = {
      */
     getBookByISBN: async (ISBN: string): Promise<BookType | null> => {
         const book = await BookModel.findOne({
-            ISBN: ISBNUtil.normalizeISBN(ISBN),
+            ISBN: ISBNUtil.normalizeISBN(ISBN.toUpperCase()),
         });
         return book as BookType | null;
     },
@@ -105,7 +105,11 @@ const bookService = {
      * @returns {BookType | null} the updated book document or null if not found
      */
     updateBook: async (id: string, book: BookType) => {
-        const updatedBook = await BookModel.findByIdAndUpdate(id, book, {
+        const newBook = {
+            ...book,
+            updatedAt: new Date(),
+        };
+        const updatedBook = await BookModel.findByIdAndUpdate(id, newBook, {
             new: true,
         });
         return updatedBook as BookType | null;

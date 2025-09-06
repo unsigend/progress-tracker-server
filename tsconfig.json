@@ -49,7 +49,7 @@
         }
     },
     "include": ["src/**/*", "../shared/**/*"],
-    "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+    "exclude": ["node_modules", "dist"],
     "ts-node": {
         "esm": true,
         "experimentalSpecifierResolution": "node"
