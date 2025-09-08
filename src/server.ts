@@ -8,6 +8,10 @@ import logger from "@/util/log.js";
 
 // import routes
 import bookRouter from "@/routes/book.route.js";
+import userRouter from "@/routes/user.route.js";
+
+// import error middleware
+import errorHandler from "@/middleware/errorHandler.js";
 
 // import config
 import apiConfig from "@/config/api.js";
@@ -28,6 +32,10 @@ async function main() {
 
     // setup routes
     app.use(apiConfig.bookAPIRoot, bookRouter);
+    app.use(apiConfig.userAPIRoot, userRouter);
+
+    // setup error middleware
+    app.use(errorHandler);
 
     // setup port
     const port = process.env.PORT;
