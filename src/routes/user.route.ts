@@ -18,6 +18,7 @@ import { MongoDBObjectIdSchema } from "@/schema/general.schema";
 const userRouter = Router();
 
 // setup routes
+userRouter.get("/email/check", userController.checkUserEmail);
 userRouter.get("/email/:email", userController.getUserByEmail);
 userRouter.get(
     "/:id",

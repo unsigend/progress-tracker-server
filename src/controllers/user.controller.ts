@@ -7,6 +7,9 @@ import userService from "@/service/user.service";
 // import types
 import { UserType } from "@root/shared/types";
 
+// import error
+import AppError from "@/util/error";
+
 /**
  * User controller
  */
@@ -55,12 +58,47 @@ const userController = {
      */
     createUser: async (req: Request, res: Response, next: NextFunction) => {
         const user: UserType = req.body;
+        const userWithEmail = await userService.getUserByEmail(user.email);
+
+        if (userWithEmail) {
+            return next(new AppError("Email already in use", 400));
+        }
 
         try {
             const newUser = await userService.createUser(user);
             res.status(201).json(newUser);
         } catch (error) {
             next(error);
+        }
+    },
+
+    /**
+     * Check if a user email is already in use
+     * @param req - the request object
+     * @param res - the response object
+     * @param next - the next function
+     * @api public: GET /api/v1/user/email/check?email=:email
+     */
+    checkUserEmail: async (req: Request, res: Response, next: NextFunction) => {
+        const email: string = req.query.email as string;
+        let userWithEmail: UserType | null = null;
+
+        try {
+            userWithEmail = await userService.getUserByEmail(email);
+        } catch (error) {
+            next(error);
+        }
+
+        if (userWithEmail) {
+            return res.status(200).json({
+                exists: true,
+                message: "Email already in use",
+            });
+        } else {
+            return res.status(200).json({
+                exists: false,
+                message: "Email is available",
+            });
         }
     },
 
