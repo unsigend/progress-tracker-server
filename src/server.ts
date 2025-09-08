@@ -11,7 +11,7 @@ import bookRouter from "@/routes/book.route.js";
 import userRouter from "@/routes/user.route.js";
 
 // import error middleware
-import errorHandler from "@/middleware/errorHandler.js";
+import errorHandler from "@/middleware/errorMiddleware.js";
 
 // import config
 import apiConfig from "@/config/api.js";
