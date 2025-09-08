@@ -1,5 +1,6 @@
 // import model
 import UserModel from "@/models/user.model";
+import bcrypt from "bcrypt";
 
 // import types
 import { UserType } from "@root/shared/types";
@@ -32,7 +33,14 @@ const userService = {
      * @returns {UserType} the created user document
      */
     createUser: async (user: UserType): Promise<UserType> => {
-        const newUser = await UserModel.create(user);
+        // hash password
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+
+        // create user
+        const newUser = await UserModel.create({
+            ...user,
+            password: hashedPassword,
+        });
         return newUser as unknown as UserType;
     },
 
@@ -56,16 +64,32 @@ const userService = {
         id: string,
         user: UserType
     ): Promise<UserType | null> => {
-        const updatedUser = await UserModel.findByIdAndUpdate(
-            id,
-            {
-                ...user,
-                updatedAt: new Date(),
-            },
-            {
-                new: true,
-            }
-        );
+        let updatedUser: UserType | null = null;
+
+        if (user.password) {
+            // hash password
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+
+            // update user
+            updatedUser = await UserModel.findByIdAndUpdate(
+                id,
+                {
+                    ...user,
+                    password: hashedPassword,
+                    updatedAt: new Date(),
+                },
+                {
+                    new: true,
+                }
+            );
+        } else {
+            // update user
+            updatedUser = await UserModel.findByIdAndUpdate(
+                id,
+                { ...user, updatedAt: new Date() },
+                { new: true }
+            );
+        }
         return updatedUser as UserType | null;
     },
 };

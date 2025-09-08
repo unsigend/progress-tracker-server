@@ -125,7 +125,7 @@ const userController = {
      * @param req - the request object
      * @param res - the response object
      * @param next - the next function
-     * @api public: PUT /api/v1/user/:id
+     * @api public: PATCH /api/v1/user/:id
      */
     updateUserById: async (req: Request, res: Response, next: NextFunction) => {
         const id: string = req.params.id as string;

@@ -36,7 +36,7 @@ userRouter.delete(
     userController.deleteUserById
 );
 
-userRouter.put(
+userRouter.patch(
     "/:id",
     validateParamsMiddleware(MongoDBObjectIdSchema),
     validateBodyMiddleware(userUpdateSchema),
