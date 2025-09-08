@@ -4,9 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // import service
 import bookService from "@/service/book.service";
 
-// import error
-import AppError from "@/util/error";
-
 // import types
 import { BookQueryType, BookType } from "@root/shared/types";
 
@@ -39,9 +36,6 @@ const bookController = {
      * @api public: GET /api/v1/book/:id
      */
     getBookByID: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.id) {
-            return next(new AppError("Book ID is required", 400));
-        }
         const id: string = req.params.id as string;
 
         try {
@@ -78,9 +72,6 @@ const bookController = {
      * @api public: PUT /api/v1/book/:id
      */
     updateBook: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.id) {
-            return next(new AppError("Book ID is required", 400));
-        }
         const id: string = req.params.id as string;
         const book: BookType = req.body;
 
@@ -100,9 +91,6 @@ const bookController = {
      * @api public: DELETE /api/v1/book/:id
      */
     deleteBook: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.id) {
-            return next(new AppError("Book ID is required", 400));
-        }
         const id: string = req.params.id as string;
 
         try {

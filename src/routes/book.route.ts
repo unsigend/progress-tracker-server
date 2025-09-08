@@ -4,14 +4,41 @@ import { Router } from "express";
 // import controllers
 import bookController from "@/controllers/book.controller.js";
 
+// import middleware
+import {
+    validateBodyMiddleware,
+    validateParamsMiddleware,
+} from "@/middleware/validateMiddleware";
+
+// import schema
+import bookSchema from "@/schema/book.schema";
+import { MongoDBObjectIdSchema } from "@/schema/general.schema";
+
 // create router instance
 const bookRouter = Router();
 
 // setup routes
 bookRouter.get("/", bookController.getAllBooks);
-bookRouter.get("/:id", bookController.getBookByID);
-bookRouter.post("/", bookController.createBook);
-bookRouter.put("/:id", bookController.updateBook);
-bookRouter.delete("/:id", bookController.deleteBook);
+bookRouter.get(
+    "/:id",
+    validateParamsMiddleware(MongoDBObjectIdSchema),
+    bookController.getBookByID
+);
+bookRouter.post(
+    "/",
+    validateBodyMiddleware(bookSchema),
+    bookController.createBook
+);
+bookRouter.put(
+    "/:id",
+    validateParamsMiddleware(MongoDBObjectIdSchema),
+    validateBodyMiddleware(bookSchema),
+    bookController.updateBook
+);
+bookRouter.delete(
+    "/:id",
+    validateParamsMiddleware(MongoDBObjectIdSchema),
+    bookController.deleteBook
+);
 
 export default bookRouter;

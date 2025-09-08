@@ -4,9 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // import service
 import userService from "@/service/user.service";
 
-// import error
-import AppError from "@/util/error";
-
 // import types
 import { UserType } from "@root/shared/types";
 
@@ -22,11 +19,7 @@ const userController = {
      * @api public: GET /api/v1/user/:id
      */
     getUserById: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.id) {
-            return next(new AppError("User ID is required", 400));
-        }
         const id: string = req.params.id as string;
-
         try {
             const user = await userService.getUserById(id);
             res.status(200).json(user);
@@ -43,9 +36,6 @@ const userController = {
      * @api public: GET /api/v1/user/email/:email
      */
     getUserByEmail: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.email) {
-            return next(new AppError("User email is required", 400));
-        }
         const email: string = req.params.email as string;
 
         try {
@@ -82,9 +72,6 @@ const userController = {
      * @api public: DELETE /api/v1/user/:id
      */
     deleteUserById: async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.params.id) {
-            return next(new AppError("User ID is required", 400));
-        }
         const id: string = req.params.id as string;
 
         try {
