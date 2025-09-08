@@ -45,6 +45,29 @@ const userService = {
         const deletedUser = await UserModel.findByIdAndDelete(id);
         return deletedUser as UserType | null;
     },
+
+    /**
+     * Update a user by ID
+     * @param id - the id of the user to update
+     * @param user - the user to update
+     * @returns {UserType | null} the updated user document or null if not found
+     */
+    updateUserById: async (
+        id: string,
+        user: UserType
+    ): Promise<UserType | null> => {
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            id,
+            {
+                ...user,
+                updatedAt: new Date(),
+            },
+            {
+                new: true,
+            }
+        );
+        return updatedUser as UserType | null;
+    },
 };
 
 export default userService;

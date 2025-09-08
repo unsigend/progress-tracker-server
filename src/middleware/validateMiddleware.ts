@@ -63,7 +63,8 @@ const validateParamsMiddleware = (schema: ZodSchema) => {
 const validateQueryMiddleware = (schema: ZodSchema) => {
     return (req: Request, _res: Response, next: NextFunction) => {
         try {
-            req.query = schema.parse(req.query) as any;
+            // parse the query but don't reassign the query to the request object
+            schema.parse(req.query);
             next();
         } catch (error) {
             if (error instanceof ZodError) {

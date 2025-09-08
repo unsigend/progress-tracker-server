@@ -16,4 +16,17 @@ const userSchema = z.object({
     avatar: z.string().trim().optional().default(""),
 });
 
-export default userSchema;
+// user update schema
+const userUpdateSchema = z.object({
+    username: z.string().trim().optional().default(""),
+    email: z
+        .string()
+        .trim()
+        .email("Invalid email address")
+        .optional()
+        .default(""),
+    password: z.string().trim().optional().default(""),
+    avatar: z.string().trim().optional().default(""),
+});
+
+export { userSchema, userUpdateSchema };

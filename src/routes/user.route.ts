@@ -11,7 +11,7 @@ import {
 } from "@/middleware/validateMiddleware";
 
 // import schema
-import userSchema from "@/schema/user.schema";
+import { userSchema, userUpdateSchema } from "@/schema/user.schema";
 import { MongoDBObjectIdSchema } from "@/schema/general.schema";
 
 // create router instance
@@ -33,6 +33,13 @@ userRouter.delete(
     "/:id",
     validateParamsMiddleware(MongoDBObjectIdSchema),
     userController.deleteUserById
+);
+
+userRouter.put(
+    "/:id",
+    validateParamsMiddleware(MongoDBObjectIdSchema),
+    validateBodyMiddleware(userUpdateSchema),
+    userController.updateUserById
 );
 
 export default userRouter;

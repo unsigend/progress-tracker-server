@@ -81,6 +81,25 @@ const userController = {
             next(error);
         }
     },
+
+    /**
+     * Update a user by ID
+     * @param req - the request object
+     * @param res - the response object
+     * @param next - the next function
+     * @api public: PUT /api/v1/user/:id
+     */
+    updateUserById: async (req: Request, res: Response, next: NextFunction) => {
+        const id: string = req.params.id as string;
+        const user: UserType = req.body;
+
+        try {
+            const updatedUser = await userService.updateUserById(id, user);
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            next(error);
+        }
+    },
 };
 
 export default userController;

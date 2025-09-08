@@ -8,17 +8,26 @@ import bookController from "@/controllers/book.controller.js";
 import {
     validateBodyMiddleware,
     validateParamsMiddleware,
+    validateQueryMiddleware,
 } from "@/middleware/validateMiddleware";
 
 // import schema
-import bookSchema from "@/schema/book.schema";
+import {
+    bookQuerySchema,
+    bookSchema,
+    bookUpdateSchema,
+} from "@/schema/book.schema";
 import { MongoDBObjectIdSchema } from "@/schema/general.schema";
 
 // create router instance
 const bookRouter = Router();
 
 // setup routes
-bookRouter.get("/", bookController.getAllBooks);
+bookRouter.get(
+    "/",
+    validateQueryMiddleware(bookQuerySchema),
+    bookController.getAllBooks
+);
 bookRouter.get(
     "/:id",
     validateParamsMiddleware(MongoDBObjectIdSchema),
@@ -32,7 +41,7 @@ bookRouter.post(
 bookRouter.put(
     "/:id",
     validateParamsMiddleware(MongoDBObjectIdSchema),
-    validateBodyMiddleware(bookSchema),
+    validateBodyMiddleware(bookUpdateSchema),
     bookController.updateBook
 );
 bookRouter.delete(
