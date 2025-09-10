@@ -94,6 +94,9 @@ const bookService = {
      * @returns {BookType} the created book document
      */
     createBook: async (book: BookType): Promise<BookType> => {
+        // the server will save the ISBN as the normalized ISBN
+        const normalizedISBN = ISBNUtil.normalizeISBN(book.ISBN || "");
+        book.ISBN = normalizedISBN;
         const newBook = await BookModel.create(book);
         return newBook as BookType;
     },
