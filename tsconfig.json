@@ -1,57 +1,25 @@
 {
-    "compilerOptions": {
-        /* Language and Environment */
-        "target": "ES2022",
-        "lib": ["ES2022"],
-        "module": "ESNext",
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-
-        /* Emit */
-        "outDir": "./dist",
-        "rootDir": "..",
-        "removeComments": true,
-        "sourceMap": true,
-        "declaration": true,
-        "declarationMap": true,
-
-        /* Interop Constraints */
-        "isolatedModules": true,
-        "forceConsistentCasingInFileNames": true,
-
-        /* Type Checking */
-        "strict": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strictBindCallApply": true,
-        "strictPropertyInitialization": true,
-        "noImplicitThis": true,
-        "alwaysStrict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "exactOptionalPropertyTypes": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedIndexedAccess": true,
-        "noImplicitOverride": true,
-
-        /* Completeness */
-        "skipLibCheck": true,
-        "noEmitOnError": true,
-
-        /* Path Mapping */
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["src/*"],
-            "@root/*": ["../*"]
-        }
-    },
-    "include": ["src/**/*", "../shared/**/*"],
-    "exclude": ["src/test/**/*", "node_modules", "dist"],
-    "ts-node": {
-        "esm": true,
-        "experimentalSpecifierResolution": "node"
-    }
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "noFallthroughCasesInSwitch": true
+  }
 }
