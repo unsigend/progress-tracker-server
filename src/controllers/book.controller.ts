@@ -12,11 +12,42 @@ import { BookQueryType, BookType } from "@root/shared/types";
  */
 const bookController = {
     /**
-     * Get all books
-     * @param req - the request object
-     * @param res - the response object
-     * @param next - the next function
-     * @api public: GET /api/v1/book
+     * @swagger
+     * /api/v1/books:
+     *   get:
+     *     summary: Get all books
+     *     tags: [Books]
+     *     parameters:
+     *       - in: query
+     *         name: limit
+     *         schema:
+     *           type: integer
+     *         description: Maximum number of books to return
+     *       - in: query
+     *         name: offset
+     *         schema:
+     *           type: integer
+     *         description: Number of books to skip
+     *       - in: query
+     *         name: search
+     *         schema:
+     *           type: string
+     *         description: Search term for title or author
+     *     responses:
+     *       200:
+     *         description: List of books
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Book'
+     *       400:
+     *         description: Bad request
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     getAllBooks: async (req: Request, res: Response, next: NextFunction) => {
         const query: BookQueryType = req.query;
@@ -47,11 +78,30 @@ const bookController = {
     },
 
     /**
-     * Create a book
-     * @param req - the request object
-     * @param res - the response object
-     * @param next - the next function
-     * @api public: POST /api/v1/book
+     * @swagger
+     * /api/v1/books:
+     *   post:
+     *     summary: Create a new book
+     *     tags: [Books]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Book'
+     *     responses:
+     *       201:
+     *         description: Book created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Book'
+     *       400:
+     *         description: Invalid book data
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     createBook: async (req: Request, res: Response, next: NextFunction) => {
         const book: BookType = req.body;

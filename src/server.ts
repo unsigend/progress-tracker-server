@@ -3,6 +3,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
+// import swagger
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import swaggerOptions from "@/config/swagger.js";
+
 // import util
 import logger from "@/util/log.js";
 
@@ -25,10 +30,15 @@ async function main() {
     // create app instance
     const app = express();
 
+    const specs = swaggerJsdoc(swaggerOptions);
+
     // setup middleware
     app.use(cors());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+
+    // setup swagger documentation
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
     // setup routes
     app.use(apiConfig.bookAPIRoot, bookRouter);
