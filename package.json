@@ -1,10 +1,10 @@
 {
-  "name": "server",
+  "name": "server for progress tracker",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "backend server for progress tracker",
+  "author": "Yixiang Qiu",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
