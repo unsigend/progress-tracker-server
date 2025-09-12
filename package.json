@@ -1,10 +1,10 @@
 {
-  "name": "server for progress tracker",
+  "name": "server",
   "version": "0.0.1",
-  "description": "backend server for progress tracker",
-  "author": "Yixiang Qiu",
+  "description": "",
+  "author": "",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -23,6 +23,7 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
