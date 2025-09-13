@@ -2,9 +2,9 @@
 import { Injectable } from "@nestjs/common";
 
 // import DTO
-import { QueryBookDto } from "@/books/dto/queryBook.dto";
-import { CreateBookDto } from "@/books/dto/createBook.dto";
-import { UpdateBookDto } from "@/books/dto/updateBook.dto";
+import { QueryBookDto } from "@/books/dto/query-book.dto";
+import { CreateBookDto } from "@/books/dto/create-book.dto";
+import { UpdateBookDto } from "@/books/dto/update-book.dto";
 
 @Injectable()
 export class BooksService {
