@@ -17,8 +17,9 @@ async function bootstrap() {
     abortOnError: false,
   });
 
-  // set global prefix
+  // enable features of the app
   app.setGlobalPrefix("api/v1");
+  app.enableCors();
 
   // use validation pipe
   app.useGlobalPipes(

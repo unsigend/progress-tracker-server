@@ -1,5 +1,5 @@
 // import dependencies
-import { Controller } from "@nestjs/common";
+import { Controller, Patch } from "@nestjs/common";
 import { Get, Post, Put, Delete, Param, Body, Query } from "@nestjs/common";
 
 // import services
@@ -8,7 +8,10 @@ import { BooksService } from "@/books/books.service";
 // import DTO
 import { CreateBookDto } from "@/books/dto/create-book.dto";
 import { QueryBookDto } from "@/books/dto/query-book.dto";
-import { UpdateBookDto } from "@/books/dto/update-book.dto";
+import { PatchBookDto, UpdateBookDto } from "@/books/dto/update-book.dto";
+
+// import models
+import { Book } from "@prisma/client";
 
 @Controller("books")
 export class BooksController {
@@ -20,8 +23,8 @@ export class BooksController {
    * @remarks This endpoint returns all books with query parameters
    */
   @Get()
-  findAll(@Query() queryBookDto: QueryBookDto): Promise<string | null> {
-    const books = this.booksService.findAll(queryBookDto);
+  async findAll(@Query() queryBookDto: QueryBookDto): Promise<Book[] | null> {
+    const books: Book[] | null = await this.booksService.findAll(queryBookDto);
     return books;
   }
 
@@ -31,8 +34,8 @@ export class BooksController {
    * @remarks This endpoint returns a single book by ID
    */
   @Get(":id")
-  findOne(@Param("id") id: string): Promise<string | null> {
-    const book = this.booksService.findOne(id);
+  async findOne(@Param("id") id: string): Promise<Book | null> {
+    const book: Book | null = await this.booksService.findOne(id);
     return book;
   }
 
@@ -42,8 +45,8 @@ export class BooksController {
    * @remarks This endpoint creates a new book
    */
   @Post()
-  create(@Body() createBookDto: CreateBookDto): Promise<string | null> {
-    const book = this.booksService.create(createBookDto);
+  async create(@Body() createBookDto: CreateBookDto): Promise<Book | null> {
+    const book: Book | null = await this.booksService.create(createBookDto);
     return book;
   }
 
@@ -53,11 +56,25 @@ export class BooksController {
    * @remarks This endpoint updates a book by ID
    */
   @Put(":id")
-  update(
+  async update(
     @Param("id") id: string,
     @Body() updateBookDto: UpdateBookDto,
-  ): Promise<string | null> {
-    const book = this.booksService.update(id, updateBookDto);
+  ): Promise<Book | null> {
+    const book: Book | null = await this.booksService.update(id, updateBookDto);
+    return book;
+  }
+
+  /**
+   * Patch a book
+   *
+   * @remarks This endpoint patches a book by ID
+   */
+  @Patch(":id")
+  async patch(
+    @Param("id") id: string,
+    @Body() patchBookDto: PatchBookDto,
+  ): Promise<Book | null> {
+    const book: Book | null = await this.booksService.patch(id, patchBookDto);
     return book;
   }
 
@@ -67,8 +84,8 @@ export class BooksController {
    * @remarks This endpoint deletes a book by ID
    */
   @Delete(":id")
-  delete(@Param("id") id: string): Promise<string | null> {
-    const book = this.booksService.delete(id);
+  async delete(@Param("id") id: string): Promise<Book | null> {
+    const book: Book | null = await this.booksService.delete(id);
     return book;
   }
 }
