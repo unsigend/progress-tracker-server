@@ -8,7 +8,8 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator";
  */
 export class LoginDto {
   /**
-   * The email of the user
+   * The email address of the user
+   * @example "john.doe@example.com"
    */
   @IsEmail({}, { message: "Email must be a valid email" })
   @IsNotEmpty({ message: "Email is required" })
@@ -16,6 +17,7 @@ export class LoginDto {
 
   /**
    * The password of the user
+   * @example "mySecurePassword123"
    */
   @IsString()
   @IsNotEmpty({ message: "Password is required" })

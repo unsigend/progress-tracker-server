@@ -9,12 +9,21 @@ import { BooksService } from "@/books/books.service";
 import { CreateBookDto } from "@/books/dto/create-book.dto";
 import { QueryBookDto } from "@/books/dto/query-book.dto";
 import { PatchBookDto, UpdateBookDto } from "@/books/dto/update-book.dto";
+import { BookResponseDto } from "@/books/dto/book-response.dto";
 
 // import models
 import { Book } from "@prisma/client";
 
 // import pipes
 import { ParseUUIDPipe } from "@nestjs/common";
+
+// import swagger decorators
+import {
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+} from "@nestjs/swagger";
 
 @Controller("books")
 export class BooksController {
@@ -25,8 +34,15 @@ export class BooksController {
    *
    * @remarks This endpoint returns all books with query parameters
    */
+  @ApiResponse({
+    status: 200,
+    description: "Books retrieved successfully",
+    type: [BookResponseDto],
+  })
   @Get()
-  async findAll(@Query() queryBookDto: QueryBookDto): Promise<Book[] | null> {
+  async findAll(
+    @Query() queryBookDto: QueryBookDto,
+  ): Promise<BookResponseDto[] | null> {
     const books: Book[] | null = await this.booksService.findAll(queryBookDto);
     return books;
   }
@@ -36,6 +52,17 @@ export class BooksController {
    *
    * @remarks This endpoint returns a single book by ID
    */
+  @ApiResponse({
+    status: 200,
+    description: "Book retrieved successfully",
+    type: BookResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Book not found",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid book ID format",
+  })
   @Get(":id")
   async findOne(
     @Param(
@@ -49,7 +76,7 @@ export class BooksController {
       }),
     )
     id: string,
-  ): Promise<Book | null> {
+  ): Promise<BookResponseDto | null> {
     const book: Book | null = await this.booksService.findOne(id);
     return book;
   }
@@ -59,8 +86,17 @@ export class BooksController {
    *
    * @remarks This endpoint creates a new book
    */
+  @ApiCreatedResponse({
+    description: "Book created successfully",
+    type: BookResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid book data",
+  })
   @Post()
-  async create(@Body() createBookDto: CreateBookDto): Promise<Book | null> {
+  async create(
+    @Body() createBookDto: CreateBookDto,
+  ): Promise<BookResponseDto | null> {
     const book: Book | null = await this.booksService.create(createBookDto);
     return book;
   }
@@ -70,6 +106,17 @@ export class BooksController {
    *
    * @remarks This endpoint updates a book by ID
    */
+  @ApiResponse({
+    status: 200,
+    description: "Book updated successfully",
+    type: BookResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Book not found",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid book ID format or data",
+  })
   @Put(":id")
   async update(
     @Param(
@@ -84,7 +131,7 @@ export class BooksController {
     )
     id: string,
     @Body() updateBookDto: UpdateBookDto,
-  ): Promise<Book | null> {
+  ): Promise<BookResponseDto | null> {
     const book: Book | null = await this.booksService.update(id, updateBookDto);
     return book;
   }
@@ -94,6 +141,17 @@ export class BooksController {
    *
    * @remarks This endpoint patches a book by ID
    */
+  @ApiResponse({
+    status: 200,
+    description: "Book patched successfully",
+    type: BookResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Book not found",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid book ID format or data",
+  })
   @Patch(":id")
   async patch(
     @Param(
@@ -108,7 +166,7 @@ export class BooksController {
     )
     id: string,
     @Body() patchBookDto: PatchBookDto,
-  ): Promise<Book | null> {
+  ): Promise<BookResponseDto | null> {
     const book: Book | null = await this.booksService.patch(id, patchBookDto);
     return book;
   }
@@ -118,6 +176,17 @@ export class BooksController {
    *
    * @remarks This endpoint deletes a book by ID
    */
+  @ApiResponse({
+    status: 200,
+    description: "Book deleted successfully",
+    type: BookResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Book not found",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid book ID format",
+  })
   @Delete(":id")
   async delete(
     @Param(
@@ -131,7 +200,7 @@ export class BooksController {
       }),
     )
     id: string,
-  ): Promise<Book | null> {
+  ): Promise<BookResponseDto | null> {
     const book: Book | null = await this.booksService.delete(id);
     return book;
   }

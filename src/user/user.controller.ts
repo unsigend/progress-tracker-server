@@ -32,8 +32,8 @@ import { IDCheckerGuard } from "@/user/guards/id-checker.guard";
 // import swagger decorators
 import {
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiForbiddenResponse,
+  ApiResponse,
 } from "@nestjs/swagger";
 
 @Controller("user")
@@ -45,18 +45,10 @@ export class UserController {
    *
    * @remarks This endpoint returns a user by id
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "User retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "string" },
-        name: { type: "string" },
-        email: { type: "string" },
-        createdAt: { type: "string" },
-        updatedAt: { type: "string" },
-      },
-    },
+    type: ResponseUserDto,
   })
   @ApiNotFoundResponse({
     description: "User not found",
@@ -92,18 +84,10 @@ export class UserController {
    *
    * @remarks This endpoint updates a user
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "User updated successfully",
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "string" },
-        name: { type: "string" },
-        email: { type: "string" },
-        createdAt: { type: "string" },
-        updatedAt: { type: "string" },
-      },
-    },
+    type: ResponseUserDto,
   })
   @ApiNotFoundResponse({
     description: "User not found",
@@ -140,18 +124,10 @@ export class UserController {
    *
    * @remarks This endpoint deletes a user
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "User deleted successfully",
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "string" },
-        name: { type: "string" },
-        email: { type: "string" },
-        createdAt: { type: "string" },
-        updatedAt: { type: "string" },
-      },
-    },
+    type: ResponseUserDto,
   })
   @ApiNotFoundResponse({
     description: "User not found",

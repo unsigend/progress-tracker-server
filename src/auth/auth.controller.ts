@@ -24,6 +24,8 @@ import { LoginDto } from "@/auth/dto/login.dto";
 import { RegisterDto } from "@/auth/dto/register.dto";
 import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 import { EmailCheckDto } from "@/auth/dto/email-check.dto";
+import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
+import { EmailCheckResponseDto } from "@/auth/dto/email-check-response.dto";
 
 // import decorators
 import { Public } from "@/decorators/public.decorator";
@@ -35,6 +37,7 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
   ApiBadRequestResponse,
+  ApiResponse,
 } from "@nestjs/swagger";
 
 @Controller("auth")
@@ -50,14 +53,10 @@ export class AuthController {
    * @remarks This endpoint logs in a user
    * @returns The access token if the login is successful, null otherwise
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "Login successful",
-    schema: {
-      type: "object",
-      properties: {
-        access_token: { type: "string" },
-      },
-    },
+    type: AuthResponseDto,
   })
   @ApiUnauthorizedResponse({
     description: "Invalid email or password",
@@ -65,7 +64,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post("login")
-  async login(@Body() loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(loginDto);
   }
 
@@ -75,14 +74,10 @@ export class AuthController {
    * @remarks This endpoint registers a user
    * @returns The user if the registration is successful, null otherwise
    */
-  @ApiCreatedResponse({
+  @ApiResponse({
+    status: 201,
     description: "User registered successfully",
-    schema: {
-      type: "object",
-      properties: {
-        access_token: { type: "string" },
-      },
-    },
+    type: AuthResponseDto,
   })
   @ApiBadRequestResponse({
     description: "Invalid request",
@@ -98,9 +93,7 @@ export class AuthController {
   @Public()
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  async register(
-    @Body() registerDto: RegisterDto,
-  ): Promise<{ access_token: string }> {
+  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
     return this.authService.register(registerDto);
   }
 
@@ -110,20 +103,16 @@ export class AuthController {
    * @remarks This endpoint checks if an email is already in use
    * @returns True if the email is already in use, false otherwise
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "Email check successful",
-    schema: {
-      type: "object",
-      properties: {
-        exists: { type: "boolean" },
-      },
-    },
+    type: EmailCheckResponseDto,
   })
   @Public()
   @Get("email-check")
   async emailCheck(
     @Query() emailCheckDto: EmailCheckDto,
-  ): Promise<{ exists: boolean }> {
+  ): Promise<EmailCheckResponseDto> {
     const isEmailInUse = await this.authService.emailCheck(emailCheckDto.email);
     return { exists: isEmailInUse };
   }
@@ -133,18 +122,10 @@ export class AuthController {
    *
    * @remarks This endpoint returns the current user data
    */
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: "User data retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "string" },
-        name: { type: "string" },
-        email: { type: "string" },
-        createdAt: { type: "string" },
-        updatedAt: { type: "string" },
-      },
-    },
+    type: ResponseUserDto,
   })
   @ApiUnauthorizedResponse({
     description: "User not found",

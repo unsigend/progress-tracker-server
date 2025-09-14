@@ -1,31 +1,36 @@
 /**
- * Response user DTO
+ * User response DTO
  *
- * @remarks This DTO is used to response a user
+ * @remarks This DTO represents a user in API responses
  */
 export class ResponseUserDto {
   /**
-   * The id of the user
+   * The unique identifier of the user
+   * @example "cm123456789abcdef"
    */
   id: string;
 
   /**
    * The name of the user
+   * @example "John Doe"
    */
   name: string;
 
   /**
-   * The email of the user
+   * The email address of the user
+   * @example "john.doe@example.com"
    */
   email: string;
 
   /**
-   * The created at of the user
+   * The timestamp when the user was created
+   * @example "2024-01-15T10:30:00.000Z"
    */
   createdAt: Date;
 
   /**
-   * The updated at of the user
+   * The timestamp when the user was last updated
+   * @example "2024-01-15T10:30:00.000Z"
    */
   updatedAt: Date;
 }

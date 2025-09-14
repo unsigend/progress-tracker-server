@@ -8,7 +8,8 @@ import { IsEmail, IsNotEmpty } from "class-validator";
  */
 export class EmailCheckDto {
   /**
-   * The email to check
+   * The email address to check for availability
+   * @example "john.doe@example.com"
    */
   @IsEmail({}, { message: "Email must be a valid email" })
   @IsNotEmpty({ message: "Email is required" })

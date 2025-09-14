@@ -15,6 +15,7 @@ import { Transform } from "class-transformer";
 export class QueryBookDto {
   /**
    * The search query could be title, author, or ISBN
+   * @example "Gatsby"
    */
   @Transform(({ value }) =>
     typeof value === "string" ? value.trim() : undefined,
@@ -26,6 +27,7 @@ export class QueryBookDto {
 
   /**
    * The page number for pagination
+   * @example 1
    */
   @Transform(({ value }) => (value ? parseInt(String(value), 10) : undefined))
   @IsNumber()
@@ -34,7 +36,8 @@ export class QueryBookDto {
   page?: number = 1;
 
   /**
-   * The limit of books per page
+   * The number of books per page
+   * @example 10
    */
   @Transform(({ value }) => (value ? parseInt(String(value), 10) : undefined))
   @IsNumber()
@@ -45,6 +48,7 @@ export class QueryBookDto {
 
   /**
    * The field to sort by
+   * @example "createdAt"
    */
   @IsString()
   @IsOptional()
@@ -54,7 +58,8 @@ export class QueryBookDto {
   sortedBy?: string = "createdAt";
 
   /**
-   * The order to sort by
+   * The sort order (ascending or descending)
+   * @example "desc"
    */
   @IsString()
   @IsOptional()

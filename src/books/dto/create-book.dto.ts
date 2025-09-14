@@ -18,6 +18,7 @@ import { Transform } from "class-transformer";
 export class CreateBookDto {
   /**
    * The title of the book
+   * @example "The Great Gatsby"
    */
   @Transform(({ value }) =>
     typeof value === "string" ? value.trim() : undefined,
@@ -30,6 +31,7 @@ export class CreateBookDto {
 
   /**
    * The author of the book
+   * @example "F. Scott Fitzgerald"
    */
   @Transform(({ value }) =>
     typeof value === "string" ? value.trim() : undefined,
@@ -40,6 +42,7 @@ export class CreateBookDto {
 
   /**
    * The description of the book
+   * @example "A classic American novel set in the Jazz Age"
    */
   @Transform(({ value }) =>
     typeof value === "string" ? value.trim() : undefined,
@@ -50,6 +53,7 @@ export class CreateBookDto {
 
   /**
    * The number of pages in the book
+   * @example 180
    */
   @Transform(({ value }) => (value ? parseInt(String(value), 10) : undefined))
   @IsNumber()
@@ -59,7 +63,8 @@ export class CreateBookDto {
   pages?: number;
 
   /**
-   * The URL of the book's image
+   * The URL of the book's cover image
+   * @example "https://example.com/book-cover.jpg"
    */
   @IsString()
   @IsOptional()
@@ -68,6 +73,7 @@ export class CreateBookDto {
 
   /**
    * The ISBN of the book (ISBN-10 or ISBN-13)
+   * @example "978-0-7432-7356-5"
    */
   @IsString()
   @IsOptional()

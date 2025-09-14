@@ -14,7 +14,8 @@ import {
  */
 export class RegisterDto {
   /**
-   * The name of the user
+   * The full name of the user
+   * @example "John Doe"
    */
   @IsString()
   @IsNotEmpty({ message: "Name is required" })
@@ -23,14 +24,16 @@ export class RegisterDto {
   name: string;
 
   /**
-   * The email of the user
+   * The email address of the user
+   * @example "john.doe@example.com"
    */
   @IsEmail({}, { message: "Email must be a valid email" })
   @IsNotEmpty({ message: "Email is required" })
   email: string;
 
   /**
-   * The password of the user
+   * The password for the user account
+   * @example "mySecurePassword123"
    */
   @IsString()
   @IsNotEmpty({ message: "Password is required" })
