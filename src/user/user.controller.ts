@@ -29,6 +29,13 @@ import { User } from "@prisma/client";
 // import guards
 import { IDCheckerGuard } from "@/user/guards/id-checker.guard";
 
+// import swagger decorators
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiForbiddenResponse,
+} from "@nestjs/swagger";
+
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -38,6 +45,25 @@ export class UserController {
    *
    * @remarks This endpoint returns a user by id
    */
+  @ApiOkResponse({
+    description: "User retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        email: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
   @Get(":id")
   @UseGuards(IDCheckerGuard)
   async getById(
@@ -66,6 +92,25 @@ export class UserController {
    *
    * @remarks This endpoint updates a user
    */
+  @ApiOkResponse({
+    description: "User updated successfully",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        email: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
   @UseGuards(IDCheckerGuard)
   @Put(":id")
   async update(
@@ -95,6 +140,25 @@ export class UserController {
    *
    * @remarks This endpoint deletes a user
    */
+  @ApiOkResponse({
+    description: "User deleted successfully",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        email: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
   @UseGuards(IDCheckerGuard)
   @Delete(":id")
   async delete(
