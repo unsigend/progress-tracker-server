@@ -10,6 +10,7 @@ import {
   Get,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from "@nestjs/common";
 
 // import pipes
@@ -25,6 +26,9 @@ import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 // import models
 import { User } from "@prisma/client";
 
+// import guards
+import { IDCheckerGuard } from "@/user/guards/id-checker.guard";
+
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -35,6 +39,7 @@ export class UserController {
    * @remarks This endpoint returns a user by id
    */
   @Get(":id")
+  @UseGuards(IDCheckerGuard)
   async getById(
     @Param(
       "id",
@@ -61,6 +66,7 @@ export class UserController {
    *
    * @remarks This endpoint updates a user
    */
+  @UseGuards(IDCheckerGuard)
   @Put(":id")
   async update(
     @Param(
@@ -89,6 +95,7 @@ export class UserController {
    *
    * @remarks This endpoint deletes a user
    */
+  @UseGuards(IDCheckerGuard)
   @Delete(":id")
   async delete(
     @Param(

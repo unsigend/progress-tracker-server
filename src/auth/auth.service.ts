@@ -6,7 +6,6 @@ import { Injectable } from "@nestjs/common";
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
 import { RegisterDto } from "@/auth/dto/register.dto";
-import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 
 // import models
 import { User } from "@prisma/client";
@@ -69,7 +68,7 @@ export class AuthService {
    * @remarks This method registers a user
    * @returns The user if the registration is successful, null otherwise
    */
-  async register(registerDto: RegisterDto): Promise<ResponseUserDto | null> {
+  async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     const user: User | null = await this.prismaService.user.create({
       data: {
@@ -78,8 +77,13 @@ export class AuthService {
       },
     });
 
-    const { password, ...safeUser } = user;
-    return safeUser;
+    // create JWT token
+    const playload = { sub: user.id, username: user.name };
+    const token = await this.jwtService.signAsync(playload);
+    const tokenizedUser = {
+      access_token: token,
+    };
+    return tokenizedUser;
   }
 
   /**
