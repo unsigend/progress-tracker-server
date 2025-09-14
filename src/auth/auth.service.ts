@@ -33,6 +33,7 @@ export class AuthService {
    * Login a user
    *
    * @remarks This method logs in a user
+   * @returns The user if the login is successful, null otherwise
    */
   async login(loginDto: LoginDto): Promise<ResponseUserDto | null> {
     const user: User | null = await this.userService.findByEmail(
@@ -64,6 +65,7 @@ export class AuthService {
    * Register a user
    *
    * @remarks This method registers a user
+   * @returns The user if the registration is successful, null otherwise
    */
   async register(registerDto: RegisterDto): Promise<ResponseUserDto | null> {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
@@ -83,5 +85,16 @@ export class AuthService {
     };
 
     return safeUser;
+  }
+
+  /**
+   * Check if an email is already in use
+   *
+   * @remarks This method checks if an email is already in use
+   * @returns True if the email is already in use, false otherwise
+   */
+  async emailCheck(email: string): Promise<boolean> {
+    const user: User | null = await this.userService.findByEmail(email);
+    return user !== null;
   }
 }

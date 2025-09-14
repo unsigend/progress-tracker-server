@@ -1,5 +1,5 @@
 // import dependencies
-import { Controller, Patch } from "@nestjs/common";
+import { BadRequestException, Controller, Patch } from "@nestjs/common";
 import { Get, Post, Put, Delete, Param, Body, Query } from "@nestjs/common";
 
 // import services
@@ -12,6 +12,9 @@ import { PatchBookDto, UpdateBookDto } from "@/books/dto/update-book.dto";
 
 // import models
 import { Book } from "@prisma/client";
+
+// import pipes
+import { ParseUUIDPipe } from "@nestjs/common";
 
 @Controller("books")
 export class BooksController {
@@ -34,7 +37,19 @@ export class BooksController {
    * @remarks This endpoint returns a single book by ID
    */
   @Get(":id")
-  async findOne(@Param("id") id: string): Promise<Book | null> {
+  async findOne(
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid book ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
+  ): Promise<Book | null> {
     const book: Book | null = await this.booksService.findOne(id);
     return book;
   }
@@ -57,7 +72,17 @@ export class BooksController {
    */
   @Put(":id")
   async update(
-    @Param("id") id: string,
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid book ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<Book | null> {
     const book: Book | null = await this.booksService.update(id, updateBookDto);
@@ -71,7 +96,17 @@ export class BooksController {
    */
   @Patch(":id")
   async patch(
-    @Param("id") id: string,
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid book ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
     @Body() patchBookDto: PatchBookDto,
   ): Promise<Book | null> {
     const book: Book | null = await this.booksService.patch(id, patchBookDto);
@@ -84,7 +119,19 @@ export class BooksController {
    * @remarks This endpoint deletes a book by ID
    */
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<Book | null> {
+  async delete(
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid book ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
+  ): Promise<Book | null> {
     const book: Book | null = await this.booksService.delete(id);
     return book;
   }

@@ -1,11 +1,24 @@
 // import dependencies
-import { Controller, Delete, Body, Put, Param, Get } from "@nestjs/common";
+import {
+  Controller,
+  Delete,
+  Body,
+  Put,
+  Param,
+  Get,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+
+// import pipes
+import { ParseUUIDPipe } from "@nestjs/common";
 
 // import services
 import { UserService } from "@/user/user.service";
 
 // import DTO
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateUserDto } from "@/user/dto/update-user.dto";
+import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 
 // import models
 import { User } from "@prisma/client";
@@ -20,9 +33,31 @@ export class UserController {
    * @remarks This endpoint returns a user by id
    */
   @Get(":id")
-  async getById(@Param("id") id: string): Promise<User | null> {
+  async getById(
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid user ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
+  ): Promise<ResponseUserDto | null> {
     const user: User | null = await this.userService.findById(id);
-    return user;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const safeUser: ResponseUserDto = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    return safeUser;
   }
 
   /**
@@ -32,11 +67,31 @@ export class UserController {
    */
   @Put(":id")
   async update(
-    @Param("id") id: string,
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid user ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User | null> {
+  ): Promise<ResponseUserDto | null> {
     const user: User | null = await this.userService.update(id, updateUserDto);
-    return user;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const safeUser: ResponseUserDto = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    return safeUser;
   }
 
   /**
@@ -45,8 +100,30 @@ export class UserController {
    * @remarks This endpoint deletes a user
    */
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<User | null> {
+  async delete(
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid user ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
+  ): Promise<ResponseUserDto | null> {
     const user: User | null = await this.userService.delete(id);
-    return user;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const safeUser: ResponseUserDto = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    return safeUser;
   }
 }
