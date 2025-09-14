@@ -7,6 +7,10 @@ import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "@/user/user.module";
 import { AuthModule } from "@/auth/auth.module";
 
+// import guards
+import { AuthGuard } from "@/guards/auth.guard";
+import { APP_GUARD } from "@nestjs/core";
+
 @Module({
   imports: [
     BooksModule,
@@ -15,6 +19,12 @@ import { AuthModule } from "@/auth/auth.module";
     }),
     UserModule,
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}
