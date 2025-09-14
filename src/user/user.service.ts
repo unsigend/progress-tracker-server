@@ -10,6 +10,9 @@ import { UpdateUserDto } from "@/user/dto/update-user.dto";
 // import models
 import { User } from "@prisma/client";
 
+// import bcrypt
+import * as bcrypt from "bcrypt";
+
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -44,6 +47,11 @@ export class UserService {
    * @remarks This method updates a user
    */
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
+    // hash password if it is provided
+    if (updateUserDto.password) {
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
+      updateUserDto.password = hashedPassword;
+    }
     const user: User | null = await this.prismaService.user.update({
       where: { id },
       data: {

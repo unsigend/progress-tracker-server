@@ -20,7 +20,7 @@ export class AuthController {
    * @remarks This endpoint logs in a user
    */
   @Post("login")
-  async login(@Body() loginDto: LoginDto): Promise<ResponseUserDto | null> {
+  async login(@Body() loginDto: LoginDto): Promise<{ access_token: string }> {
     return this.authService.login(loginDto);
   }
 

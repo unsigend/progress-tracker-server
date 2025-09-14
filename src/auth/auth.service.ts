@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
@@ -18,6 +19,7 @@ import { UnauthorizedException } from "@nestjs/common";
 // import services
 import { UserService } from "@/user/user.service";
 import { PrismaService } from "@/prisma/prisma.service";
+import { JwtService } from "@nestjs/jwt";
 
 // import bcrypt
 import * as bcrypt from "bcrypt";
@@ -27,22 +29,25 @@ export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
+    private readonly jwtService: JwtService,
   ) {}
 
   /**
    * Login a user
    *
    * @remarks This method logs in a user
-   * @returns The user if the login is successful, null otherwise
+   * @returns The access token if the login is successful, null otherwise
    */
-  async login(loginDto: LoginDto): Promise<ResponseUserDto | null> {
+  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     const user: User | null = await this.userService.findByEmail(
       loginDto.email,
     );
+    // check if user exists
     if (!user) {
       throw new UnauthorizedException("Invalid email or password");
     }
 
+    // check if password is correct
     const plainPassword = loginDto.password;
     const hashedPassword = user.password;
     const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
@@ -50,15 +55,14 @@ export class AuthService {
       throw new UnauthorizedException("Invalid email or password");
     }
 
-    const safeUser: ResponseUserDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+    // create JWT token
+    const playload = { sub: user.id, username: user.name };
+    const token = await this.jwtService.signAsync(playload);
+    const tokenizedUser = {
+      access_token: token,
     };
 
-    return safeUser;
+    return tokenizedUser;
   }
 
   /**
@@ -76,14 +80,7 @@ export class AuthService {
       },
     });
 
-    const safeUser: ResponseUserDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
-
+    const { password, ...safeUser } = user;
     return safeUser;
   }
 

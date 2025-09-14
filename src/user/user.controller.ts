@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // import dependencies
 import {
   Controller,
@@ -50,13 +52,7 @@ export class UserController {
     if (!user) {
       throw new NotFoundException("User not found");
     }
-    const safeUser: ResponseUserDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const { password, ...safeUser } = user;
     return safeUser;
   }
 
@@ -84,13 +80,7 @@ export class UserController {
     if (!user) {
       throw new NotFoundException("User not found");
     }
-    const safeUser: ResponseUserDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const { password, ...safeUser } = user;
     return safeUser;
   }
 
@@ -117,13 +107,7 @@ export class UserController {
     if (!user) {
       throw new NotFoundException("User not found");
     }
-    const safeUser: ResponseUserDto = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const { password, ...safeUser } = user;
     return safeUser;
   }
 }
