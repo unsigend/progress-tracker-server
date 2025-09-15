@@ -5,6 +5,7 @@ import {
   IsOptional,
   MinLength,
   MaxLength,
+  IsUrl,
 } from "class-validator";
 
 /**
@@ -40,4 +41,13 @@ export class UpdateUserDto {
   @MinLength(8, { message: "Password must be at least 8 characters" })
   @MaxLength(255, { message: "Password must be less than 255 characters" })
   password?: string;
+
+  /**
+   * The URL of the user's avatar
+   * @example "https://example.com/avatar.jpg"
+   */
+  @IsString()
+  @IsOptional()
+  @IsUrl({}, { message: "Avatar URL must be a valid URL" })
+  avatarURL?: string = "";
 }

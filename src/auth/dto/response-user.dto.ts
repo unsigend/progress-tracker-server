@@ -33,4 +33,10 @@ export class ResponseUserDto {
    * @example "2024-01-15T10:30:00.000Z"
    */
   updatedAt: Date;
+
+  /**
+   * The URL of the user's avatar
+   * @example "https://example.com/avatar.jpg"
+   */
+  avatarURL: string | null;
 }

@@ -2,6 +2,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -40,4 +41,12 @@ export class RegisterDto {
   @MinLength(8, { message: "Password must be at least 8 characters" })
   @MaxLength(255, { message: "Password must be less than 255 characters" })
   password: string;
+
+  /**
+   * The URL of the user's avatar
+   * @example "https://example.com/avatar.jpg"
+   */
+  @IsString()
+  @IsOptional()
+  avatarURL?: string = "";
 }

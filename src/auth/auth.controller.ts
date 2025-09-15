@@ -34,8 +34,6 @@ import { User } from "@prisma/client";
 // import swagger decorators
 import {
   ApiUnauthorizedResponse,
-  ApiOkResponse,
-  ApiCreatedResponse,
   ApiBadRequestResponse,
   ApiResponse,
 } from "@nestjs/swagger";
