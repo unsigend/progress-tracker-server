@@ -39,4 +39,10 @@ export class ResponseUserDto {
    * @example "https://example.com/avatar.jpg"
    */
   avatarURL: string | null;
+
+  /**
+   * The providers of the user
+   * @example ["local", "google", "github"]
+   */
+  provider: string[];
 }

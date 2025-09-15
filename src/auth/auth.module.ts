@@ -13,6 +13,7 @@ import { UserModule } from "@/user/user.module";
 import { PrismaModule } from "@/prisma/prisma.module";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
+import { AuthGithubService } from "@/auth/auth.github.service";
 
 @Module({
   imports: [
@@ -20,14 +21,20 @@ import { ConfigModule } from "@nestjs/config";
     PrismaModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>("JWT_SECRET"),
-        signOptions: { expiresIn: "7d" },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>("JWT_SECRET");
+        if (!secret) {
+          throw new Error("JWT_SECRET is required in environment variables");
+        }
+        return {
+          secret,
+          signOptions: { expiresIn: "7d" },
+        };
+      },
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, AuthGithubService],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],
 })

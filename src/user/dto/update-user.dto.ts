@@ -6,6 +6,7 @@ import {
   MinLength,
   MaxLength,
   IsUrl,
+  IsArray,
 } from "class-validator";
 
 /**
@@ -50,4 +51,13 @@ export class UpdateUserDto {
   @IsOptional()
   @IsUrl({}, { message: "Avatar URL must be a valid URL" })
   avatarURL?: string = "";
+
+  /**
+   * The providers of the user
+   * @example ["local", "google", "github"]
+   */
+  @IsString({ each: true })
+  @IsOptional()
+  @IsArray()
+  provider?: string[] = ["local"];
 }

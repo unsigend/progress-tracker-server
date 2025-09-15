@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // import dependencies
 import { Injectable } from "@nestjs/common";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
 import { RegisterDto } from "@/auth/dto/register.dto";
+import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
 
 // import models
 import { User } from "@prisma/client";
@@ -15,7 +14,6 @@ import { UnauthorizedException } from "@nestjs/common";
 
 // import services
 import { UserService } from "@/user/user.service";
-import { PrismaService } from "@/prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 
 // import bcrypt
@@ -24,10 +22,25 @@ import * as bcrypt from "bcrypt";
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
+
+  /**
+   * Create a token for a user
+   *
+   * @remarks This method creates a token for a user
+   * @param user The user to create a token for
+   * @returns The tokenized user
+   */
+  async createToken(user: User): Promise<AuthResponseDto> {
+    const playload = { sub: user.id, username: user.name };
+    const token = await this.jwtService.signAsync(playload);
+    const tokenizedUser = {
+      access_token: token,
+    };
+    return tokenizedUser;
+  }
 
   /**
    * Login a user
@@ -35,7 +48,7 @@ export class AuthService {
    * @remarks This method logs in a user
    * @returns The access token if the login is successful, null otherwise
    */
-  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user: User | null = await this.userService.findByEmail(
       loginDto.email,
     );
@@ -53,12 +66,7 @@ export class AuthService {
     }
 
     // create JWT token
-    const playload = { sub: user.id, username: user.name };
-    const token = await this.jwtService.signAsync(playload);
-    const tokenizedUser = {
-      access_token: token,
-    };
-
+    const tokenizedUser = await this.createToken(user);
     return tokenizedUser;
   }
 
@@ -68,21 +76,11 @@ export class AuthService {
    * @remarks This method registers a user
    * @returns The user if the registration is successful, null otherwise
    */
-  async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const user: User | null = await this.prismaService.user.create({
-      data: {
-        ...registerDto,
-        password: hashedPassword,
-      },
-    });
+  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    const user: User = await this.userService.create(registerDto);
 
     // create JWT token
-    const playload = { sub: user.id, username: user.name };
-    const token = await this.jwtService.signAsync(playload);
-    const tokenizedUser = {
-      access_token: token,
-    };
+    const tokenizedUser = await this.createToken(user);
     return tokenizedUser;
   }
 

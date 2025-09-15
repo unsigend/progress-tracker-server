@@ -27,6 +27,7 @@ model User {
   email     String   @unique
   password  String
   avatarURL String?
+  provider  String[] @default(["local"])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -18,6 +18,7 @@ import {
 // import services
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
+import { AuthGithubService } from "@/auth/auth.github.service";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
@@ -26,6 +27,7 @@ import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 import { EmailCheckDto } from "@/auth/dto/email-check.dto";
 import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
 import { EmailCheckResponseDto } from "@/auth/dto/email-check-response.dto";
+import { GithubAuthDto } from "@/auth/dto/github-auth.dto";
 
 // import decorators
 import { Public } from "@/decorators/public.decorator";
@@ -36,6 +38,7 @@ import {
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
   ApiResponse,
+  ApiBody,
 } from "@nestjs/swagger";
 
 @Controller("auth")
@@ -43,6 +46,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly authGithubService: AuthGithubService,
   ) {}
 
   /**
@@ -140,5 +144,42 @@ export class AuthController {
     }
     const { password, ...safeUser } = user;
     return safeUser;
+  }
+
+  /**
+   * Authenticate a user with github
+   *
+   * @remarks This endpoint authenticates a user with github
+   * @param githubAuthDto The code from github
+   * @returns The access token if the authentication is successful, null otherwise
+   */
+  @ApiResponse({
+    status: 200,
+    description: "Github authentication successful",
+    type: AuthResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid code",
+  })
+  @Public()
+  @Post("github")
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: GithubAuthDto })
+  async githubAuth(
+    @Body() githubAuthDto: GithubAuthDto,
+  ): Promise<AuthResponseDto> {
+    // exchange the code for a token
+    const accessToken = await this.authGithubService.exchangeCodeForToken(
+      githubAuthDto.code,
+    );
+
+    // get the user from github
+    const githubUser = await this.authGithubService.getGithubUser(accessToken);
+
+    // create or link the user to the github account
+    const user = await this.authGithubService.createOrLinkUser(githubUser);
+
+    // create a token for the user
+    return this.authService.createToken(user);
   }
 }

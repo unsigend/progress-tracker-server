@@ -2,6 +2,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsArray,
   IsOptional,
   IsString,
   MaxLength,
@@ -49,4 +50,13 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   avatarURL?: string = "";
+
+  /**
+   * The providers of the user
+   * @example ["local", "google", "github"]
+   */
+  @IsString({ each: true })
+  @IsOptional()
+  @IsArray()
+  provider?: string[] = ["local"];
 }

@@ -6,6 +6,7 @@ import { PrismaService } from "@/prisma/prisma.service";
 
 // import DTO
 import { UpdateUserDto } from "@/user/dto/update-user.dto";
+import { RegisterDto } from "@/auth/dto/register.dto";
 
 // import models
 import { User } from "@prisma/client";
@@ -70,6 +71,22 @@ export class UserService {
   async delete(id: string): Promise<User | null> {
     const user: User | null = await this.prismaService.user.delete({
       where: { id },
+    });
+    return user;
+  }
+
+  /**
+   * Create a new user
+   *
+   * @remarks This method creates a new user
+   */
+  async create(registerDto: RegisterDto): Promise<User> {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const user: User = await this.prismaService.user.create({
+      data: {
+        ...registerDto,
+        password: hashedPassword,
+      },
     });
     return user;
   }
