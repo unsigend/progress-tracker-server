@@ -59,4 +59,20 @@ export class CreateUserDto {
   @IsOptional()
   @IsArray()
   provider?: string[] = ["local"];
+
+  /**
+   * The Google ID of the user
+   * @example "1234567890"
+   */
+  @IsString()
+  @IsOptional()
+  googleId?: string;
+
+  /**
+   * The GitHub ID of the user
+   * @example "1234567890"
+   */
+  @IsString()
+  @IsOptional()
+  githubId?: string;
 }

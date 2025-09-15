@@ -19,6 +19,7 @@ import {
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
 import { AuthGithubService } from "@/auth/auth.github.service";
+import { AuthGoogleService } from "@/auth/auth.google.service";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
@@ -28,6 +29,7 @@ import { EmailCheckDto } from "@/auth/dto/email-check.dto";
 import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
 import { EmailCheckResponseDto } from "@/auth/dto/email-check-response.dto";
 import { GithubAuthDto } from "@/auth/dto/github-auth.dto";
+import { GoogleAuthDto } from "@/auth/dto/google-auth.dto";
 
 // import decorators
 import { Public } from "@/decorators/public.decorator";
@@ -47,6 +49,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly authGithubService: AuthGithubService,
+    private readonly authGoogleService: AuthGoogleService,
   ) {}
 
   /**
@@ -181,6 +184,47 @@ export class AuthController {
     }
     // create or link the user to the github account
     const user = await this.authGithubService.createOrLinkUser(githubUser);
+    // create a token for the user
+    const token = await this.authService.createToken(user);
+    return token;
+  }
+
+  /**
+   * Authenticate a user with google
+   *
+   * @remarks This endpoint authenticates a user with google
+   * @param googleAuthDto The code from google
+   * @returns The access token if the authentication is successful, null otherwise
+   */
+  @ApiResponse({
+    status: 200,
+    description: "Google authentication successful",
+    type: AuthResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Google authentication failed",
+  })
+  @Public()
+  @Post("google")
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: GoogleAuthDto })
+  async googleAuth(
+    @Body() googleAuthDto: GoogleAuthDto,
+  ): Promise<AuthResponseDto | null> {
+    let googleUser: any;
+    try {
+      // exchange the code for a token
+      const accessToken = await this.authGoogleService.exchangeCodeForToken(
+        googleAuthDto.code,
+      );
+      // get the user from google
+      googleUser = await this.authGoogleService.getGoogleUser(accessToken);
+    } catch (error) {
+      throw new UnauthorizedException("Google authentication failed");
+    }
+
+    // create or link the user to the google account
+    const user = await this.authGoogleService.createOrLinkUser(googleUser);
     // create a token for the user
     const token = await this.authService.createToken(user);
     return token;

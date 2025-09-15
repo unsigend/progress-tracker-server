@@ -14,6 +14,7 @@ import { PrismaModule } from "@/prisma/prisma.module";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
 import { AuthGithubService } from "@/auth/auth.github.service";
+import { AuthGoogleService } from "@/auth/auth.google.service";
 
 @Module({
   imports: [
@@ -34,8 +35,8 @@ import { AuthGithubService } from "@/auth/auth.github.service";
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, AuthGithubService],
+  providers: [AuthService, AuthGithubService, AuthGoogleService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, AuthGithubService, AuthGoogleService],
 })
 export class AuthModule {}
