@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -14,22 +15,28 @@ import { User } from "@prisma/client";
 // import services
 import { UserService } from "@/user/user.service";
 
-// import bcrypt
-import { RegisterDto } from "@/auth/dto/register.dto";
+// import DTO
+import { CreateUserDto } from "@/user/dto/create-user.dto";
+
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class AuthGithubService {
+  private readonly logger: Logger;
   constructor(
     private readonly configService: ConfigService,
     private readonly userService: UserService,
-  ) {}
+  ) {
+    this.logger = new Logger(AuthGithubService.name);
+  }
 
   /**
    * Exchange a code for a token used for authentication in github
    *
    * @remarks This method exchanges a code for a token
-   * @param code The code to exchange for a token
-   * @returns The access token
+   * @param code The code to exchange used for authentication in github
+   * @returns The access token return by github
+   * @throws An error if the code cannot be exchanged for a token in github
    */
   async exchangeCodeForToken(code: string): Promise<string> {
     const clientID: string | undefined =
@@ -38,6 +45,9 @@ export class AuthGithubService {
       "GITHUB_CLIENT_SECRET",
     );
     if (!clientID || !clientSecret) {
+      this.logger.error(
+        "GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET is required in environment variables",
+      );
       throw new Error(
         "GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET is required in environment variables",
       );
@@ -56,6 +66,12 @@ export class AuthGithubService {
         }),
       },
     );
+
+    if (!response.ok) {
+      this.logger.error("Failed to exchange code for token in github");
+      throw new Error("Failed to exchange code for token in github");
+    }
+
     const data: any = await response.json();
     return data.access_token;
   }
@@ -66,14 +82,35 @@ export class AuthGithubService {
    * @remarks This method gets a user from github
    * @param accessToken The access token to get a user from github
    * @returns The user from github
+   * @throws An error if the user data cannot be retrieved from github
    */
   async getGithubUser(accessToken: string): Promise<any> {
-    const response = await fetch("https://api.github.com/user", {
+    const url = "https://api.github.com/user";
+    const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+
+    if (!response.ok) {
+      this.logger.error(`Failed to get user data from github: ${url}`);
+      throw new Error(`Failed to get user data from github: ${url}`);
+    }
+
     const data: any = await response.json();
+
+    // second request to get the user's email
+    if (!data.email) {
+      const emailResponse = await fetch(`${url}/emails`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const emailData: any = await emailResponse.json();
+      const primaryEmail = emailData.find((email: any) => email.primary);
+      data.email = primaryEmail?.email || emailData[0]?.email;
+    }
+
     return data;
   }
 
@@ -85,14 +122,9 @@ export class AuthGithubService {
    * @returns The user
    */
   async createOrLinkUser(githubUser: any): Promise<User> {
-    const userEmail: string = githubUser.email;
-
-    // Check if email exists (GitHub might not provide email)
-    if (!userEmail) {
-      throw new Error("GitHub user email is required but not provided");
-    }
-
-    const user: User | null = await this.userService.findByEmail(userEmail);
+    const user: User | null = await this.userService.findByEmail(
+      githubUser.email,
+    );
 
     // check if user exists
     if (user) {
@@ -112,9 +144,9 @@ export class AuthGithubService {
         .substring(2, 15);
 
       // construct the create user dto
-      const createUserDto: RegisterDto = {
+      const createUserDto: CreateUserDto = {
         password: randomPassword,
-        email: userEmail,
+        email: githubUser.email,
         name: githubUser.name || githubUser.login,
         provider: ["github"],
         avatarURL: githubUser.avatar_url || "",

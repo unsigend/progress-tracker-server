@@ -22,7 +22,7 @@ import { AuthGithubService } from "@/auth/auth.github.service";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
-import { RegisterDto } from "@/auth/dto/register.dto";
+import { CreateUserDto } from "@/user/dto/create-user.dto";
 import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 import { EmailCheckDto } from "@/auth/dto/email-check.dto";
 import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
@@ -95,7 +95,7 @@ export class AuthController {
   @Public()
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
+  async register(@Body() registerDto: CreateUserDto): Promise<AuthResponseDto> {
     return this.authService.register(registerDto);
   }
 
@@ -159,7 +159,7 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiUnauthorizedResponse({
-    description: "Invalid code",
+    description: "Github authentication failed",
   })
   @Public()
   @Post("github")
@@ -168,18 +168,21 @@ export class AuthController {
   async githubAuth(
     @Body() githubAuthDto: GithubAuthDto,
   ): Promise<AuthResponseDto> {
-    // exchange the code for a token
-    const accessToken = await this.authGithubService.exchangeCodeForToken(
-      githubAuthDto.code,
-    );
-
-    // get the user from github
-    const githubUser = await this.authGithubService.getGithubUser(accessToken);
-
+    let githubUser: any;
+    try {
+      // exchange the code for a token
+      const accessToken = await this.authGithubService.exchangeCodeForToken(
+        githubAuthDto.code,
+      );
+      // get the user from github
+      githubUser = await this.authGithubService.getGithubUser(accessToken);
+    } catch {
+      throw new UnauthorizedException("Github authentication failed");
+    }
     // create or link the user to the github account
     const user = await this.authGithubService.createOrLinkUser(githubUser);
-
     // create a token for the user
-    return this.authService.createToken(user);
+    const token = await this.authService.createToken(user);
+    return token;
   }
 }

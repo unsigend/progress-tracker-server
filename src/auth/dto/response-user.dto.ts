@@ -1,5 +1,5 @@
 /**
- * User response DTO
+ * Response user DTO
  *
  * @remarks This DTO represents a user in API responses
  */

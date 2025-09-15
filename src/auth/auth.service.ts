@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
-import { RegisterDto } from "@/auth/dto/register.dto";
+import { CreateUserDto } from "@/user/dto/create-user.dto";
 import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
 
 // import models
@@ -76,7 +76,7 @@ export class AuthService {
    * @remarks This method registers a user
    * @returns The user if the registration is successful, null otherwise
    */
-  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+  async register(registerDto: CreateUserDto): Promise<AuthResponseDto> {
     const user: User = await this.userService.create(registerDto);
 
     // create JWT token

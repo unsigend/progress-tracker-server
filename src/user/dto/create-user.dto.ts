@@ -10,11 +10,11 @@ import {
 } from "class-validator";
 
 /**
- * Register DTO
+ * Create user DTO
  *
- * @remarks This DTO is used to register a user
+ * @remarks This DTO is used to create a user
  */
-export class RegisterDto {
+export class CreateUserDto {
   /**
    * The full name of the user
    * @example "John Doe"
