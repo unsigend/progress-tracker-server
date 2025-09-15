@@ -48,17 +48,20 @@ export class UserService {
    * @remarks This method updates a user
    */
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    // hash password if it is provided
-    if (updateUserDto.password) {
-      const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
-      updateUserDto.password = hashedPassword;
+    // Remove undefined values and hash password if provided
+    const { password, ...updateData } = updateUserDto;
+    const filteredData = Object.fromEntries(
+      Object.entries(updateData).filter(([, value]) => value !== undefined),
+    );
+
+    // Hash password if provided
+    if (password) {
+      filteredData.password = await bcrypt.hash(password, 10);
     }
+
     const user: User | null = await this.prismaService.user.update({
       where: { id },
-      data: {
-        ...updateUserDto,
-        updatedAt: new Date(),
-      },
+      data: filteredData,
     });
     return user;
   }

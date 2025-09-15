@@ -47,33 +47,16 @@ export class UpdateUserDto {
    * The URL of the user's avatar
    * @example "https://example.com/avatar.jpg"
    */
-  @IsString()
   @IsOptional()
   @IsUrl({}, { message: "Avatar URL must be a valid URL" })
-  avatarURL?: string = "";
+  avatarURL?: string;
 
   /**
    * The providers of the user
    * @example ["local", "google", "github"]
    */
-  @IsString({ each: true })
   @IsOptional()
   @IsArray()
-  provider?: string[] = ["local"];
-
-  /**
-   * The Google ID of the user
-   * @example "1234567890"
-   */
-  @IsString()
-  @IsOptional()
-  googleId?: string;
-
-  /**
-   * The GitHub ID of the user
-   * @example "1234567890"
-   */
-  @IsString()
-  @IsOptional()
-  githubId?: string;
+  @IsString({ each: true })
+  provider?: string[];
 }
