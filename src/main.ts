@@ -11,15 +11,26 @@ import { ValidationPipe } from "@nestjs/common";
 // import types
 import { INestApplication } from "@nestjs/common";
 
+// import third party modules
+import cookieParser from "cookie-parser";
+
 async function bootstrap() {
   // create app instance
   const app: INestApplication = await NestFactory.create(AppModule, {
     abortOnError: false,
   });
 
+  // use cookie parser
+  app.use(cookieParser());
+  app.enableCors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  });
+
   // enable features of the app
   app.setGlobalPrefix("api/v1");
-  app.enableCors();
 
   // use validation pipe
   app.useGlobalPipes(

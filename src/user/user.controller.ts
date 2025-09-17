@@ -46,6 +46,106 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   /**
+   * Get the current user data
+   *
+   * @remarks This endpoint returns the current user data
+   */
+  @ApiResponse({
+    description: "User data retrieved successfully",
+    type: ResponseUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
+  @Get("me")
+  async me(
+    @Request() request: Request & { user: { sub: string } },
+  ): Promise<ResponseUserDto | null> {
+    const userID: string = request.user.sub;
+    if (!userID) {
+      throw new UnauthorizedException("User not found");
+    }
+    const user: User | null = await this.userService.findById(userID);
+    if (!user) {
+      throw new UnauthorizedException("User not found");
+    }
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+
+  /**
+   * Patch the current user data
+   *
+   * @remarks This endpoint patches the current user data
+   */
+  @ApiOkResponse({
+    description: "User data patched successfully",
+    type: ResponseUserDto,
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
+  @Patch("me")
+  async patchMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() request: Request & { user: { sub: string } },
+  ): Promise<ResponseUserDto | null> {
+    const userID: string = request.user.sub;
+    if (!userID) {
+      throw new UnauthorizedException("User not found");
+    }
+    const user: User | null = await this.userService.update(
+      userID,
+      updateUserDto,
+    );
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+
+  /**
+   * Delete the current user
+   *
+   * @remarks This endpoint deletes the current user
+   */
+  @ApiOkResponse({
+    description: "User deleted successfully",
+    type: ResponseUserDto,
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Forbidden",
+  })
+  @Delete("me")
+  async deleteMe(
+    @Request() request: Request & { user: { sub: string } },
+  ): Promise<ResponseUserDto | null> {
+    // get the user ID from the request
+    const userID: string = request.user.sub;
+    if (!userID) {
+      throw new UnauthorizedException("User not found");
+    }
+
+    // delete the user
+    const user: User | null = await this.userService.delete(userID);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+
+  /**
    * Get a user by id
    *
    * @remarks This endpoint returns a user by id
@@ -156,98 +256,6 @@ export class UserController {
     id: string,
   ): Promise<ResponseUserDto | null> {
     const user: User | null = await this.userService.delete(id);
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-
-  /**
-   * Get the current user data
-   *
-   * @remarks This endpoint returns the current user data
-   */
-  @ApiResponse({
-    status: 200,
-    description: "User data retrieved successfully",
-    type: ResponseUserDto,
-  })
-  @ApiUnauthorizedResponse({
-    description: "User not found",
-  })
-  @Get("me")
-  async me(
-    @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
-    const userID: string = request.user.sub;
-    if (!userID) {
-      throw new UnauthorizedException("User not found");
-    }
-    const user: User | null = await this.userService.findById(userID);
-    if (!user) {
-      throw new UnauthorizedException("User not found");
-    }
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-
-  /**
-   * Patch the current user data
-   *
-   * @remarks This endpoint patches the current user data
-   */
-  @ApiOkResponse({
-    description: "User data patched successfully",
-    type: ResponseUserDto,
-  })
-  @ApiNotFoundResponse({
-    description: "User not found",
-  })
-  @Patch("me")
-  async patchMe(
-    @Body() updateUserDto: UpdateUserDto,
-    @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
-    const userID: string = request.user.sub;
-    if (!userID) {
-      throw new UnauthorizedException("User not found");
-    }
-    const user: User | null = await this.userService.update(
-      userID,
-      updateUserDto,
-    );
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-
-  /**
-   * Delete the current user
-   *
-   * @remarks This endpoint deletes the current user
-   */
-  @ApiOkResponse({
-    description: "User deleted successfully",
-    type: ResponseUserDto,
-  })
-  @ApiNotFoundResponse({
-    description: "User not found",
-  })
-  @Delete("me")
-  async deleteMe(
-    @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
-    // get the user ID from the request
-    const userID: string = request.user.sub;
-    if (!userID) {
-      throw new UnauthorizedException("User not found");
-    }
-
-    // delete the user
-    const user: User | null = await this.userService.delete(userID);
     if (!user) {
       throw new NotFoundException("User not found");
     }

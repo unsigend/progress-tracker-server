@@ -11,7 +11,9 @@ import {
   UnauthorizedException,
   HttpCode,
   HttpStatus,
+  Res,
 } from "@nestjs/common";
+import type { Response as ExpressResponse } from "express";
 
 // import services
 import { AuthService } from "@/auth/auth.service";
@@ -48,8 +50,8 @@ export class AuthController {
   /**
    * Login a user
    *
-   * @remarks This endpoint logs in a user
-   * @returns The access token if the login is successful, null otherwise
+   * @remarks This endpoint logs in a user and set cookie for the token
+   * @returns whether the login is successful
    */
   @ApiResponse({
     status: 200,
@@ -62,15 +64,38 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post("login")
-  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res() response: ExpressResponse,
+  ): Promise<AuthResponseDto> {
+    return this.authService.login(loginDto, response);
+  }
+
+  /**
+   * Logout a user
+   *
+   * @remarks This endpoint logs out a user and clear the cookie for the token
+   * @returns whether the logout is successful
+   */
+  @Post("logout")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: "Logout successful",
+    type: AuthResponseDto,
+  })
+  logout(@Res() response: ExpressResponse): AuthResponseDto {
+    // clear the cookie for the token
+    response.clearCookie("access_token");
+
+    return { success: true };
   }
 
   /**
    * Register a user
    *
-   * @remarks This endpoint registers a user
-   * @returns The user if the registration is successful, null otherwise
+   * @remarks This endpoint registers a user and set cookie for the token
+   * @returns whether the registration is successful
    */
   @ApiResponse({
     status: 201,
@@ -91,36 +116,19 @@ export class AuthController {
   @Public()
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerDto: CreateUserDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
-  }
-
-  /**
-   * Check if an email is already in use
-   *
-   * @remarks This endpoint checks if an email is already in use
-   * @returns True if the email is already in use, false otherwise
-   */
-  @ApiResponse({
-    status: 200,
-    description: "Email check successful",
-    type: EmailCheckResponseDto,
-  })
-  @Public()
-  @Get("email-check")
-  async emailCheck(
-    @Query() emailCheckDto: EmailCheckDto,
-  ): Promise<EmailCheckResponseDto> {
-    const isEmailInUse = await this.authService.emailCheck(emailCheckDto.email);
-    return { exists: isEmailInUse };
+  async register(
+    @Body() registerDto: CreateUserDto,
+    @Res() response: ExpressResponse,
+  ): Promise<AuthResponseDto> {
+    return this.authService.register(registerDto, response);
   }
 
   /**
    * Authenticate a user with github
    *
-   * @remarks This endpoint authenticates a user with github
-   * @param githubAuthDto The code from github
-   * @returns The access token if the authentication is successful, null otherwise
+   * @remarks This endpoint authenticates a user with github and set cookie for the token
+   * @param authRequestDto The code from github
+   * @returns whether the authentication is successful
    */
   @ApiResponse({
     status: 200,
@@ -136,6 +144,7 @@ export class AuthController {
   @ApiBody({ type: AuthRequestDto })
   async githubAuth(
     @Body() authRequestDto: AuthRequestDto,
+    @Res() response: ExpressResponse,
   ): Promise<AuthResponseDto> {
     let githubUser: any;
     try {
@@ -152,15 +161,22 @@ export class AuthController {
     const user = await this.authGithubService.createOrLinkUser(githubUser);
     // create a token for the user
     const token = await this.authService.createToken(user);
-    return token;
+
+    response.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return { success: true };
   }
 
   /**
    * Authenticate a user with google
    *
-   * @remarks This endpoint authenticates a user with google
-   * @param googleAuthDto The code from google
-   * @returns The access token if the authentication is successful, null otherwise
+   * @remarks This endpoint authenticates a user with google and set cookie for the token
+   * @param authRequestDto The code from google
+   * @returns whether the authentication is successful
    */
   @ApiResponse({
     status: 200,
@@ -176,6 +192,7 @@ export class AuthController {
   @ApiBody({ type: AuthRequestDto })
   async googleAuth(
     @Body() authRequestDto: AuthRequestDto,
+    @Res() response: ExpressResponse,
   ): Promise<AuthResponseDto | null> {
     let googleUser: any;
     try {
@@ -193,6 +210,34 @@ export class AuthController {
     const user = await this.authGoogleService.createOrLinkUser(googleUser);
     // create a token for the user
     const token = await this.authService.createToken(user);
-    return token;
+
+    response.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return { success: true };
+  }
+
+  /**
+   * Check if an email is already in use
+   *
+   * @remarks This endpoint checks if an email is already in use
+   * @param emailCheckDto The email to check
+   * @returns whether the email is already in use
+   */
+  @ApiResponse({
+    status: 200,
+    description: "Email check successful",
+    type: EmailCheckResponseDto,
+  })
+  @Public()
+  @Get("email-check")
+  async emailCheck(
+    @Query() emailCheckDto: EmailCheckDto,
+  ): Promise<EmailCheckResponseDto> {
+    const isEmailInUse = await this.authService.emailCheck(emailCheckDto.email);
+    return { exists: isEmailInUse };
   }
 }

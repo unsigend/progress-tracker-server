@@ -5,8 +5,8 @@
  */
 export class AuthResponseDto {
   /**
-   * The JWT access token for authentication
-   * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   * The success of the authentication
+   * @example true
    */
-  access_token: string;
+  success: boolean;
 }

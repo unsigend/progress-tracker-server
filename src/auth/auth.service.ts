@@ -1,5 +1,6 @@
 // import dependencies
 import { Injectable } from "@nestjs/common";
+import { Response } from "express";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
@@ -31,24 +32,25 @@ export class AuthService {
    *
    * @remarks This method creates a token for a user
    * @param user The user to create a token for
-   * @returns The tokenized user
+   * @returns The token
    */
-  async createToken(user: User): Promise<AuthResponseDto> {
+  async createToken(user: User): Promise<string> {
     const playload = { sub: user.id, username: user.name };
     const token = await this.jwtService.signAsync(playload);
-    const tokenizedUser = {
-      access_token: token,
-    };
-    return tokenizedUser;
+    return token;
   }
 
   /**
    * Login a user
    *
-   * @remarks This method logs in a user
-   * @returns The access token if the login is successful, null otherwise
+   * @remarks This method logs in a user, and set cookie for the token
+   * @returns whether the login is successful
    */
-  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+  async login(
+    loginDto: LoginDto,
+    response: Response,
+  ): Promise<AuthResponseDto> {
+    // find the user by email
     const user: User | null = await this.userService.findByEmail(
       loginDto.email,
     );
@@ -67,7 +69,13 @@ export class AuthService {
 
     // create JWT token
     const tokenizedUser = await this.createToken(user);
-    return tokenizedUser;
+    response.cookie("access_token", tokenizedUser, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return { success: true };
   }
 
   /**
@@ -76,12 +84,21 @@ export class AuthService {
    * @remarks This method registers a user
    * @returns The user if the registration is successful, null otherwise
    */
-  async register(registerDto: CreateUserDto): Promise<AuthResponseDto> {
+  async register(
+    registerDto: CreateUserDto,
+    response: Response,
+  ): Promise<AuthResponseDto> {
     const user: User = await this.userService.create(registerDto);
 
     // create JWT token
     const tokenizedUser = await this.createToken(user);
-    return tokenizedUser;
+    response.cookie("access_token", tokenizedUser, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return { success: true };
   }
 
   /**
