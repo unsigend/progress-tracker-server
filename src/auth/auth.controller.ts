@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -9,7 +8,6 @@ import {
   Body,
   Query,
   Get,
-  Request,
   UnauthorizedException,
   HttpCode,
   HttpStatus,
@@ -17,23 +15,19 @@ import {
 
 // import services
 import { AuthService } from "@/auth/auth.service";
-import { UserService } from "@/user/user.service";
 import { AuthGithubService } from "@/auth/auth.github.service";
 import { AuthGoogleService } from "@/auth/auth.google.service";
 
 // import DTO
 import { LoginDto } from "@/auth/dto/login.dto";
 import { CreateUserDto } from "@/user/dto/create-user.dto";
-import { ResponseUserDto } from "@/auth/dto/response-user.dto";
 import { EmailCheckDto } from "@/auth/dto/email-check.dto";
 import { AuthResponseDto } from "@/auth/dto/auth-response.dto";
 import { EmailCheckResponseDto } from "@/auth/dto/email-check-response.dto";
-import { GithubAuthDto } from "@/auth/dto/github-auth.dto";
-import { GoogleAuthDto } from "@/auth/dto/google-auth.dto";
+import { AuthRequestDto } from "@/auth/dto/auth-request.dto";
 
 // import decorators
 import { Public } from "@/decorators/public.decorator";
-import { User } from "@prisma/client";
 
 // import swagger decorators
 import {
@@ -47,7 +41,6 @@ import {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
     private readonly authGithubService: AuthGithubService,
     private readonly authGoogleService: AuthGoogleService,
   ) {}
@@ -123,33 +116,6 @@ export class AuthController {
   }
 
   /**
-   * Get the current user data
-   *
-   * @remarks This endpoint returns the current user data
-   */
-  @ApiResponse({
-    status: 200,
-    description: "User data retrieved successfully",
-    type: ResponseUserDto,
-  })
-  @ApiUnauthorizedResponse({
-    description: "User not found",
-  })
-  @Get("me")
-  async me(@Request() request: any): Promise<ResponseUserDto | null> {
-    const userID: string = request.user.sub;
-    if (!userID) {
-      throw new UnauthorizedException("User not found");
-    }
-    const user: User | null = await this.userService.findById(userID);
-    if (!user) {
-      throw new UnauthorizedException("User not found");
-    }
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-
-  /**
    * Authenticate a user with github
    *
    * @remarks This endpoint authenticates a user with github
@@ -167,15 +133,15 @@ export class AuthController {
   @Public()
   @Post("github")
   @HttpCode(HttpStatus.OK)
-  @ApiBody({ type: GithubAuthDto })
+  @ApiBody({ type: AuthRequestDto })
   async githubAuth(
-    @Body() githubAuthDto: GithubAuthDto,
+    @Body() authRequestDto: AuthRequestDto,
   ): Promise<AuthResponseDto> {
     let githubUser: any;
     try {
       // exchange the code for a token
       const accessToken = await this.authGithubService.exchangeCodeForToken(
-        githubAuthDto.code,
+        authRequestDto.code,
       );
       // get the user from github
       githubUser = await this.authGithubService.getGithubUser(accessToken);
@@ -207,15 +173,15 @@ export class AuthController {
   @Public()
   @Post("google")
   @HttpCode(HttpStatus.OK)
-  @ApiBody({ type: GoogleAuthDto })
+  @ApiBody({ type: AuthRequestDto })
   async googleAuth(
-    @Body() googleAuthDto: GoogleAuthDto,
+    @Body() authRequestDto: AuthRequestDto,
   ): Promise<AuthResponseDto | null> {
     let googleUser: any;
     try {
       // exchange the code for a token
       const accessToken = await this.authGoogleService.exchangeCodeForToken(
-        googleAuthDto.code,
+        authRequestDto.code,
       );
       // get the user from google
       googleUser = await this.authGoogleService.getGoogleUser(accessToken);
