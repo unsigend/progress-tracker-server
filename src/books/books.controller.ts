@@ -1,6 +1,22 @@
 // import dependencies
-import { BadRequestException, Controller, Patch } from "@nestjs/common";
-import { Get, Post, Put, Delete, Param, Body, Query } from "@nestjs/common";
+import {
+  Controller,
+  Delete,
+  Body,
+  Put,
+  Param,
+  Get,
+  Post,
+  NotFoundException,
+  BadRequestException,
+  Patch,
+  HttpCode,
+  HttpStatus,
+  Query,
+} from "@nestjs/common";
+
+// import pipes
+import { ParseUUIDPipe } from "@nestjs/common";
 
 // import services
 import { BooksService } from "@/books/books.service";
@@ -8,14 +24,11 @@ import { BooksService } from "@/books/books.service";
 // import DTO
 import { CreateBookDto } from "@/books/dto/create-book.dto";
 import { QueryBookDto } from "@/books/dto/query-book.dto";
-import { PatchBookDto, UpdateBookDto } from "@/books/dto/update-book.dto";
+import { UpdateBookDto } from "@/books/dto/update-book.dto";
 import { BookResponseDto } from "@/books/dto/book-response.dto";
 
 // import models
 import { Book } from "@prisma/client";
-
-// import pipes
-import { ParseUUIDPipe } from "@nestjs/common";
 
 // import swagger decorators
 import {
@@ -30,27 +43,34 @@ export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   /**
-   * Find all books
+   * Create a new book
    *
-   * @remarks This endpoint returns all books with query parameters
+   * @remarks Creates a new book in the system
+   * @param createBookDto - The book data for creation
+   * @returns The newly created book
    */
-  @ApiResponse({
-    status: 200,
-    description: "Books retrieved successfully",
-    type: [BookResponseDto],
+  @ApiCreatedResponse({
+    description: "Book created successfully",
+    type: BookResponseDto,
   })
-  @Get()
-  async findAll(
-    @Query() queryBookDto: QueryBookDto,
-  ): Promise<BookResponseDto[] | null> {
-    const books: Book[] | null = await this.booksService.findAll(queryBookDto);
-    return books;
+  @ApiBadRequestResponse({
+    description: "Invalid book data",
+  })
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async createBook(
+    @Body() createBookDto: CreateBookDto,
+  ): Promise<BookResponseDto> {
+    const book: Book = await this.booksService.create(createBookDto);
+    return book;
   }
 
   /**
-   * Find one book
+   * Get book by ID
    *
-   * @remarks This endpoint returns a single book by ID
+   * @remarks Retrieves a specific book by its unique identifier
+   * @param id - The unique identifier of the book
+   * @returns The book's data
    */
   @ApiResponse({
     status: 200,
@@ -64,7 +84,7 @@ export class BooksController {
     description: "Invalid book ID format",
   })
   @Get(":id")
-  async findOne(
+  async getBookById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -76,35 +96,41 @@ export class BooksController {
       }),
     )
     id: string,
-  ): Promise<BookResponseDto | null> {
-    const book: Book | null = await this.booksService.findOne(id);
+  ): Promise<BookResponseDto> {
+    const book: Book | null = await this.booksService.findById(id);
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
     return book;
   }
 
   /**
-   * Create a new book
+   * Get all books
    *
-   * @remarks This endpoint creates a new book
+   * @remarks Retrieves books with optional filtering, pagination, and sorting
+   * @param queryBookDto - Query parameters for filtering and pagination
+   * @returns Array of books matching the criteria
    */
-  @ApiCreatedResponse({
-    description: "Book created successfully",
-    type: BookResponseDto,
+  @ApiResponse({
+    status: 200,
+    description: "Books retrieved successfully",
+    type: [BookResponseDto],
   })
-  @ApiBadRequestResponse({
-    description: "Invalid book data",
-  })
-  @Post()
-  async create(
-    @Body() createBookDto: CreateBookDto,
-  ): Promise<BookResponseDto | null> {
-    const book: Book | null = await this.booksService.create(createBookDto);
-    return book;
+  @Get()
+  async getAllBooks(
+    @Query() queryBookDto: QueryBookDto,
+  ): Promise<BookResponseDto[]> {
+    const books: Book[] = await this.booksService.findAll(queryBookDto);
+    return books;
   }
 
   /**
-   * Update a book
+   * Update book by ID (PATCH)
    *
-   * @remarks This endpoint updates a book by ID
+   * @remarks Partially updates a specific book with only provided fields
+   * @param id - The unique identifier of the book
+   * @param updateBookDto - The fields to update
+   * @returns The updated book
    */
   @ApiResponse({
     status: 200,
@@ -117,8 +143,8 @@ export class BooksController {
   @ApiBadRequestResponse({
     description: "Invalid book ID format or data",
   })
-  @Put(":id")
-  async update(
+  @Patch(":id")
+  async updateBookById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -131,19 +157,25 @@ export class BooksController {
     )
     id: string,
     @Body() updateBookDto: UpdateBookDto,
-  ): Promise<BookResponseDto | null> {
+  ): Promise<BookResponseDto> {
     const book: Book | null = await this.booksService.update(id, updateBookDto);
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
     return book;
   }
 
   /**
-   * Patch a book
+   * Replace book by ID (PUT)
    *
-   * @remarks This endpoint patches a book by ID
+   * @remarks Completely replaces a specific book's data
+   * @param id - The unique identifier of the book
+   * @param updateBookDto - The complete book data
+   * @returns The updated book
    */
   @ApiResponse({
     status: 200,
-    description: "Book patched successfully",
+    description: "Book replaced successfully",
     type: BookResponseDto,
   })
   @ApiNotFoundResponse({
@@ -152,8 +184,8 @@ export class BooksController {
   @ApiBadRequestResponse({
     description: "Invalid book ID format or data",
   })
-  @Patch(":id")
-  async patch(
+  @Put(":id")
+  async replaceBookById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -165,16 +197,24 @@ export class BooksController {
       }),
     )
     id: string,
-    @Body() patchBookDto: PatchBookDto,
-  ): Promise<BookResponseDto | null> {
-    const book: Book | null = await this.booksService.patch(id, patchBookDto);
+    @Body() updateBookDto: UpdateBookDto,
+  ): Promise<BookResponseDto> {
+    const book: Book | null = await this.booksService.replace(
+      id,
+      updateBookDto,
+    );
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
     return book;
   }
 
   /**
-   * Delete a book
+   * Delete book by ID
    *
-   * @remarks This endpoint deletes a book by ID
+   * @remarks Permanently deletes a specific book
+   * @param id - The unique identifier of the book to delete
+   * @returns The deleted book
    */
   @ApiResponse({
     status: 200,
@@ -188,7 +228,7 @@ export class BooksController {
     description: "Invalid book ID format",
   })
   @Delete(":id")
-  async delete(
+  async deleteBookById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -200,8 +240,11 @@ export class BooksController {
       }),
     )
     id: string,
-  ): Promise<BookResponseDto | null> {
+  ): Promise<BookResponseDto> {
     const book: Book | null = await this.booksService.delete(id);
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
     return book;
   }
 }

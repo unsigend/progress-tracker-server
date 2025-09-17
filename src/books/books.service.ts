@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 // import dependencies
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 
 // import DTO
 import { QueryBookDto } from "@/books/dto/query-book.dto";
 import { CreateBookDto } from "@/books/dto/create-book.dto";
 import { UpdateBookDto } from "@/books/dto/update-book.dto";
-import { PatchBookDto } from "@/books/dto/update-book.dto";
 
 // import services
 import { PrismaService } from "@/prisma/prisma.service";
@@ -16,7 +18,7 @@ import { Book } from "@prisma/client";
 /**
  * Books service
  *
- * @remarks This service is used to interact with the books database
+ * @remarks This service handles all book-related database operations
  */
 @Injectable()
 export class BooksService {
@@ -25,9 +27,11 @@ export class BooksService {
   /**
    * Find all books
    *
-   * @remarks This method returns all books with query parameters
+   * @remarks Retrieves books with optional filtering, pagination, and sorting
+   * @param queryBookDto - Query parameters for filtering and pagination
+   * @returns Array of books matching the criteria
    */
-  async findAll(queryBookDto: QueryBookDto): Promise<Book[] | null> {
+  async findAll(queryBookDto: QueryBookDto): Promise<Book[]> {
     const {
       search = "",
       page = 1,
@@ -35,9 +39,11 @@ export class BooksService {
       sortedBy = "createdAt",
       sortOrder = "desc",
     } = queryBookDto;
+
     const skip = (page - 1) * limit;
     const take = limit;
     const orderBy = { [sortedBy]: sortOrder };
+
     const where = {
       OR: [
         { title: { contains: search } },
@@ -45,21 +51,25 @@ export class BooksService {
         { ISBN: { contains: search } },
       ],
     };
+
     const books = await this.prismaService.book.findMany({
       where,
       skip,
       take,
       orderBy,
     });
+
     return books;
   }
 
   /**
-   * Find one book
+   * Find a book by ID
    *
-   * @remarks This method returns a single book by ID
+   * @remarks Retrieves a specific book by its unique identifier
+   * @param id - The unique identifier of the book
+   * @returns The book if found, null otherwise
    */
-  async findOne(id: string): Promise<Book | null> {
+  async findById(id: string): Promise<Book | null> {
     const book = await this.prismaService.book.findUnique({
       where: { id },
     });
@@ -69,7 +79,9 @@ export class BooksService {
   /**
    * Create a new book
    *
-   * @remarks This method creates a new book
+   * @remarks Creates a new book in the database
+   * @param createBookDto - The book data for creation
+   * @returns The newly created book
    */
   async create(createBookDto: CreateBookDto): Promise<Book> {
     const book = await this.prismaService.book.create({
@@ -79,15 +91,34 @@ export class BooksService {
   }
 
   /**
-   * Update a book (PUT - replaces entire resource)
+   * Update a book (PATCH operation)
    *
-   * @remarks This method updates a book by ID with all fields
+   * @remarks Partially updates a book with only the provided fields
+   * @param id - The unique identifier of the book
+   * @param updateBookDto - The fields to update
+   * @returns The updated book or null if not found
    */
-  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book | null> {
+    // Throw an error if the DTO is empty
+    if (Object.keys(updateBookDto).length === 0) {
+      throw new BadRequestException("At least one field must be provided");
+    }
+
+    // Remove undefined values
+    const filteredData = Object.fromEntries(
+      Object.entries(updateBookDto).filter(([, value]) => value !== undefined),
+    );
+
+    // If no fields to update, return the existing book
+    if (Object.keys(filteredData).length === 0) {
+      return await this.findById(id);
+    }
+
+    // Update the book with the new data
     const book = await this.prismaService.book.update({
       where: { id },
       data: {
-        ...updateBookDto,
+        ...filteredData,
         updatedAt: new Date(),
       },
     });
@@ -95,15 +126,41 @@ export class BooksService {
   }
 
   /**
-   * Patch a book (PATCH - partial update)
+   * Replace a book (PUT operation)
    *
-   * @remarks This method partially updates a book by ID
+   * @remarks Completely replaces a book's data with the provided data
+   * @param id - The unique identifier of the book
+   * @param updateBookDto - The complete book data
+   * @returns The updated book or null if not found
    */
-  async patch(id: string, patchBookDto: PatchBookDto): Promise<Book> {
+  async replace(
+    id: string,
+    updateBookDto: UpdateBookDto,
+  ): Promise<Book | null> {
+    // Get the existing book
+    const existingBook = await this.findById(id);
+    if (!existingBook) {
+      return null;
+    }
+
+    // Create a new book object with default values
+    const newBook: CreateBookDto = {
+      title: existingBook.title,
+      author: existingBook.author || "",
+      ISBN: existingBook.ISBN || "",
+      description: existingBook.description || "",
+      pages: existingBook.pages || undefined,
+      imageURL: existingBook.imageURL || "",
+    };
+
+    // Merge the new data with the default values
+    const dataToUpdate: any = { ...newBook, ...updateBookDto };
+
+    // Update the book with the new data
     const book = await this.prismaService.book.update({
       where: { id },
       data: {
-        ...patchBookDto,
+        ...dataToUpdate,
         updatedAt: new Date(),
       },
     });
@@ -113,9 +170,11 @@ export class BooksService {
   /**
    * Delete a book
    *
-   * @remarks This method deletes a book by ID
+   * @remarks Permanently deletes a book from the database
+   * @param id - The unique identifier of the book to delete
+   * @returns The deleted book if found, null otherwise
    */
-  async delete(id: string): Promise<Book> {
+  async delete(id: string): Promise<Book | null> {
     const book = await this.prismaService.book.delete({
       where: { id },
     });

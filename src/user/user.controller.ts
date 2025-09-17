@@ -36,7 +36,6 @@ import { IDCheckerGuard } from "@/user/guards/id-checker.guard";
 import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
-  ApiOkResponse,
   ApiUnauthorizedResponse,
   ApiResponse,
 } from "@nestjs/swagger";
@@ -46,27 +45,29 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   /**
-   * Get the current user data
+   * Get current user profile
    *
-   * @remarks This endpoint returns the current user data
+   * @remarks Retrieves the authenticated user's profile information
+   * @returns The current user's profile data
    */
   @ApiResponse({
-    description: "User data retrieved successfully",
+    status: 200,
+    description: "User profile retrieved successfully",
     type: ResponseUserDto,
   })
   @ApiUnauthorizedResponse({
-    description: "User not found",
+    description: "User not authenticated",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
   @Get("me")
-  async me(
+  async getCurrentUser(
     @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
+  ): Promise<ResponseUserDto> {
     const userID: string = request.user.sub;
     if (!userID) {
-      throw new UnauthorizedException("User not found");
+      throw new UnauthorizedException("User not authenticated");
     }
     const user: User | null = await this.userService.findById(userID);
     if (!user) {
@@ -77,28 +78,34 @@ export class UserController {
   }
 
   /**
-   * Patch the current user data
+   * Update current user profile (PATCH)
    *
-   * @remarks This endpoint patches the current user data
+   * @remarks Partially updates the authenticated user's profile with only provided fields
+   * @param updateUserDto - The fields to update
+   * @returns The updated user profile
    */
-  @ApiOkResponse({
-    description: "User data patched successfully",
+  @ApiResponse({
+    status: 200,
+    description: "User profile updated successfully",
     type: ResponseUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "User not authenticated",
   })
   @ApiNotFoundResponse({
     description: "User not found",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
   @Patch("me")
-  async patchMe(
+  async updateCurrentUser(
     @Body() updateUserDto: UpdateUserDto,
     @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
+  ): Promise<ResponseUserDto> {
     const userID: string = request.user.sub;
     if (!userID) {
-      throw new UnauthorizedException("User not found");
+      throw new UnauthorizedException("User not authenticated");
     }
     const user: User | null = await this.userService.update(
       userID,
@@ -112,31 +119,75 @@ export class UserController {
   }
 
   /**
-   * Delete the current user
+   * Replace current user profile (PUT)
    *
-   * @remarks This endpoint deletes the current user
+   * @remarks Completely replaces the authenticated user's profile data
+   * @param updateUserDto - The complete user data
+   * @returns The updated user profile
    */
-  @ApiOkResponse({
-    description: "User deleted successfully",
+  @ApiResponse({
+    status: 200,
+    description: "User profile replaced successfully",
     type: ResponseUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "User not authenticated",
   })
   @ApiNotFoundResponse({
     description: "User not found",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
-  @Delete("me")
-  async deleteMe(
+  @Put("me")
+  async replaceCurrentUser(
+    @Body() updateUserDto: UpdateUserDto,
     @Request() request: Request & { user: { sub: string } },
-  ): Promise<ResponseUserDto | null> {
-    // get the user ID from the request
+  ): Promise<ResponseUserDto> {
     const userID: string = request.user.sub;
     if (!userID) {
-      throw new UnauthorizedException("User not found");
+      throw new UnauthorizedException("User not authenticated");
+    }
+    const user: User | null = await this.userService.replace(
+      userID,
+      updateUserDto,
+    );
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+
+  /**
+   * Delete current user account
+   *
+   * @remarks Permanently deletes the authenticated user's account
+   * @returns The deleted user profile
+   */
+  @ApiResponse({
+    status: 200,
+    description: "User account deleted successfully",
+    type: ResponseUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "User not authenticated",
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Access forbidden",
+  })
+  @Delete("me")
+  async deleteCurrentUser(
+    @Request() request: Request & { user: { sub: string } },
+  ): Promise<ResponseUserDto> {
+    const userID: string = request.user.sub;
+    if (!userID) {
+      throw new UnauthorizedException("User not authenticated");
     }
 
-    // delete the user
     const user: User | null = await this.userService.delete(userID);
     if (!user) {
       throw new NotFoundException("User not found");
@@ -146,9 +197,11 @@ export class UserController {
   }
 
   /**
-   * Get a user by id
+   * Get user by ID
    *
-   * @remarks This endpoint returns a user by id
+   * @remarks Retrieves a specific user's profile by their unique identifier
+   * @param id - The unique identifier of the user
+   * @returns The user's profile data
    */
   @ApiResponse({
     status: 200,
@@ -159,11 +212,11 @@ export class UserController {
     description: "User not found",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
   @Get(":id")
   @UseGuards(IDCheckerGuard)
-  async getById(
+  async getUserById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -175,7 +228,7 @@ export class UserController {
       }),
     )
     id: string,
-  ): Promise<ResponseUserDto | null> {
+  ): Promise<ResponseUserDto> {
     const user: User | null = await this.userService.findById(id);
     if (!user) {
       throw new NotFoundException("User not found");
@@ -185,9 +238,12 @@ export class UserController {
   }
 
   /**
-   * Update a user
+   * Update user by ID (PATCH)
    *
-   * @remarks This endpoint updates a user
+   * @remarks Partially updates a specific user's profile with only provided fields
+   * @param id - The unique identifier of the user
+   * @param updateUserDto - The fields to update
+   * @returns The updated user profile
    */
   @ApiResponse({
     status: 200,
@@ -198,11 +254,11 @@ export class UserController {
     description: "User not found",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
   @UseGuards(IDCheckerGuard)
-  @Put(":id")
-  async update(
+  @Patch(":id")
+  async updateUserById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -215,7 +271,7 @@ export class UserController {
     )
     id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<ResponseUserDto | null> {
+  ): Promise<ResponseUserDto> {
     const user: User | null = await this.userService.update(id, updateUserDto);
     if (!user) {
       throw new NotFoundException("User not found");
@@ -225,24 +281,27 @@ export class UserController {
   }
 
   /**
-   * Delete a user
+   * Replace user by ID (PUT)
    *
-   * @remarks This endpoint deletes a user
+   * @remarks Completely replaces a specific user's profile data
+   * @param id - The unique identifier of the user
+   * @param updateUserDto - The complete user data
+   * @returns The updated user profile
    */
   @ApiResponse({
     status: 200,
-    description: "User deleted successfully",
+    description: "User replaced successfully",
     type: ResponseUserDto,
   })
   @ApiNotFoundResponse({
     description: "User not found",
   })
   @ApiForbiddenResponse({
-    description: "Forbidden",
+    description: "Access forbidden",
   })
   @UseGuards(IDCheckerGuard)
-  @Delete(":id")
-  async delete(
+  @Put(":id")
+  async replaceUserById(
     @Param(
       "id",
       new ParseUUIDPipe({
@@ -254,7 +313,49 @@ export class UserController {
       }),
     )
     id: string,
-  ): Promise<ResponseUserDto | null> {
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<ResponseUserDto> {
+    const user: User | null = await this.userService.replace(id, updateUserDto);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+
+  /**
+   * Delete user by ID
+   *
+   * @remarks Permanently deletes a specific user's account
+   * @param id - The unique identifier of the user to delete
+   * @returns The deleted user profile
+   */
+  @ApiResponse({
+    status: 200,
+    description: "User deleted successfully",
+    type: ResponseUserDto,
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiForbiddenResponse({
+    description: "Access forbidden",
+  })
+  @UseGuards(IDCheckerGuard)
+  @Delete(":id")
+  async deleteUserById(
+    @Param(
+      "id",
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory: () =>
+          new BadRequestException(
+            "Invalid user ID format. Please provide a valid UUID.",
+          ),
+      }),
+    )
+    id: string,
+  ): Promise<ResponseUserDto> {
     const user: User | null = await this.userService.delete(id);
     if (!user) {
       throw new NotFoundException("User not found");
