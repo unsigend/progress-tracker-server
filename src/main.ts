@@ -1,32 +1,24 @@
 // import dependencies
-import { NestFactory } from '@nestjs/core';
-import { INestApplication } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from "@nestjs/core";
 
 // import app module
-import { AppModule } from './app.module';
+import { AppModule } from "@/app.module";
 
-// bootstrap function
+// import services
+import { ConfigService } from "@nestjs/config";
+import { Logger } from "@nestjs/common";
+
+// main entry point
 async function bootstrap() {
-  // create app instance
-  const app: INestApplication = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-  // create swagger configuration
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Progress Tracker API')
-    .setDescription('Progress Tracker Backend API Specification')
-    .setVersion('1.0')
-    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .setOpenAPIVersion('3.0.0')
-    .build();
+  const configService = app.get(ConfigService);
 
-  // create swagger document
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, documentFactory);
-
-  // listen on port
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get<number>("app.PORT")!, () => {
+    Logger.log(
+      `Server is running on ${configService.get<string>("app.DOMAIN")!}:${configService.get<number>("app.PORT")!}`,
+    );
+  });
 }
 
 bootstrap().catch((error) => {
