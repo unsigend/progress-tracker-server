@@ -8,4 +8,6 @@ export interface CONFIG_APP {
   PORT: number;
   // environment
   NODE_ENV: string;
+  // api version
+  API_VERSION: string;
 }

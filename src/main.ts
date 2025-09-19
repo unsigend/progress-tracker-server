@@ -1,5 +1,6 @@
 // import dependencies
 import { NestFactory } from "@nestjs/core";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 // import app module
 import { AppModule } from "@/app.module";
@@ -14,6 +15,18 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  // build for swagger
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("Progress Tracker API")
+    .setDescription("Progress Tracker Backend API Specification")
+    .setVersion(configService.get<string>("app.API_VERSION")!)
+    .setLicense("MIT", "https://opensource.org/licenses/MIT")
+    .build();
+
+  const documentFactory = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup("api-docs", app, documentFactory);
+
+  // listen on port
   await app.listen(configService.get<number>("app.PORT")!, () => {
     Logger.log(
       `Server is running on ${configService.get<string>("app.DOMAIN")!}:${configService.get<number>("app.PORT")!}`,

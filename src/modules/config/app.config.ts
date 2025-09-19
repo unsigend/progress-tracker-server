@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
 // import dependencies
 import { registerAs } from "@nestjs/config";
 import validateConfig from "@common/utils/validate-config";
@@ -40,6 +38,11 @@ class EnvironmentVariablesValidator {
   @IsOptional()
   @IsNotEmpty()
   NODE_ENV: Environment;
+
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  API_VERSION: string;
 }
 
 export default registerAs<CONFIG_APP>("app", () => {
@@ -49,5 +52,6 @@ export default registerAs<CONFIG_APP>("app", () => {
     DOMAIN: process.env.DOMAIN ?? "http://localhost",
     PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
     NODE_ENV: process.env.NODE_ENV ?? Environment.Development,
+    API_VERSION: process.env.API_VERSION ?? "1.0",
   };
 });
