@@ -21,10 +21,9 @@ async function bootstrap() {
 
   // use validation pipe
   const validationPipeOptions: ValidationPipeOptions = {
-    skipUndefinedProperties: true,
-    skipNullProperties: true,
-    skipMissingProperties: true,
     transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
   };
   app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 

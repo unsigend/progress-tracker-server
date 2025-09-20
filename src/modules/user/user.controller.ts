@@ -71,7 +71,7 @@ export class UserController {
     type: UserResponseDto,
     description: "The user found successfully",
   })
-  @ApiBadRequestResponse({
+  @ApiNotFoundResponse({
     description: "User not found",
   })
   @Get(":id")
@@ -80,7 +80,7 @@ export class UserController {
   ): Promise<UserResponseDto> {
     const user: UserResponseDto | null = await this.userService.findByID(id);
     if (!user) {
-      throw new BadRequestException("User not found");
+      throw new NotFoundException("User not found");
     }
     return user;
   }

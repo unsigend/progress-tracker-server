@@ -1,5 +1,9 @@
 // import dependencies
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
 import { PrismaService } from "@modules/database/prisma.service";
 import { Prisma, Book } from "@prisma/client";
 
@@ -44,11 +48,15 @@ export class BookService {
    * @returns The book or null if the book is not found
    */
   public async create(createBookDto: CreateBookDto): Promise<Book | null> {
-    const book: Book | null = await this.prisma.book.create({
-      data: createBookDto,
-    });
+    try {
+      const book: Book | null = await this.prisma.book.create({
+        data: createBookDto,
+      });
 
-    return book;
+      return book;
+    } catch {
+      throw new BadRequestException("Failed to create book");
+    }
   }
 
   /**
@@ -61,12 +69,23 @@ export class BookService {
     id: string,
     updateBookDto: UpdateBookDto,
   ): Promise<Book | null> {
-    const book: Book | null = await this.prisma.book.update({
-      where: { id },
-      data: { ...updateBookDto, updatedAt: new Date() },
-    });
+    try {
+      const book: Book | null = await this.prisma.book.update({
+        where: { id },
+        data: { ...updateBookDto, updatedAt: new Date() },
+      });
 
-    return book;
+      return book;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        // Record not found
+        throw new NotFoundException("Book not found");
+      }
+      throw new BadRequestException("Failed to update book");
+    }
   }
 
   /**
@@ -81,8 +100,15 @@ export class BookService {
       });
 
       return book;
-    } catch {
-      throw new NotFoundException();
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        // Record not found
+        throw new NotFoundException("Book not found");
+      }
+      throw new BadRequestException("Failed to delete book");
     }
   }
 

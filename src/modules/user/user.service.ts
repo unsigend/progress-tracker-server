@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // import dependencies
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "@modules/database/prisma.service";
 import { Prisma, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -47,28 +51,41 @@ export class UserService {
   /**
    * Delete a user by a unique key
    * @param where - The unique key to delete the user
-   * @returns The user or null if the user is not found
+   * @returns The user or throw exception if the user is not found
    * @private
    */
-  private async deleteBy(
-    where: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    const user: User | null = await this.prisma.user.delete({
-      where,
-    });
+  private async deleteBy(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    try {
+      const user: User = await this.prisma.user.delete({
+        where,
+      });
 
-    return user;
+      return user;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        throw new NotFoundException("User not found");
+      }
+      throw new BadRequestException("Failed to delete user");
+    }
   }
 
   /**
    * Create a user
    * @param createUserDto - The data to create the user
-   * @returns The user or null if the user is not found
+   * @returns The user or throw exception if the user is not found
    */
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     // hash the password if it is provided
     if (createUserDto.password) {
       createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    }
+
+    const checkExists = await this.findByEmail(createUserDto.email);
+    if (checkExists) {
+      throw new BadRequestException("User already exists");
     }
 
     // create the user
@@ -112,26 +129,32 @@ export class UserService {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
 
-    // update the user
-    const user: User = await this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+    try {
+      // update the user
+      const user: User = await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
 
-    return this.filterUser(user);
+      return this.filterUser(user);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        throw new NotFoundException("User not found");
+      }
+      throw new BadRequestException("Failed to update user");
+    }
   }
 
   /**
    * Delete a user by id
    * @param id - The id of the user
-   * @returns The user or null if the user is not found
+   * @returns The user or throw exception if the user is not found
    */
-  async deleteById(id: string): Promise<UserResponseDto | null> {
-    const user: User | null = await this.deleteBy({ id });
-
-    if (!user) return null;
-
-    return this.filterUser(user);
+  async deleteById(id: string): Promise<UserResponseDto> {
+    return this.filterUser(await this.deleteBy({ id }));
   }
 
   /**
@@ -139,11 +162,7 @@ export class UserService {
    * @param email - The email of the user
    * @returns The user or null if the user is not found
    */
-  async deleteByEmail(email: string): Promise<UserResponseDto | null> {
-    const user: User | null = await this.deleteBy({ email });
-
-    if (!user) return null;
-
-    return this.filterUser(user);
+  async deleteByEmail(email: string): Promise<UserResponseDto> {
+    return this.filterUser(await this.deleteBy({ email }));
   }
 }

@@ -7,9 +7,9 @@ import {
   Delete,
   Body,
   Param,
-  BadRequestException,
   Query,
   Patch,
+  NotFoundException,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -55,9 +55,6 @@ export class BookController {
   @Post()
   async create(@Body() createBookDto: CreateBookDto): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.create(createBookDto);
-    if (!book) {
-      throw new BadRequestException("Book not created");
-    }
     return book as BookResponseDto;
   }
 
@@ -82,7 +79,7 @@ export class BookController {
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.findByID(id);
     if (!book) {
-      throw new BadRequestException("Book not found");
+      throw new NotFoundException("Book not found");
     }
     return book as BookResponseDto;
   }
@@ -110,9 +107,6 @@ export class BookController {
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
-    if (!book) {
-      throw new BadRequestException("Book not updated");
-    }
     return book as BookResponseDto;
   }
 
@@ -136,9 +130,6 @@ export class BookController {
     @Param("id", ParseUUIDPipe) id: string,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.delete(id);
-    if (!book) {
-      throw new BadRequestException("Book not deleted");
-    }
     return book as BookResponseDto;
   }
 
@@ -161,9 +152,6 @@ export class BookController {
     @Query() queryBookDto: QueryBookDto,
   ): Promise<BookResponseDto[]> {
     const books: Book[] = await this.bookService.findAll(queryBookDto);
-    if (!books) {
-      throw new BadRequestException("Books not found");
-    }
     return books as BookResponseDto[];
   }
 
@@ -190,9 +178,6 @@ export class BookController {
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
-    if (!book) {
-      throw new BadRequestException("Book not replaced");
-    }
     return book as BookResponseDto;
   }
 
@@ -219,9 +204,6 @@ export class BookController {
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
-    if (!book) {
-      throw new BadRequestException("Book not patched");
-    }
     return book as BookResponseDto;
   }
 }

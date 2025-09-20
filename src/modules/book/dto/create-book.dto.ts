@@ -11,19 +11,21 @@ import {
   IsUrl,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 
 export class CreateBookDto {
   @ApiProperty({ description: "The title of the book", type: String })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.trim() : undefined,
+  )
   @IsString({ message: "Title must be a string" })
   @IsNotEmpty({ message: "Title is required" })
   title: string;
 
-  @ApiProperty({ description: "The author of the book", type: String })
+  @ApiPropertyOptional({ description: "The author of the book", type: String })
   @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
   @IsString({ message: "Author must be a string" })
-  @IsNotEmpty({ message: "Author is required" })
+  @IsOptional()
   author?: string | null;
 
   @ApiProperty({ description: "The description of the book", type: String })
@@ -48,9 +50,7 @@ export class CreateBookDto {
   ISBN13?: string | null;
 
   @ApiPropertyOptional({ description: "The pages of the book", type: Number })
-  @Transform(({ value }) =>
-    typeof value === "string" ? parseInt(value) : null,
-  )
+  @Type(() => Number)
   @IsInt({ message: "Pages must be an integer" })
   @IsOptional()
   @Min(1, { message: "Pages must be greater than 0" })

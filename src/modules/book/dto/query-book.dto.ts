@@ -1,7 +1,7 @@
 // import dependencies
 import { IsString, IsOptional, IsInt, Min, Max, IsIn } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
+import { Type } from "class-transformer";
 
 export class QueryBookDto {
   @ApiPropertyOptional({
@@ -20,9 +20,7 @@ export class QueryBookDto {
     minimum: 1,
     type: Number,
   })
-  @Transform(({ value }) =>
-    typeof value === "string" ? parseInt(value, 10) : null,
-  )
+  @Type(() => Number)
   @IsInt({ message: "Page must be an integer" })
   @Min(1, { message: "Page must be at least 1" })
   @IsOptional()
@@ -35,9 +33,7 @@ export class QueryBookDto {
     maximum: 100,
     type: Number,
   })
-  @Transform(({ value }) =>
-    typeof value === "string" ? parseInt(value, 10) : null,
-  )
+  @Type(() => Number)
   @IsInt({ message: "Limit must be an integer" })
   @Min(1, { message: "Limit must be at least 1" })
   @Max(100, { message: "Limit cannot exceed 100" })
