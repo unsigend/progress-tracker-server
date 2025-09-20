@@ -2,6 +2,7 @@
 import { IsString, IsOptional, IsInt, Min, Max, IsIn } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
+import { TrimString } from "@common/transform/trim-string";
 
 export class QueryBookDto {
   @ApiPropertyOptional({
@@ -10,6 +11,7 @@ export class QueryBookDto {
     example: "",
     type: String,
   })
+  @TrimString()
   @IsString({ message: "Search must be a string" })
   @IsOptional()
   search?: string | null;

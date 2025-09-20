@@ -11,39 +11,38 @@ import {
   IsUrl,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Transform, Type } from "class-transformer";
+import { Type } from "class-transformer";
+import { TrimString } from "@common/transform/trim-string";
 
 export class CreateBookDto {
   @ApiProperty({ description: "The title of the book", type: String })
-  @Transform(({ value }) =>
-    typeof value === "string" ? value.trim() : undefined,
-  )
+  @TrimString()
   @IsString({ message: "Title must be a string" })
   @IsNotEmpty({ message: "Title is required" })
   title: string;
 
   @ApiPropertyOptional({ description: "The author of the book", type: String })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @TrimString()
   @IsString({ message: "Author must be a string" })
   @IsOptional()
   author?: string | null;
 
   @ApiProperty({ description: "The description of the book", type: String })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @TrimString()
   @IsString({ message: "Description must be a string" })
   @IsOptional()
   @MaxLength(1000)
   description?: string | null;
 
   @ApiPropertyOptional({ description: "The ISBN10 of the book", type: String })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @TrimString()
   @IsString({ message: "ISBN10 must be a string" })
   @IsOptional()
   @IsISBN(10, { message: "Invalid ISBN10" })
   ISBN10?: string | null;
 
   @ApiPropertyOptional({ description: "The ISBN13 of the book", type: String })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @TrimString()
   @IsString({ message: "ISBN13 must be a string" })
   @IsISBN(13, { message: "Invalid ISBN13" })
   @IsOptional()
@@ -61,7 +60,7 @@ export class CreateBookDto {
     description: "The cover url of the book",
     type: String,
   })
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : null))
+  @TrimString()
   @IsString({ message: "Cover url must be a string" })
   @IsOptional()
   @IsUrl(undefined, { message: "Invalid cover url" })

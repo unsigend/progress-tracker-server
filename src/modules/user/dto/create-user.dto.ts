@@ -10,7 +10,7 @@ import {
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
-import { TrimString } from "@common/transform/trimString";
+import { TrimString } from "@/common/transform/trim-string";
 
 export class CreateUserDto {
   @ApiProperty({

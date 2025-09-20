@@ -51,8 +51,11 @@ export class UserController {
   })
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const user: UserResponseDto | null =
-      await this.userService.create(createUserDto);
+    const user: UserResponseDto | null = (await this.userService.create(
+      createUserDto,
+      false,
+    )) as UserResponseDto | null;
+
     if (!user) {
       throw new BadRequestException("User not created");
     }
@@ -78,7 +81,10 @@ export class UserController {
   async findByID(
     @Param("id", ParseUUIDPipe) id: string,
   ): Promise<UserResponseDto> {
-    const user: UserResponseDto | null = await this.userService.findByID(id);
+    const user: UserResponseDto | null = (await this.userService.findByID(
+      id,
+      false,
+    )) as UserResponseDto | null;
     if (!user) {
       throw new NotFoundException("User not found");
     }
@@ -107,10 +113,11 @@ export class UserController {
     @Param("id", ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    const user: UserResponseDto | null = await this.userService.update(
+    const user: UserResponseDto | null = (await this.userService.update(
       id,
       updateUserDto,
-    );
+      false,
+    )) as UserResponseDto | null;
     if (!user) {
       throw new NotFoundException("User not found");
     }
@@ -136,10 +143,15 @@ export class UserController {
   async deleteByID(
     @Param("id", ParseUUIDPipe) id: string,
   ): Promise<UserResponseDto> {
-    const user: UserResponseDto | null = await this.userService.deleteById(id);
+    const user: UserResponseDto | null = (await this.userService.deleteById(
+      id,
+      false,
+    )) as UserResponseDto | null;
+
     if (!user) {
       throw new NotFoundException("User does not exist");
     }
+
     return user;
   }
 
@@ -165,10 +177,12 @@ export class UserController {
     @Param("id", ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    const user: UserResponseDto | null = await this.userService.update(
+    const user: UserResponseDto | null = (await this.userService.update(
       id,
       updateUserDto,
-    );
+      false,
+    )) as UserResponseDto | null;
+
     if (!user) {
       throw new NotFoundException("User not found");
     }
