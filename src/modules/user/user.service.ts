@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // import dependencies
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@modules/database/prisma.service";
@@ -7,10 +9,22 @@ import * as bcrypt from "bcrypt";
 // import dto
 import { CreateUserDto } from "@modules/user/dto/create-user.dto";
 import { UpdateUserDto } from "@modules/user/dto/update-user.dto";
+import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Filter out sensitive fields from user
+   * @param user - The user to filter
+   * @returns The filtered user without password and deletedAt
+   * @private
+   */
+  private filterUser(user: User): UserResponseDto {
+    const { password, deletedAt, ...safeUser } = user;
+    return safeUser as UserResponseDto;
+  }
 
   /**
    * Find a user by a unique key
@@ -20,12 +34,14 @@ export class UserService {
    */
   private async findBy(
     where: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
+  ): Promise<UserResponseDto | null> {
     const user: User | null = await this.prisma.user.findUnique({
       where,
     });
 
-    return user;
+    if (!user) return null;
+
+    return this.filterUser(user);
   }
 
   /**
@@ -49,18 +65,18 @@ export class UserService {
    * @param createUserDto - The data to create the user
    * @returns The user or null if the user is not found
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     // hash the password if it is provided
     if (createUserDto.password) {
       createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
     }
 
     // create the user
-    const user: User | null = await this.prisma.user.create({
+    const user: User = await this.prisma.user.create({
       data: createUserDto,
     });
 
-    return user;
+    return this.filterUser(user);
   }
 
   /**
@@ -68,10 +84,8 @@ export class UserService {
    * @param id - The id of the user
    * @returns The user or null if the user is not found
    */
-  async findByID(id: string): Promise<User | null> {
-    const user: User | null = await this.findBy({ id });
-
-    return user;
+  async findByID(id: string): Promise<UserResponseDto | null> {
+    return await this.findBy({ id });
   }
 
   /**
@@ -79,10 +93,8 @@ export class UserService {
    * @param email - The email of the user
    * @returns The user or null if the user is not found
    */
-  async findByEmail(email: string): Promise<User | null> {
-    const user: User | null = await this.findBy({ email });
-
-    return user;
+  async findByEmail(email: string): Promise<UserResponseDto | null> {
+    return await this.findBy({ email });
   }
 
   /**
@@ -91,19 +103,22 @@ export class UserService {
    * @param updateUserDto - The data to update the user
    * @returns The user or null if the user is not found
    */
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     // hash the password if it is provided
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
 
     // update the user
-    const user: User | null = await this.prisma.user.update({
+    const user: User = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
 
-    return user;
+    return this.filterUser(user);
   }
 
   /**
@@ -111,10 +126,12 @@ export class UserService {
    * @param id - The id of the user
    * @returns The user or null if the user is not found
    */
-  async deleteById(id: string): Promise<User | null> {
+  async deleteById(id: string): Promise<UserResponseDto | null> {
     const user: User | null = await this.deleteBy({ id });
 
-    return user;
+    if (!user) return null;
+
+    return this.filterUser(user);
   }
 
   /**
@@ -122,9 +139,11 @@ export class UserService {
    * @param email - The email of the user
    * @returns The user or null if the user is not found
    */
-  async deleteByEmail(email: string): Promise<User | null> {
+  async deleteByEmail(email: string): Promise<UserResponseDto | null> {
     const user: User | null = await this.deleteBy({ email });
 
-    return user;
+    if (!user) return null;
+
+    return this.filterUser(user);
   }
 }

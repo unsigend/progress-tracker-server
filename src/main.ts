@@ -9,11 +9,24 @@ import { AppModule } from "@/app.module";
 import { ConfigService } from "@nestjs/config";
 import { Logger } from "@nestjs/common";
 
+// import pipes
+import { ValidationPipe } from "@nestjs/common";
+import { ValidationPipeOptions } from "@nestjs/common";
+
 // main entry point
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // use validation pipe
+  const validationPipeOptions: ValidationPipeOptions = {
+    skipUndefinedProperties: true,
+    skipNullProperties: true,
+    skipMissingProperties: true,
+    transform: true,
+  };
+  app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 
   // build for swagger
   const swaggerConfig = new DocumentBuilder()

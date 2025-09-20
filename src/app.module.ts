@@ -8,6 +8,7 @@ import DATABASE_CONFIG from "@modules/database/config/database.config";
 // import modules
 import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "@modules/user/user.module";
+import { BookModule } from "@modules/book/book.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from "@modules/user/user.module";
       isGlobal: true,
     }),
     UserModule,
+    BookModule,
   ],
   controllers: [],
   providers: [],
