@@ -10,6 +10,7 @@ import {
   BadRequestException,
   NotFoundException,
   Patch,
+  Req,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -19,7 +20,9 @@ import {
   ApiParam,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
+import type { Request } from "express";
 
 // import services
 import { UserService } from "@modules/user/user.service";
@@ -33,6 +36,138 @@ import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  /**
+   * Get the current user
+   * @route GET api/v1/user/me
+   * @param req - The request object
+   * @returns The user
+   */
+  @ApiOperation({ summary: "Get the current user" })
+  @ApiOkResponse({
+    type: UserResponseDto,
+    description: "The user found successfully",
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Unauthorized",
+  })
+  @Get("me")
+  async getMe(@Req() req: Request): Promise<UserResponseDto> {
+    const userID: string = (req.user as UserResponseDto).id;
+    const user: UserResponseDto | null = (await this.userService.findByID(
+      userID,
+      false,
+    )) as UserResponseDto | null;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    return user;
+  }
+
+  /**
+   * Update the current user
+   * @route Patch api/v1/user/me
+   * @param req - The request object
+   * @param updateUserDto - The data to update the user
+   * @returns The user
+   */
+  @ApiOperation({ summary: "Update the current user" })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiOkResponse({
+    type: UserResponseDto,
+    description: "The user updated successfully",
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Unauthorized",
+  })
+  @Patch("me")
+  async updateMe(
+    @Req() req: Request,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const userID: string = (req.user as UserResponseDto).id;
+    const user: UserResponseDto | null = (await this.userService.update(
+      userID,
+      updateUserDto,
+      false,
+    )) as UserResponseDto | null;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    return user;
+  }
+
+  /**
+   * Delete the current user
+   * @route DELETE api/v1/user/me
+   * @param req - The request object
+   * @returns The user
+   */
+  @ApiOperation({ summary: "Delete the current user" })
+  @ApiOkResponse({
+    type: UserResponseDto,
+    description: "The user deleted successfully",
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Unauthorized",
+  })
+  @Delete("me")
+  async deleteMe(@Req() req: Request): Promise<UserResponseDto> {
+    const userID: string = (req.user as UserResponseDto).id;
+    const user: UserResponseDto | null = (await this.userService.deleteById(
+      userID,
+      false,
+    )) as UserResponseDto | null;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    return user;
+  }
+
+  /**
+   * Replace the current user
+   * @route PUT api/v1/user/me
+   * @param req - The request object
+   * @param updateUserDto - The data to update the user
+   * @returns The user
+   */
+  @Put("me")
+  @ApiOperation({ summary: "Replace the current user" })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiOkResponse({
+    type: UserResponseDto,
+    description: "The user replaced successfully",
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Unauthorized",
+  })
+  async replaceMe(
+    @Req() req: Request,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const userID: string = (req.user as UserResponseDto).id;
+    const user: UserResponseDto | null = (await this.userService.update(
+      userID,
+      updateUserDto,
+      false,
+    )) as UserResponseDto | null;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    return user;
+  }
 
   /**
    * Create a user
