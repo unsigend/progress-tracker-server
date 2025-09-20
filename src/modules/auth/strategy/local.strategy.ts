@@ -7,7 +7,7 @@ import { Strategy } from "passport-local";
 import { AuthService } from "@modules/auth/auth.service";
 
 // import dto
-import { UserLoginDto } from "@modules/auth/dto/user-login.dto";
+import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Injectable()
@@ -30,7 +30,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     email: string,
     password: string,
   ): Promise<UserResponseDto> {
-    const userLoginDto: UserLoginDto = { email, password };
+    const userLoginDto: LoginRequestDto = { email, password };
     const user: UserResponseDto | null =
       await this.authService.validateUser(userLoginDto);
     if (!user) {

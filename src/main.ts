@@ -1,5 +1,5 @@
 // import dependencies
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 // import app module
@@ -13,11 +13,22 @@ import { Logger } from "@nestjs/common";
 import { ValidationPipe } from "@nestjs/common";
 import { ValidationPipeOptions } from "@nestjs/common";
 
+// import guards
+import { JwtAuthGuard } from "@common/guards/jwt-auth.guard";
+
 // main entry point
 async function bootstrap() {
+  // create app instance
   const app = await NestFactory.create(AppModule);
 
+  // get config service
   const configService = app.get(ConfigService);
+
+  // set global prefix
+  app.setGlobalPrefix(`api/${configService.get<string>("app.API_VERSION")!}`);
+
+  // use jwt auth guard
+  app.useGlobalGuards(new JwtAuthGuard(new Reflector()));
 
   // use validation pipe
   const validationPipeOptions: ValidationPipeOptions = {

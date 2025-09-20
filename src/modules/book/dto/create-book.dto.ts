@@ -53,7 +53,7 @@ export class CreateBookDto {
   @IsInt({ message: "Pages must be an integer" })
   @IsOptional()
   @Min(1, { message: "Pages must be greater than 0" })
-  @Max(10000, { message: "Pages must be less than 10000" })
+  @Max(4000, { message: "Pages must be less than 4000" })
   pages?: number | null;
 
   @ApiPropertyOptional({

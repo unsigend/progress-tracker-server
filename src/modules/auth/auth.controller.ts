@@ -7,7 +7,6 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import type { Request } from "express";
-import { AuthGuard } from "@nestjs/passport";
 import {
   ApiBody,
   ApiOperation,
@@ -18,13 +17,16 @@ import {
 
 // import services
 import { AuthService } from "@modules/auth/auth.service";
-
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { UserLoginDto } from "@modules/auth/dto/user-login.dto";
+import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
+import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
 
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";
+
+// import decorators
+import { Public } from "@common/decorators/public.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -38,11 +40,13 @@ export class AuthController {
   @ApiOperation({ summary: "Login a user" })
   @ApiResponse({ status: 201, description: "User logged in successfully" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
-  @ApiBody({ type: UserLoginDto })
+  @ApiBody({ type: LoginRequestDto })
   @Post("login")
+  @Public()
   @UseGuards(LocalAuthGuard)
-  login(@Req() req: Request): UserResponseDto {
-    return req.user as UserResponseDto;
+  login(@Req() req: Request): LoginResponseDto {
+    const user: UserResponseDto = req.user as UserResponseDto;
+    return this.authService.generateJWT(user);
   }
 
   /**
@@ -53,7 +57,8 @@ export class AuthController {
   @ApiOkResponse({ description: "User logged out successfully" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Post("logout")
-  @UseGuards(AuthGuard("local"))
+  @Public()
+  @UseGuards(LocalAuthGuard)
   logout(@Req() req: Request): void {
     req.logOut((err) => {
       if (err) {
