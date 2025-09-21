@@ -33,13 +33,13 @@ import { CreateUserDto } from "@modules/user/dto/create-user.dto";
 import { UpdateUserDto } from "@modules/user/dto/update-user.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
-@Controller("user")
+@Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   /**
    * Get the current user
-   * @route GET api/v1/user/me
+   * @route GET api/v1/users/me
    * @param req - The request object
    * @returns The user
    */
@@ -69,7 +69,7 @@ export class UserController {
 
   /**
    * Update the current user
-   * @route Patch api/v1/user/me
+   * @route Patch api/v1/users/me
    * @param req - The request object
    * @param updateUserDto - The data to update the user
    * @returns The user
@@ -105,7 +105,7 @@ export class UserController {
 
   /**
    * Delete the current user
-   * @route DELETE api/v1/user/me
+   * @route DELETE api/v1/users/me
    * @param req - The request object
    * @returns The user
    */
@@ -135,7 +135,7 @@ export class UserController {
 
   /**
    * Replace the current user
-   * @route PUT api/v1/user/me
+   * @route PUT api/v1/users/me
    * @param req - The request object
    * @param updateUserDto - The data to update the user
    * @returns The user
@@ -171,7 +171,7 @@ export class UserController {
 
   /**
    * Create a user
-   * @route POST api/v1/user
+   * @route POST api/v1/users
    * @param createUserDto - The data to create the user
    * @returns The user or null if the user is not found
    */
@@ -199,7 +199,7 @@ export class UserController {
 
   /**
    * Find a user by id
-   * @route GET api/v1/user/:id
+   * @route GET api/v1/users/:id
    * @param id - The id of the user
    * @returns The user or null if the user is not found
    */
@@ -228,7 +228,7 @@ export class UserController {
 
   /**
    * Update a user by id
-   * @route PATCH api/v1/user/:id
+   * @route PATCH api/v1/users/:id
    * @param id - The id of the user
    * @param updateUserDto - The data to update the user
    * @returns The user or null if the user is not found
@@ -261,7 +261,7 @@ export class UserController {
 
   /**
    * Delete a user by id
-   * @route DELETE api/v1/user/:id
+   * @route DELETE api/v1/users/:id
    * @param id - The id of the user
    * @returns The user or null if the user is not found
    */
@@ -292,7 +292,7 @@ export class UserController {
 
   /**
    * Replace a user by id
-   * @route PUT api/v1/user/:id
+   * @route PUT api/v1/users/:id
    * @param id - The id of the user
    * @param updateUserDto - The data to update the user
    * @returns The user or null if the user is not found

@@ -32,14 +32,14 @@ import { UpdateBookDto } from "@modules/book/dto/update-book.dto";
 import { QueryBookDto } from "@modules/book/dto/query-book.dto";
 import { Book } from "@prisma/client";
 
-@Controller("book")
-@ApiTags("Book")
+@Controller("books")
+@ApiTags("Books")
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   /**
    * Create a book
-   * @route POST api/v1/book
+   * @route POST api/v1/books
    * @param createBookDto - The data to create the book
    * @returns The book or null if the book is not found
    */
@@ -60,7 +60,7 @@ export class BookController {
 
   /**
    * Get a book by id
-   * @route GET api/v1/book/:id
+   * @route GET api/v1/books/:id
    * @param id - The id of the book
    * @returns The book or null if the book is not found
    */
@@ -86,7 +86,7 @@ export class BookController {
 
   /**
    * Update a book by id
-   * @route PUT api/v1/book/:id
+   * @route PUT api/v1/books/:id
    * @param id - The id of the book
    * @param updateBookDto - The data to update the book
    * @returns The book or null if the book is not found
@@ -112,7 +112,7 @@ export class BookController {
 
   /**
    * Delete a book by id
-   * @route DELETE api/v1/book/:id
+   * @route DELETE api/v1/books/:id
    * @param id - The id of the book
    * @returns The book or null if the book is not found
    */
@@ -135,7 +135,7 @@ export class BookController {
 
   /**
    * Get all books
-   * @route GET api/v1/book
+   * @route GET api/v1/books
    * @param queryBookDto - The query parameters
    * @returns The books or null if the books are not found
    */
@@ -157,7 +157,7 @@ export class BookController {
 
   /**
    * Replace a book by id
-   * @route PUT api/v1/book/:id
+   * @route PUT api/v1/books/:id
    * @param id - The id of the book
    * @param updateBookDto - The data to update the book
    * @returns The book or null if the book is not found
@@ -183,7 +183,7 @@ export class BookController {
 
   /**
    * Patch a book by id
-   * @route PATCH api/v1/book/:id
+   * @route PATCH api/v1/books/:id
    * @param id - The id of the book
    * @param updateBookDto - The data to update the book
    * @returns The book or null if the book is not found
