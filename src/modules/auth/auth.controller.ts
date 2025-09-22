@@ -20,7 +20,6 @@ import {
   ApiParam,
 } from "@nestjs/swagger";
 import type { Request } from "express";
-import * as bcrypt from "bcrypt";
 
 // import services
 import { AuthService } from "@modules/auth/auth.service";
