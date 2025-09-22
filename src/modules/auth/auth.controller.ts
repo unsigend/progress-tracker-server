@@ -17,6 +17,7 @@ import {
   ApiOkResponse,
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
+  ApiParam,
 } from "@nestjs/swagger";
 import type { Request } from "express";
 import * as bcrypt from "bcrypt";
@@ -82,6 +83,11 @@ export class AuthController {
     });
   }
 
+  /**
+   * Register a user
+   * @param registerUserDto - The register user dto
+   * @returns The login response dto
+   */
   @ApiOperation({ summary: "Register a user" })
   @ApiBody({ type: RegisterUserDto })
   @ApiOkResponse({
@@ -109,7 +115,6 @@ export class AuthController {
     // create the user
     const newUser: CreateUserDto = {
       ...registerUserDto,
-      password: await bcrypt.hash(registerUserDto.password, 10),
     };
 
     // create the user
@@ -124,6 +129,17 @@ export class AuthController {
     return jwtToken;
   }
 
+  /**
+   * Check if an email exists
+   * @param emailCheckParam - The email check param
+   * @returns The email check response dto
+   */
+  @ApiOperation({ summary: "Check if an email exists" })
+  @ApiParam({ name: "email", description: "The email to check" })
+  @ApiOkResponse({
+    type: EmailCheckResponseDto,
+    description: "Whether the email exists",
+  })
   @Get("email-check/:email")
   @Public()
   public async emailCheck(

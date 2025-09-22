@@ -32,7 +32,6 @@ export class AuthService {
       userLoginDto.email,
       true,
     )) as User | null;
-
     if (!user) return null;
 
     const isPasswordValid = await bcrypt.compare(
