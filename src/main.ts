@@ -29,7 +29,7 @@ async function bootstrap() {
   app.setGlobalPrefix(`api/${configService.get<string>("app.API_VERSION")!}`);
 
   // use jwt auth guard
-  // app.useGlobalGuards(new JwtAuthGuard(new Reflector()));
+  app.useGlobalGuards(new JwtAuthGuard(new Reflector()));
 
   // use validation pipe
   const validationPipeOptions: ValidationPipeOptions = {

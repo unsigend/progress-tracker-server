@@ -15,6 +15,9 @@ export class UserResponseDto {
   @ApiProperty({ description: "The avatar url of the user" })
   avatar_url: string;
 
+  @ApiProperty({ description: "The provider of the user" })
+  provider: string[];
+
   @ApiProperty({ description: "The role of the user" })
   role: UserRole;
 
