@@ -10,4 +10,7 @@ export interface CONFIG_APP {
   NODE_ENV: string;
   // api version
   API_VERSION: string;
+
+  // frontend url
+  FRONTEND_URL: string;
 }

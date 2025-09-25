@@ -9,6 +9,8 @@ import {
   BadRequestException,
   Get,
   Param,
+  Logger,
+  Res,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -17,13 +19,14 @@ import {
   ApiOkResponse,
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
+  ApiParam,
 } from "@nestjs/swagger";
-import type { Request } from "express";
-import * as bcrypt from "bcrypt";
+import type { Request, Response } from "express";
 
 // import services
 import { AuthService } from "@modules/auth/auth.service";
 import { UserService } from "@modules/user/user.service";
+import { ConfigService } from "@nestjs/config";
 
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
@@ -32,19 +35,22 @@ import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
 import { RegisterUserDto } from "@/modules/auth/dto/register-user.dto";
 import { CreateUserDto } from "@modules/user/dto/create-user.dto";
 import { EmailCheckResponseDto } from "@/modules/auth/dto/email-check-response.dto";
+import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";
+import { GoogleAuthGuard } from "@common/guards/google-auth.guard";
+import { GithubAuthGuard } from "@common/guards/github-auth.guard";
 
 // import decorators
 import { Public } from "@common/decorators/public.decorator";
-import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -73,7 +79,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Post("logout")
   @Public()
-  @UseGuards(LocalAuthGuard)
   public logout(@Req() req: Request): void {
     req.logOut((err) => {
       if (err) {
@@ -82,6 +87,11 @@ export class AuthController {
     });
   }
 
+  /**
+   * Register a user
+   * @param registerUserDto - The register user dto
+   * @returns The login response dto
+   */
   @ApiOperation({ summary: "Register a user" })
   @ApiBody({ type: RegisterUserDto })
   @ApiOkResponse({
@@ -109,7 +119,6 @@ export class AuthController {
     // create the user
     const newUser: CreateUserDto = {
       ...registerUserDto,
-      password: await bcrypt.hash(registerUserDto.password, 10),
     };
 
     // create the user
@@ -124,6 +133,17 @@ export class AuthController {
     return jwtToken;
   }
 
+  /**
+   * Check if an email exists
+   * @param emailCheckParam - The email check param
+   * @returns The email check response dto
+   */
+  @ApiOperation({ summary: "Check if an email exists" })
+  @ApiParam({ name: "email", description: "The email to check" })
+  @ApiOkResponse({
+    type: EmailCheckResponseDto,
+    description: "Whether the email exists",
+  })
   @Get("email-check/:email")
   @Public()
   public async emailCheck(
@@ -134,5 +154,96 @@ export class AuthController {
       false,
     )) as UserResponseDto | null;
     return { exists: !!user };
+  }
+
+  /**
+   * Login with Google entry point
+   * This method is the entry point for the Google OAuth flow
+   * but no data is returned
+   * @returns void
+   */
+  @ApiOperation({ summary: "Login with Google only the entry point" })
+  @ApiOkResponse({ description: "User logged in with Google successfully" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("google")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public google(): void {}
+
+  /**
+   * Google OAuth callback
+   * This method is the callback for the Google OAuth flow
+   * redirect to the frontend with the access_token
+   */
+  @ApiOperation({
+    summary:
+      "Google OAuth callback redirect to the frontend with the access_token",
+  })
+  @ApiOkResponse({
+    description: "User logged in with Google successfully",
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("google/callback")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public googleCallback(
+    @Res({ passthrough: false }) res: Response,
+    @Req() req: Request,
+  ): void {
+    // generate the access token
+    const accessToken: LoginResponseDto = this.authService.generateJWT(
+      req.user as UserResponseDto,
+    );
+    // format the redirect url
+    let redirectUrl = `${this.configService.get<string>("auth.GOOGLE_FRONTEND_REDIRECT_URL")!}?`;
+    redirectUrl += `access_token=${accessToken.access_token}`;
+    Logger.log(`Redirecting to: ${redirectUrl}`);
+    // redirect to the frontend
+    res.redirect(redirectUrl);
+  }
+
+  /**
+   * Login with Github entry point
+   * This method is the entry point for the Github OAuth flow
+   * but no data is returned
+   * @returns void
+   */
+  @ApiOperation({ summary: "Login with Github only the entry point" })
+  @ApiOkResponse({ description: "User logged in with Github successfully" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("github")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public github(): void {}
+
+  /**
+   * Github OAuth callback
+   * This method is the callback for the Github OAuth flow
+   * redirect to the frontend with the access_token
+   */
+  @ApiOperation({
+    summary:
+      "Github OAuth callback redirect to the frontend with the access_token",
+  })
+  @ApiOkResponse({
+    description: "User logged in with Github successfully",
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("github/callback")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public githubCallback(
+    @Res({ passthrough: false }) res: Response,
+    @Req() req: Request,
+  ): void {
+    // generate the access token
+    const accessToken: LoginResponseDto = this.authService.generateJWT(
+      req.user as UserResponseDto,
+    );
+    // redirect to the frontend
+    let redirectUrl = `${this.configService.get<string>("auth.GITHUB_FRONTEND_REDIRECT_URL")!}?`;
+    redirectUrl += `access_token=${accessToken.access_token}`;
+    Logger.log(`Redirecting to: ${redirectUrl}`);
+    res.redirect(redirectUrl);
   }
 }

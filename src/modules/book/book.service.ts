@@ -153,4 +153,13 @@ export class BookService {
 
     return books;
   }
+
+  /**
+   * Get the total number of books
+   * @returns The total number of books
+   */
+  public async getTotalCount(): Promise<number> {
+    const totalCount: number = await this.prisma.book.count();
+    return totalCount;
+  }
 }
