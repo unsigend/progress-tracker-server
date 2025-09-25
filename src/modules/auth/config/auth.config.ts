@@ -17,6 +17,14 @@ class EnvironmentVariablesValidator {
   @IsNotEmpty()
   @IsOptional()
   JWT_EXPIRATION_TIME: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_ID: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_SECRET: string;
 }
 
 export default registerAs<CONFIG_AUTH>("auth", () => {
@@ -25,5 +33,10 @@ export default registerAs<CONFIG_AUTH>("auth", () => {
   return {
     JWT_SECRET: process.env.JWT_SECRET!,
     JWT_EXPIRATION_TIME: process.env.JWT_EXPIRATION_TIME || "7d",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
+    GOOGLE_FRONTEND_REDIRECT_URL:
+      process.env.GOOGLE_FRONTEND_REDIRECT_URL ??
+      `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/google/callback`,
   };
 });

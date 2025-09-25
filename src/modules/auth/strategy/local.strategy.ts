@@ -11,7 +11,7 @@ import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, "local") {
   constructor(private readonly authService: AuthService) {
     // specify the validation needs email and password
     super({
@@ -21,7 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   /**
-   * Validate a user
+   * Validate a user for local login
    * @param email - The email of the user
    * @param password - The password of the user
    * @returns The user or throw exception if the user is not found

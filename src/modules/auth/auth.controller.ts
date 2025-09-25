@@ -9,6 +9,8 @@ import {
   BadRequestException,
   Get,
   Param,
+  Logger,
+  Res,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -19,11 +21,12 @@ import {
   ApiBadRequestResponse,
   ApiParam,
 } from "@nestjs/swagger";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 
 // import services
 import { AuthService } from "@modules/auth/auth.service";
 import { UserService } from "@modules/user/user.service";
+import { ConfigService } from "@nestjs/config";
 
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
@@ -32,19 +35,21 @@ import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
 import { RegisterUserDto } from "@/modules/auth/dto/register-user.dto";
 import { CreateUserDto } from "@modules/user/dto/create-user.dto";
 import { EmailCheckResponseDto } from "@/modules/auth/dto/email-check-response.dto";
+import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";
+import { GoogleAuthGuard } from "@common/guards/google-auth.guard";
 
 // import decorators
 import { Public } from "@common/decorators/public.decorator";
-import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -73,7 +78,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Post("logout")
   @Public()
-  @UseGuards(LocalAuthGuard)
   public logout(@Req() req: Request): void {
     req.logOut((err) => {
       if (err) {
@@ -149,5 +153,46 @@ export class AuthController {
       false,
     )) as UserResponseDto | null;
     return { exists: !!user };
+  }
+
+  /**
+   * Login with Google entry point
+   * This method is the entry point for the Google OAuth flow
+   * but no data is returned
+   * @returns void
+   */
+  @ApiOperation({ summary: "Login with Google" })
+  @ApiOkResponse({
+    type: LoginResponseDto,
+    description: "User logged in with Google successfully",
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("google")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public google(): void {}
+
+  /**
+   * Google OAuth callback
+   * This method is the callback for the Google OAuth flow
+   * redirect to the frontend with the access_token
+   */
+  @ApiOperation({ summary: "Google OAuth callback" })
+  @ApiOkResponse({
+    type: LoginResponseDto,
+    description: "User logged in with Google successfully",
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("google/callback")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public googleCallback(@Res({ passthrough: false }) res: Response): void {
+    const accessToken = "abc159";
+    // format the redirect url
+    let redirectUrl = `${this.configService.get<string>("auth.GOOGLE_FRONTEND_REDIRECT_URL")!}?`;
+    redirectUrl += `access_token=${accessToken}`;
+    Logger.log(`Redirecting to: ${redirectUrl}`);
+    // redirect to the frontend
+    res.redirect(redirectUrl);
   }
 }
