@@ -213,4 +213,59 @@ export class UserService {
     const user: UserResponseDto | User = await this.deleteBy({ email }, full);
     return user;
   }
+
+  /**
+   * Create or link a user
+   * If the user exists, link the user to the provider
+   * If the user does not exist, create the user
+   * @param createUserDto - The data to create the user
+   * @param provider - The provider to link the user to
+   * @returns The user or null if the user is not found
+   * @public
+   */
+  public async createOrLinkUser(
+    createUserDto: CreateUserDto,
+    provider: string,
+  ): Promise<UserResponseDto> {
+    const existingUser: UserResponseDto = (await this.findByEmail(
+      createUserDto.email,
+      false,
+    )) as UserResponseDto;
+
+    if (existingUser) {
+      // if the user exists, link the user to the provider
+      const updatedUserDto: UpdateUserDto = {};
+
+      // update the avatar url only if it is different
+      if (
+        createUserDto.avatar_url &&
+        createUserDto.avatar_url !== existingUser.avatar_url
+      ) {
+        updatedUserDto.avatar_url = createUserDto.avatar_url;
+      }
+
+      // update the provider only if it is not already included
+      if (!existingUser.provider.includes(provider)) {
+        updatedUserDto.provider = [...existingUser.provider, provider];
+      }
+
+      const updatedUser: User = await this.prisma.user.update({
+        where: { id: existingUser.id },
+        data: updatedUserDto,
+      });
+      return this.filterUser(updatedUser);
+    } else {
+      // if the user does not exist, create the user
+      const newCreateUserDto: CreateUserDto = {
+        ...createUserDto,
+        avatar_url: createUserDto.avatar_url ?? null,
+        provider: [provider],
+      };
+      const newUser: UserResponseDto = (await this.create(
+        newCreateUserDto,
+        false,
+      )) as UserResponseDto;
+      return newUser;
+    }
+  }
 }

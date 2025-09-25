@@ -161,11 +161,8 @@ export class AuthController {
    * but no data is returned
    * @returns void
    */
-  @ApiOperation({ summary: "Login with Google" })
-  @ApiOkResponse({
-    type: LoginResponseDto,
-    description: "User logged in with Google successfully",
-  })
+  @ApiOperation({ summary: "Login with Google only the entry point" })
+  @ApiOkResponse({ description: "User logged in with Google successfully" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Get("google")
   @Public()
@@ -177,20 +174,28 @@ export class AuthController {
    * This method is the callback for the Google OAuth flow
    * redirect to the frontend with the access_token
    */
-  @ApiOperation({ summary: "Google OAuth callback" })
+  @ApiOperation({
+    summary:
+      "Google OAuth callback redirect to the frontend with the access_token",
+  })
   @ApiOkResponse({
-    type: LoginResponseDto,
     description: "User logged in with Google successfully",
   })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Get("google/callback")
   @Public()
   @UseGuards(GoogleAuthGuard)
-  public googleCallback(@Res({ passthrough: false }) res: Response): void {
-    const accessToken = "abc159";
+  public googleCallback(
+    @Res({ passthrough: false }) res: Response,
+    @Req() req: Request,
+  ): void {
+    // generate the access token
+    const accessToken: LoginResponseDto = this.authService.generateJWT(
+      req.user as UserResponseDto,
+    );
     // format the redirect url
     let redirectUrl = `${this.configService.get<string>("auth.GOOGLE_FRONTEND_REDIRECT_URL")!}?`;
-    redirectUrl += `access_token=${accessToken}`;
+    redirectUrl += `access_token=${accessToken.access_token}`;
     Logger.log(`Redirecting to: ${redirectUrl}`);
     // redirect to the frontend
     res.redirect(redirectUrl);

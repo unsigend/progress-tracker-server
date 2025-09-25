@@ -2,13 +2,20 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallback } from "passport-google-oauth20";
+import * as crypto from "crypto";
 
 // import services
 import { ConfigService } from "@nestjs/config";
+import { CreateUserDto } from "@/modules/user/dto/create-user.dto";
+import { UserService } from "@/modules/user/user.service";
+import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly userService: UserService,
+  ) {
     let fullDomain = configService.get<string>("app.DOMAIN")!;
     if (configService.get<number>("app.PORT")!) {
       fullDomain += `:${configService.get<number>("app.PORT")!}`;
@@ -24,20 +31,32 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     });
   }
 
-  validate(
+  public async validate(
     accessToken: string,
     refreshToken: string,
     profile: {
-      name: string;
+      name: { givenName: string; familyName: string };
       emails: { value: string }[];
       photos: { value: string }[];
     },
     callback: VerifyCallback,
   ) {
     const { name, emails, photos } = profile;
+    const randomPassword = crypto.randomBytes(16).toString("hex");
+    Logger.log(photos);
+    const createUserDto: CreateUserDto = {
+      username: name.givenName + " " + name.familyName,
+      email: emails[0].value,
+      password: randomPassword,
+      avatar_url: photos[0].value,
+    };
 
-    Logger.log(name, emails, photos);
+    // create or link the user
+    const resultUser: UserResponseDto = await this.userService.createOrLinkUser(
+      createUserDto,
+      "google",
+    );
 
-    callback(null, {});
+    callback(null, resultUser);
   }
 }

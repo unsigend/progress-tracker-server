@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
   IsEnum,
+  IsArray,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
@@ -62,4 +63,9 @@ export class CreateUserDto {
   @IsEnum(UserRole)
   @IsOptional()
   role?: UserRole;
+
+  @TrimString()
+  @IsArray()
+  @IsOptional()
+  provider?: string[];
 }
