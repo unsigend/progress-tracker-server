@@ -13,4 +13,11 @@ export interface CONFIG_AUTH {
   GOOGLE_CLIENT_SECRET: string;
   // google redirect url
   GOOGLE_FRONTEND_REDIRECT_URL: string;
+
+  // github client id
+  GITHUB_CLIENT_ID: string;
+  // github client secret
+  GITHUB_CLIENT_SECRET: string;
+  // github redirect url
+  GITHUB_FRONTEND_REDIRECT_URL: string;
 }

@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 // import dependencies
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { Strategy, VerifyCallback } from "passport-google-oauth20";
+import { Strategy } from "passport-github2";
 import * as crypto from "crypto";
 
 // import services
 import { ConfigService } from "@nestjs/config";
-import { CreateUserDto } from "@/modules/user/dto/create-user.dto";
 import { UserService } from "@/modules/user/user.service";
+
+// import dto
+import { CreateUserDto } from "@/modules/user/dto/create-user.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
+export class GithubStrategy extends PassportStrategy(Strategy, "github") {
   constructor(
     private readonly configService: ConfigService,
     private readonly userService: UserService,
@@ -20,14 +23,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     if (configService.get<number>("app.PORT")!) {
       fullDomain += `:${configService.get<number>("app.PORT")!}`;
     }
-    fullDomain += `/api/${configService.get<string>("app.API_VERSION")!}/auth/google/callback`;
+    fullDomain += `/api/${configService.get<string>("app.API_VERSION")!}/auth/github/callback`;
 
     super({
-      clientID: configService.get<string>("auth.GOOGLE_CLIENT_ID")!,
-      clientSecret: configService.get<string>("auth.GOOGLE_CLIENT_SECRET")!,
+      clientID: configService.get<string>("auth.GITHUB_CLIENT_ID")!,
+      clientSecret: configService.get<string>("auth.GITHUB_CLIENT_SECRET")!,
       callbackURL: fullDomain,
-      scope: ["email", "profile"],
-      passReqToCallback: false,
+      scope: ["user:email"],
     });
   }
 
@@ -35,27 +37,25 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     accessToken: string,
     refreshToken: string,
     profile: {
-      name: { givenName: string; familyName: string };
+      displayName: string;
       emails: { value: string }[];
       photos: { value: string }[];
     },
-    callback: VerifyCallback,
+    done,
   ) {
-    const { name, emails, photos } = profile;
     const randomPassword = crypto.randomBytes(16).toString("hex");
     const createUserDto: CreateUserDto = {
-      username: name.givenName + " " + name.familyName,
-      email: emails[0].value,
+      username: profile.displayName,
+      email: profile.emails[0]?.value,
+      avatar_url: profile.photos[0]?.value,
       password: randomPassword,
-      avatar_url: photos[0].value,
     };
 
     // create or link the user
     const resultUser: UserResponseDto = await this.userService.createOrLinkUser(
       createUserDto,
-      "google",
+      "github",
     );
-
-    callback(null, resultUser);
+    done(null, resultUser);
   }
 }

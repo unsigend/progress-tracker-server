@@ -40,6 +40,7 @@ import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";
 import { GoogleAuthGuard } from "@common/guards/google-auth.guard";
+import { GithubAuthGuard } from "@common/guards/github-auth.guard";
 
 // import decorators
 import { Public } from "@common/decorators/public.decorator";
@@ -198,6 +199,51 @@ export class AuthController {
     redirectUrl += `access_token=${accessToken.access_token}`;
     Logger.log(`Redirecting to: ${redirectUrl}`);
     // redirect to the frontend
+    res.redirect(redirectUrl);
+  }
+
+  /**
+   * Login with Github entry point
+   * This method is the entry point for the Github OAuth flow
+   * but no data is returned
+   * @returns void
+   */
+  @ApiOperation({ summary: "Login with Github only the entry point" })
+  @ApiOkResponse({ description: "User logged in with Github successfully" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("github")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public github(): void {}
+
+  /**
+   * Github OAuth callback
+   * This method is the callback for the Github OAuth flow
+   * redirect to the frontend with the access_token
+   */
+  @ApiOperation({
+    summary:
+      "Github OAuth callback redirect to the frontend with the access_token",
+  })
+  @ApiOkResponse({
+    description: "User logged in with Github successfully",
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get("github/callback")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public githubCallback(
+    @Res({ passthrough: false }) res: Response,
+    @Req() req: Request,
+  ): void {
+    // generate the access token
+    const accessToken: LoginResponseDto = this.authService.generateJWT(
+      req.user as UserResponseDto,
+    );
+    // redirect to the frontend
+    let redirectUrl = `${this.configService.get<string>("auth.GITHUB_FRONTEND_REDIRECT_URL")!}?`;
+    redirectUrl += `access_token=${accessToken.access_token}`;
+    Logger.log(`Redirecting to: ${redirectUrl}`);
     res.redirect(redirectUrl);
   }
 }

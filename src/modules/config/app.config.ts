@@ -57,6 +57,6 @@ export default registerAs<CONFIG_APP>("app", () => {
     PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
     NODE_ENV: process.env.NODE_ENV ?? Environment.Development,
     API_VERSION: process.env.API_VERSION ?? "v1",
-    FRONTEND_URL: process.env.FRONTEND_URL ?? "http://localhost:5173",
+    FRONTEND_URL: process.env.FRONTEND_URL!,
   };
 });
