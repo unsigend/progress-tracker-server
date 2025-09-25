@@ -10,7 +10,7 @@ import {
   Query,
   Patch,
   NotFoundException,
-  Logger,
+  Res,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -20,8 +20,8 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiQuery,
 } from "@nestjs/swagger";
+import type { Response } from "express";
 
 // import pipes
 import { ParseUUIDPipe } from "@nestjs/common";
@@ -139,9 +139,10 @@ export class BookController {
    * Get all books
    * @route GET api/v1/books
    * @param queryBookDto - The query parameters
+   * @note set header x-total-count to the total number of books
    * @returns The books or null if the books are not found
    */
-  @ApiOperation({ summary: "Get all books" })
+  @ApiOperation({ summary: "Get all books and set header x-total-count" })
   @ApiOkResponse({
     type: [BookResponseDto],
     description: "The books retrieved successfully",
@@ -151,9 +152,15 @@ export class BookController {
   })
   @Get()
   async findAll(
+    @Res({ passthrough: true }) res: Response,
     @Query() queryBookDto: QueryBookDto,
   ): Promise<BookResponseDto[]> {
+    // get books
     const books: Book[] = await this.bookService.findAll(queryBookDto);
+    // get total count
+    const totalCount: number = await this.bookService.getTotalCount();
+    // set header x-total-count
+    res.setHeader("x-total-count", totalCount.toString());
     return books as BookResponseDto[];
   }
 

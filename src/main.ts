@@ -20,7 +20,9 @@ import { JwtAuthGuard } from "@common/guards/jwt-auth.guard";
 async function bootstrap() {
   // create app instance
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: ["x-total-count"],
+  });
 
   // get config service
   const configService = app.get(ConfigService);
