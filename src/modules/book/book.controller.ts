@@ -10,6 +10,7 @@ import {
   Query,
   Patch,
   NotFoundException,
+  Logger,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -19,6 +20,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
 } from "@nestjs/swagger";
 
 // import pipes
@@ -141,7 +143,7 @@ export class BookController {
    */
   @ApiOperation({ summary: "Get all books" })
   @ApiOkResponse({
-    type: BookResponseDto,
+    type: [BookResponseDto],
     description: "The books retrieved successfully",
   })
   @ApiBadRequestResponse({
