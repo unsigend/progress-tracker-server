@@ -32,6 +32,7 @@ import { CreateBookDto } from "@modules/book/dto/create-book.dto";
 import { BookResponseDto } from "@modules/book/dto/book-response.dto";
 import { UpdateBookDto } from "@modules/book/dto/update-book.dto";
 import { QueryBookDto } from "@modules/book/dto/query-book.dto";
+import { AllBookResponseDto } from "@modules/book/dto/all-book-response.dto";
 import { Book } from "@prisma/client";
 
 @Controller("books")
@@ -140,11 +141,11 @@ export class BookController {
    * @route GET api/v1/books
    * @param queryBookDto - The query parameters
    * @note set header x-total-count to the total number of books
-   * @returns The books or null if the books are not found
+   * @returns the books and the total number of books
    */
   @ApiOperation({ summary: "Get all books and set header x-total-count" })
   @ApiOkResponse({
-    type: [BookResponseDto],
+    type: AllBookResponseDto,
     description: "The books retrieved successfully",
   })
   @ApiBadRequestResponse({
@@ -154,14 +155,13 @@ export class BookController {
   async findAll(
     @Res({ passthrough: true }) res: Response,
     @Query() queryBookDto: QueryBookDto,
-  ): Promise<BookResponseDto[]> {
+  ): Promise<AllBookResponseDto> {
     // get books
-    const books: Book[] = await this.bookService.findAll(queryBookDto);
-    // get total count
-    const totalCount: number = await this.bookService.getTotalCount();
+    const books: AllBookResponseDto =
+      await this.bookService.findAll(queryBookDto);
     // set header x-total-count
-    res.setHeader("x-total-count", totalCount.toString());
-    return books as BookResponseDto[];
+    res.setHeader("x-total-count", books.totalCount.toString());
+    return books;
   }
 
   /**

@@ -11,6 +11,7 @@ import { Prisma, Book } from "@prisma/client";
 import { CreateBookDto } from "@modules/book/dto/create-book.dto";
 import { UpdateBookDto } from "@modules/book/dto/update-book.dto";
 import { QueryBookDto } from "@modules/book/dto/query-book.dto";
+import { AllBookResponseDto } from "@modules/book/dto/all-book-response.dto";
 
 @Injectable()
 export class BookService {
@@ -112,7 +113,14 @@ export class BookService {
     }
   }
 
-  public async findAll(queryBookDto: QueryBookDto): Promise<Book[]> {
+  /**
+   * Find all books
+   * @param queryBookDto - The query parameters
+   * @returns The books or null if the books are not found
+   */
+  public async findAll(
+    queryBookDto: QueryBookDto,
+  ): Promise<AllBookResponseDto> {
     // set default values
     if (!queryBookDto.page) {
       queryBookDto.page = 1;
@@ -151,7 +159,18 @@ export class BookService {
       },
     });
 
-    return books;
+    if (!queryBookDto.search) {
+      const totalCount: number = await this.getTotalCount();
+      return {
+        books,
+        totalCount,
+      };
+    }
+
+    return {
+      books,
+      totalCount: books.length,
+    };
   }
 
   /**
