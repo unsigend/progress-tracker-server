@@ -9,7 +9,6 @@ import {
   BadRequestException,
   Get,
   Param,
-  Logger,
   Res,
 } from "@nestjs/common";
 import {
@@ -197,7 +196,6 @@ export class AuthController {
     // format the redirect url
     let redirectUrl = `${this.configService.get<string>("auth.GOOGLE_FRONTEND_REDIRECT_URL")!}?`;
     redirectUrl += `access_token=${accessToken.access_token}`;
-    Logger.log(`Redirecting to: ${redirectUrl}`);
     // redirect to the frontend
     res.redirect(redirectUrl);
   }
@@ -243,7 +241,6 @@ export class AuthController {
     // redirect to the frontend
     let redirectUrl = `${this.configService.get<string>("auth.GITHUB_FRONTEND_REDIRECT_URL")!}?`;
     redirectUrl += `access_token=${accessToken.access_token}`;
-    Logger.log(`Redirecting to: ${redirectUrl}`);
     res.redirect(redirectUrl);
   }
 }
