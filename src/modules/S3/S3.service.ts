@@ -3,7 +3,11 @@
 
 // import dependencies
 import { Injectable } from "@nestjs/common";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 // import services
 import { ConfigService } from "@nestjs/config";
@@ -14,7 +18,7 @@ export class S3Service {
   private readonly bucketName: string;
 
   /**
-   * Constructor for initializing the S3 service
+   * Constructor for initializing the AWS S3 service
    */
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -27,6 +31,11 @@ export class S3Service {
     this.bucketName = this.configService.get("s3.AWS_S3_BUCKET_NAME")!;
   }
 
+  /**
+   * Upload a file to AWS S3
+   * @param file - The file to upload
+   * @returns The file url
+   */
   async uploadFile(file: Express.Multer.File): Promise<string> {
     // generate a unique file name: current timestamp + original file name
     const fileName = `${Date.now()}-${file.originalname}`;
@@ -48,5 +57,19 @@ export class S3Service {
     fileUrl += ".amazonaws.com/";
     fileUrl += fileName;
     return fileUrl;
+  }
+
+  /**
+   * Delete a file from AWS S3
+   * @param fileName - The name of the file to delete
+   * @returns Whether the file was deleted successfully
+   */
+  async deleteFile(fileName: string): Promise<boolean> {
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: fileName,
+    });
+    await this.s3Client.send(deleteCommand);
+    return true;
   }
 }
