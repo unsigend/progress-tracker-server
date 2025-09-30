@@ -136,18 +136,18 @@ export class BookService {
     }
 
     const books: Book[] = await this.prisma.book.findMany({
-      where: queryBookDto.search
+      where: queryBookDto.value
         ? {
             OR: [
-              { title: { contains: queryBookDto.search, mode: "insensitive" } },
+              { title: { contains: queryBookDto.value, mode: "insensitive" } },
               {
-                author: { contains: queryBookDto.search, mode: "insensitive" },
+                author: { contains: queryBookDto.value, mode: "insensitive" },
               },
               {
-                ISBN10: { contains: queryBookDto.search, mode: "insensitive" },
+                ISBN10: { contains: queryBookDto.value, mode: "insensitive" },
               },
               {
-                ISBN13: { contains: queryBookDto.search, mode: "insensitive" },
+                ISBN13: { contains: queryBookDto.value, mode: "insensitive" },
               },
             ],
           }
@@ -159,7 +159,7 @@ export class BookService {
       },
     });
 
-    if (!queryBookDto.search) {
+    if (!queryBookDto.value) {
       const totalCount: number = await this.getTotalCount();
       return {
         books,

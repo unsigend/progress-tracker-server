@@ -37,7 +37,8 @@ async function bootstrap() {
   const validationPipeOptions: ValidationPipeOptions = {
     transform: true,
     whitelist: true,
-    forbidNonWhitelisted: true,
+    // ignore fields that are not in the dto
+    forbidNonWhitelisted: false,
   };
   app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 

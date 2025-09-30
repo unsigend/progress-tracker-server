@@ -6,15 +6,14 @@ import { TrimString } from "@common/transform/trim-string";
 
 export class QueryBookDto {
   @ApiPropertyOptional({
-    description:
-      "Search term to filter books by title, author, ISBN10 or ISBN13",
+    description: "Value to filter books by title, author, ISBN10 or ISBN13",
     example: "",
     type: String,
   })
   @TrimString()
-  @IsString({ message: "Search must be a string" })
+  @IsString({ message: "Value must be a string" })
   @IsOptional()
-  search?: string | null;
+  value?: string | null;
 
   @ApiPropertyOptional({
     description: "Page number for pagination index starts from 1",

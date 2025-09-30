@@ -92,15 +92,20 @@ export class UserBookController {
    * @returns The user books
    * @public
    */
-  @ApiOperation({ summary: "Get tracked books for a user" })
+  @ApiOperation({ summary: "Get all tracked books for a user" })
   @ApiOkResponse({ type: UserBooksResponseDto })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @ApiQuery({ type: QueryTrackedBookDto })
   @Get()
-  async getTrackedBooks(@Req() req: Request): Promise<UserBooksResponseDto> {
+  async findAll(@Req() req: Request): Promise<UserBooksResponseDto> {
+    // get the user id and query
     const user_id: string = (req.user as UserResponseDto).id;
     const query: QueryTrackedBookDto = req.query as QueryTrackedBookDto;
-    return this.readingService.getTrackedBooks(user_id, query);
+
+    // get the user books
+    const userBooks: UserBooksResponseDto =
+      await this.readingService.getTrackedBooks(user_id, query);
+    return userBooks;
   }
 }

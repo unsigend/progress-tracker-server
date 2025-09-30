@@ -1,19 +1,18 @@
 // import dependencies
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { ReadingStatus } from "@prisma/client";
-import { IsOptional, IsEnum } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 /**
  * This dto is used to store the query tracked book dto.
  */
 export class QueryTrackedBookDto {
-  @ApiPropertyOptional({
-    description: "the status of the book",
-    example: "NOT_STARTED",
-    enum: ReadingStatus,
-    enumName: "ReadingStatus",
-  })
-  @IsEnum(ReadingStatus)
+  @ApiPropertyOptional({ description: "The search field", type: String })
+  @IsString()
   @IsOptional()
-  status?: ReadingStatus | null;
+  field?: string | null;
+
+  @ApiPropertyOptional({ description: "The search value", type: String })
+  @IsString()
+  @IsOptional()
+  value?: string | null;
 }
