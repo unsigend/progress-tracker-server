@@ -11,5 +11,6 @@ import { BookController } from "@modules/book/book.controller";
   imports: [DatabaseModule],
   providers: [BookService],
   controllers: [BookController],
+  exports: [BookService],
 })
 export class BookModule {}

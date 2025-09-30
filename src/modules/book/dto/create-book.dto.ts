@@ -51,10 +51,9 @@ export class CreateBookDto {
   @ApiPropertyOptional({ description: "The pages of the book", type: Number })
   @Type(() => Number)
   @IsInt({ message: "Pages must be an integer" })
-  @IsOptional()
   @Min(1, { message: "Pages must be greater than 0" })
   @Max(4000, { message: "Pages must be less than 4000" })
-  pages?: number | null;
+  pages: number;
 
   @ApiPropertyOptional({
     description: "The cover url of the book",

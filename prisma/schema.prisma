@@ -10,6 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+/*
+  This model is used to store the book information.
+*/
 model Book {
   // primary key
   id        String   @id @default(uuid())
@@ -32,12 +36,18 @@ model Book {
   user_books UserBook[]
 }
 
+/*
+  This enum is used to store the reading status.
+*/
 enum ReadingStatus {
   NOT_STARTED
   IN_PROGRESS
   COMPLETED
 }
 
+/*
+  This model is used to store the user book information.
+*/
 model UserBook {
   // primary key
   id        String   @id @default(uuid())
@@ -70,6 +80,9 @@ model UserBook {
   @@index([user_id, status])
 }
 
+/*
+  This model is used to store the reading record information.
+*/
 model ReadingRecord {
   // primary key
   id        String   @id @default(uuid())
@@ -93,11 +106,17 @@ model ReadingRecord {
   @@index([user_book_id, date])
 }
 
+/*
+  This enum is used to store the user role.
+*/
 enum UserRole {
   ADMIN
   USER
 }
 
+/*
+  This model is used to store the user information.
+*/
 model User {
   // primary key
   id        String   @id @default(uuid())
