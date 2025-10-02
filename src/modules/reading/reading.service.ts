@@ -13,7 +13,7 @@ import { UserService } from "@modules/user/user.service";
 import { BookService } from "@modules/book/book.service";
 
 // import dto
-import { UserBook, Book, ReadingStatus } from "@prisma/client";
+import { UserBook, Book } from "@prisma/client";
 import { UserBookResponseDto } from "@modules/reading/dto/user-book-response.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 import { QueryTrackedBookDto } from "@modules/reading/dto/query-tracked-book.dto";
@@ -126,31 +126,26 @@ export class ReadingService {
       throw new NotFoundException("User not found");
     }
 
-    // if the field and value are provided
-    if (query.field && query.value) {
-      if (
-        query.field === "status" &&
-        Object.values(ReadingStatus).includes(query.value as ReadingStatus)
-      ) {
-        // if status is provided, return all user books with the status
-        const userBooksWithBooks = await this.prisma.userBook.findMany({
-          where: { user_id, status: query.value as ReadingStatus },
-          include: { book: true },
-        });
+    // if the value is provided
+    if (query.value) {
+      // if status is provided, return all user books with the status
+      const userBooksWithBooks = await this.prisma.userBook.findMany({
+        where: { user_id, status: query.value },
+        include: { book: true },
+      });
 
-        const books: BookProgressDto[] = userBooksWithBooks.map((userBook) => ({
-          book: userBook.book as any,
-          userBook: userBook as any,
-        }));
+      const books: BookProgressDto[] = userBooksWithBooks.map((userBook) => ({
+        book: userBook.book as any,
+        userBook: userBook as any,
+      }));
 
-        return {
-          books,
-          totalCount: books.length,
-        };
-      }
+      return {
+        books,
+        totalCount: books.length,
+      };
     }
 
-    // if the field and value are not provided, return all user books
+    // if the value is not provided, return all user books
     const userBooksWithBooks = await this.prisma.userBook.findMany({
       where: { user_id },
       include: { book: true },
