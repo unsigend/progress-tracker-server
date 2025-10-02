@@ -25,11 +25,11 @@ import { ReadingService } from "@/modules/reading/reading.service";
 
 // import dto
 import type { Request } from "express";
+import { ObjectIdDto } from "@common/dto/object-id.dto";
 import { UserBookResponseDto } from "@/modules/reading/dto/user-book-response.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 import { UserBooksResponseDto } from "@/modules/reading/dto/user-books-response.dto";
 import { QueryTrackedBookDto } from "@/modules/reading/dto/query-tracked-book.dto";
-import { TrackBookRequestDto } from "@/modules/reading/dto/track-book.dto";
 
 @Controller("user-books")
 export class UserBookController {
@@ -46,15 +46,15 @@ export class UserBookController {
   @ApiNotFoundResponse({ description: "Book not found" })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
-  @ApiBody({ type: TrackBookRequestDto })
+  @ApiBody({ type: ObjectIdDto })
   @Post()
   async create(
-    @Body() trackBookRequestDto: TrackBookRequestDto,
+    @Body() objectIdDto: ObjectIdDto,
     @Req() req: Request,
   ): Promise<UserBookResponseDto> {
     const user_id: string = (req.user as UserResponseDto).id;
     const userBook: UserBookResponseDto = await this.readingService.trackBook(
-      trackBookRequestDto.book_id,
+      objectIdDto.id,
       user_id,
     );
     return userBook;

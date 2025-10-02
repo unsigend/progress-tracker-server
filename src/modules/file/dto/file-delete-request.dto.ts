@@ -3,11 +3,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsNotEmpty } from "class-validator";
 
 /**
- * This dto is used to track a book
+ * This dto is used to store the file delete request.
  */
-export class TrackBookRequestDto {
-  @ApiProperty({ description: "The book id to track" })
+export class FileDeleteRequestDto {
+  @ApiProperty({ description: "The file url" })
   @IsString()
   @IsNotEmpty()
-  book_id: string;
+  file_url: string;
 }

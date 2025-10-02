@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 // import dependencies
 import { Injectable } from "@nestjs/common";
 import {
@@ -61,10 +58,16 @@ export class S3Service {
 
   /**
    * Delete a file from AWS S3
-   * @param fileName - The name of the file to delete
+   * @param fileUrl - The url of the file to delete
    * @returns Whether the file was deleted successfully
    */
-  async deleteFile(fileName: string): Promise<boolean> {
+  async deleteFile(fileUrl: string): Promise<boolean> {
+    // Extract the file name/key from the full URL
+    const fileName = fileUrl.split("/").pop();
+    if (!fileName) {
+      return false;
+    }
+
     const deleteCommand = new DeleteObjectCommand({
       Bucket: this.bucketName,
       Key: fileName,

@@ -5,6 +5,8 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  Delete,
+  Body,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
@@ -21,6 +23,8 @@ import { S3Service } from "@modules/S3/S3.service";
 
 // import dto
 import { FileUploadResponseDto } from "@modules/file/dto/file-upload-response.dto";
+import { FileDeleteRequestDto } from "@modules/file/dto/file-delete-request.dto";
+import { FileDeleteResponseDto } from "@modules/file/dto/file-delete-response.dto";
 
 @ApiTags("File")
 @Controller("file")
@@ -57,6 +61,28 @@ export class FileController {
     return {
       file_url: fileUrl,
       success: true,
+    };
+  }
+
+  /**
+   * Delete a file from S3
+   * @param fileDeleteRequestDto - The file delete request
+   * @returns The file delete response
+   */
+  @ApiOperation({ summary: "Delete a file from cloud" })
+  @ApiBody({ type: FileDeleteRequestDto })
+  @ApiOkResponse({ type: FileDeleteResponseDto })
+  @ApiBadRequestResponse({ description: "File is required" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Delete("delete")
+  async deleteFile(
+    @Body() fileDeleteRequestDto: FileDeleteRequestDto,
+  ): Promise<FileDeleteResponseDto> {
+    const fileUrl: string = fileDeleteRequestDto.file_url;
+    const fileDeleteResponseDto: boolean =
+      await this.s3Service.deleteFile(fileUrl);
+    return {
+      success: fileDeleteResponseDto,
     };
   }
 }
