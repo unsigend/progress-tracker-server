@@ -12,7 +12,7 @@ export class QueryTrackedBookDto {
     type: ReadingStatus,
     enum: ReadingStatus,
     enumName: "ReadingStatus",
-    example: ReadingStatus.NOT_STARTED,
+    example: ReadingStatus.IN_PROGRESS,
   })
   @IsString()
   @IsOptional()

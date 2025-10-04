@@ -2,7 +2,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 // import dto
-import { BookProgressDto } from "@/modules/reading/dto/book-progress.dto";
+import { BookProgressDto } from "@/modules/userBook/dto/book-progress.dto";
 
 /**
  * This dto is used to store the user books response.

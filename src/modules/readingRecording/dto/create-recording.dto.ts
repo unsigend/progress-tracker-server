@@ -17,6 +17,7 @@ export class CreateRecordingDto {
   user_book_id: string;
 
   @ApiProperty({ description: "The date of the recording", type: Date })
+  @Type(() => Date)
   @IsDate()
   date: Date;
 

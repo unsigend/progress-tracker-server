@@ -14,14 +14,14 @@ import { BookService } from "@modules/book/book.service";
 
 // import dto
 import { UserBook, Book } from "@prisma/client";
-import { UserBookResponseDto } from "@modules/reading/dto/user-book-response.dto";
+import { UserBookResponseDto } from "@/modules/userBook/dto/user-book-response.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { QueryTrackedBookDto } from "@modules/reading/dto/query-tracked-book.dto";
-import { UserBooksResponseDto } from "@modules/reading/dto/user-books-response.dto";
-import { BookProgressDto } from "@modules/reading/dto/book-progress.dto";
+import { QueryTrackedBookDto } from "@/modules/userBook/dto/query-tracked-book.dto";
+import { UserBooksResponseDto } from "@/modules/userBook/dto/user-books-response.dto";
+import { BookProgressDto } from "@/modules/userBook/dto/book-progress.dto";
 
 @Injectable()
-export class ReadingService {
+export class UserBookService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,

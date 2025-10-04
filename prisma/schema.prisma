@@ -1,3 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 
 /*
   This model is used to store the book information.
@@ -91,4 +103,34 @@ model ReadingRecord {
 
   // index optimization
   @@index([user_book_id, date])
+}
+
+/*
+  This enum is used to store the user role.
+*/
+enum UserRole {
+  ADMIN
+  USER
+}
+
+/*
+  This model is used to store the user information.
+*/
+model User {
+  // primary key
+  id        String   @id @default(uuid())
+
+  // fields
+  username  String   
+  email     String   @unique
+  password  String
+  avatar_url String?
+  provider  String[] @default(["local"])
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // relation
+  user_books UserBook[]
 }

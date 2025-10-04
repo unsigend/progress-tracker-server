@@ -14,7 +14,7 @@ import { BookModule } from "@modules/book/book.module";
 import { AuthModule } from "@modules/auth/auth.module";
 import { S3Module } from "@modules/S3/S3.module";
 import { FileModule } from "@modules/file/file.module";
-import { ReadingModule } from "@modules/reading/reading.module";
+import { UserBookModule } from "@/modules/userBook/userBook.module";
 import { ReadingRecordingModule } from "@modules/readingRecording/readingRecording.module";
 
 @Module({
@@ -28,7 +28,7 @@ import { ReadingRecordingModule } from "@modules/readingRecording/readingRecordi
     AuthModule,
     S3Module,
     FileModule,
-    ReadingModule,
+    UserBookModule,
     ReadingRecordingModule,
   ],
   controllers: [],
