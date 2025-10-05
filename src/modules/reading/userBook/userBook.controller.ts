@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   Body,
+  Patch,
 } from "@nestjs/common";
 import {
   ApiForbiddenResponse,
@@ -30,6 +31,7 @@ import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-re
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 import { UserBooksResponseDto } from "@/modules/reading/userBook/dto/user-books-response.dto";
 import { QueryTrackedBookDto } from "@/modules/reading/userBook/dto/query-tracked-book.dto";
+import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-update.dto";
 
 @Controller("user-books")
 export class UserBookController {
@@ -73,7 +75,7 @@ export class UserBookController {
   @ApiForbiddenResponse({ description: "Permission denied" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Delete(":id")
-  async delete(
+  async deleteByID(
     @Param("id", ParseUUIDPipe) id: string,
     @Req() req: Request,
   ): Promise<UserBookResponseDto> {
@@ -109,5 +111,48 @@ export class UserBookController {
       query,
     );
     return userBooks;
+  }
+
+  /**
+   * Get a user book by id
+   * @param id - The user book id
+   * @returns The user book
+   * @public
+   */
+  @ApiOperation({ summary: "Get a user book by id" })
+  @ApiOkResponse({ type: UserBookResponseDto })
+  @ApiNotFoundResponse({ description: "User book not found" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get(":id")
+  async findById(
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<UserBookResponseDto> {
+    const userBook: UserBookResponseDto =
+      await this.userBookService.findById(id);
+    return userBook;
+  }
+
+  /**
+   * Update a user book
+   * @param id - The user book id
+   * @param data - The data to update the user book
+   * @returns The user book
+   * @public
+   */
+  @ApiOperation({ summary: "Update a user book" })
+  @ApiOkResponse({ type: UserBookResponseDto })
+  @ApiNotFoundResponse({ description: "User book not found" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @ApiBody({ type: UserBookUpdateDto })
+  @Patch(":id")
+  async update(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() data: UserBookUpdateDto,
+  ): Promise<UserBookResponseDto> {
+    const userBook: UserBookResponseDto = await this.userBookService.update(
+      id,
+      data,
+    );
+    return userBook;
   }
 }

@@ -35,11 +35,14 @@ export class UserBookService {
    * @returns The user book or null if the user book is not found
    * @public
    */
-  async findById(id: string): Promise<UserBookResponseDto | null> {
+  async findById(id: string): Promise<UserBookResponseDto> {
     const userBook: UserBookResponseDto =
       (await this.prisma.userBook.findUnique({
         where: { id },
       })) as UserBookResponseDto;
+    if (!userBook) {
+      throw new NotFoundException("User book not found");
+    }
     return userBook;
   }
 
@@ -173,15 +176,17 @@ export class UserBookService {
 
   /**
    * Untrack a book for a user
-   * @param book_id - The book id
+   * @param user_book_id - The user book id
    * @param user_id - The user id
    * @returns The user book
    * @public
    */
-  async delete(book_id: string, user_id: string): Promise<UserBookResponseDto> {
-    const compositeUniqueKey = { book_id, user_id };
+  async delete(
+    user_book_id: string,
+    user_id: string,
+  ): Promise<UserBookResponseDto> {
     const userBook: UserBook | null = await this.prisma.userBook.findUnique({
-      where: { book_id_user_id: compositeUniqueKey },
+      where: { id: user_book_id },
     });
 
     if (!userBook) {
@@ -189,13 +194,13 @@ export class UserBookService {
     }
 
     // check if the user is the owner of the user book
-    if (userBook.user_id !== user_id || userBook.book_id !== book_id) {
+    if (userBook.user_id !== user_id) {
       throw new ForbiddenException("Permission denied");
     }
 
     // delete the user book
     await this.prisma.userBook.delete({
-      where: { book_id_user_id: compositeUniqueKey },
+      where: { id: user_book_id },
     });
 
     return userBook as UserBookResponseDto;
