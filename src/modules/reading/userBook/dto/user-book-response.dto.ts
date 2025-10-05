@@ -22,10 +22,10 @@ export class UserBookResponseDto {
   current_page: number;
 
   @ApiProperty({ description: "The start date of the user book" })
-  start_date: Date;
+  start_date: Date | null;
 
   @ApiProperty({ description: "The completed date of the user book" })
-  completed_date: Date;
+  completed_date: Date | null;
 
   @ApiProperty({ description: "The total minutes of the user book" })
   total_minutes: number;

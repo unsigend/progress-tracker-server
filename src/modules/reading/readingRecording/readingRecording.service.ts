@@ -3,14 +3,13 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 
 // import services
 import { PrismaService } from "@modules/database/prisma.service";
-import { UserBookService } from "@modules/userBook/userBook.service";
+import { UserBookService } from "@/modules/reading/userBook/userBook.service";
 
 // import dto
-import { CreateRecordingDto } from "@modules/readingRecording/dto/create-recording.dto";
-import { RecordingResponseDto } from "@modules/readingRecording/dto/recording-response.dto";
-import { RecordingsResponseDto } from "@modules/readingRecording/dto/recordings-response.dto";
-import { UserBookResponseDto } from "@modules/userBook/dto/user-book-response.dto";
-import { UserBookUpdateDto } from "@modules/userBook/dto/user-book-update.dto";
+import { CreateRecordingDto } from "@/modules/reading/readingRecording/dto/create-recording.dto";
+import { RecordingResponseDto } from "@/modules/reading/readingRecording/dto/recording-response.dto";
+import { RecordingsResponseDto } from "@/modules/reading/readingRecording/dto/recordings-response.dto";
+import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-update.dto";
 
 @Injectable()
 export class ReadingRecordingService {
@@ -24,16 +23,9 @@ export class ReadingRecordingService {
    * @param createRecordingDto - The data to create the recording
    * @returns The recording
    */
-  async createRecording(
+  async create(
     createRecordingDto: CreateRecordingDto,
   ): Promise<RecordingResponseDto> {
-    // check if the user book exists
-    const userBook: UserBookResponseDto | null =
-      await this.userBookService.findById(createRecordingDto.user_book_id);
-    if (!userBook) {
-      throw new NotFoundException("Tracked Book Data not found");
-    }
-
     // check if the recording date already exist in the same book with same date
     let recording: RecordingResponseDto | null =
       (await this.prisma.readingRecord.findUnique({
@@ -45,6 +37,8 @@ export class ReadingRecordingService {
         },
       })) as RecordingResponseDto;
 
+    let userBookUpdateDto: UserBookUpdateDto | null = null;
+
     if (recording) {
       // if the recording date already exist in the same book, merge the data
       recording = (await this.prisma.readingRecord.update({
@@ -55,19 +49,26 @@ export class ReadingRecordingService {
           notes: recording.notes ?? createRecordingDto.notes,
         },
       })) as RecordingResponseDto;
+
+      userBookUpdateDto = {
+        pages: createRecordingDto.pages,
+        minutes: createRecordingDto.minutes,
+        days: 0,
+      };
     } else {
-      // create the recording
+      // create the new recording
       recording = (await this.prisma.readingRecord.create({
         data: createRecordingDto,
       })) as RecordingResponseDto;
+
+      userBookUpdateDto = {
+        pages: createRecordingDto.pages,
+        minutes: createRecordingDto.minutes,
+        days: 1,
+      };
     }
 
     // update the user book data
-    const userBookUpdateDto: UserBookUpdateDto = {
-      total_minutes: userBook.total_minutes + createRecordingDto.minutes,
-      total_days: userBook.total_days + 1,
-      current_page: userBook.current_page + createRecordingDto.pages,
-    };
     await this.userBookService.update(
       createRecordingDto.user_book_id,
       userBookUpdateDto,
@@ -80,9 +81,7 @@ export class ReadingRecordingService {
    * @param user_book_id - The user book id
    * @returns The recordings
    */
-  async getRecordingsByUserBookId(
-    user_book_id: string,
-  ): Promise<RecordingsResponseDto> {
+  async getAll(user_book_id: string): Promise<RecordingsResponseDto> {
     const recordings: RecordingResponseDto[] =
       (await this.prisma.readingRecord.findMany({
         where: { user_book_id },
@@ -98,7 +97,7 @@ export class ReadingRecordingService {
    * @param id - The id of the recording
    * @returns The recording
    */
-  async deleteRecording(id: string): Promise<RecordingResponseDto> {
+  async delete(id: string): Promise<RecordingResponseDto> {
     // get the recording
     const recording: RecordingResponseDto | null =
       (await this.prisma.readingRecord.findUnique({
@@ -108,18 +107,11 @@ export class ReadingRecordingService {
       throw new NotFoundException("Recording not found");
     }
 
-    // get the user book
-    const userBook: UserBookResponseDto | null =
-      await this.userBookService.findById(recording.user_book_id);
-    if (!userBook) {
-      throw new NotFoundException("Tracked Book Data not found");
-    }
-
     // update the user book data
     const userBookUpdateDto: UserBookUpdateDto = {
-      total_minutes: userBook.total_minutes - recording.minutes,
-      total_days: userBook.total_days - 1,
-      current_page: userBook.current_page - recording.pages,
+      pages: -recording.pages,
+      minutes: -recording.minutes,
+      days: -1,
     };
     await this.userBookService.update(
       recording.user_book_id,
@@ -131,7 +123,6 @@ export class ReadingRecordingService {
       (await this.prisma.readingRecord.delete({
         where: { id },
       })) as RecordingResponseDto;
-
     return deletedRecording;
   }
 }

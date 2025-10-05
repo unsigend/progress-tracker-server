@@ -7,14 +7,15 @@ import { UserModule } from "@modules/user/user.module";
 import { BookModule } from "@modules/book/book.module";
 
 // import services
-import { UserBookService } from "@/modules/userBook/userBook.service";
+import { UserBookService } from "@/modules/reading/userBook/userBook.service";
 
 // import controllers
-import { UserBookController } from "@/modules/userBook/userBook.controller";
+import { UserBookController } from "@/modules/reading/userBook/userBook.controller";
 
 @Module({
   imports: [DatabaseModule, UserModule, BookModule],
   providers: [UserBookService],
   controllers: [UserBookController],
+  exports: [UserBookService],
 })
 export class UserBookModule {}

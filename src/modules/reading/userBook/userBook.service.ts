@@ -13,13 +13,13 @@ import { UserService } from "@modules/user/user.service";
 import { BookService } from "@modules/book/book.service";
 
 // import dto
-import { UserBook, Book } from "@prisma/client";
-import { UserBookResponseDto } from "@/modules/userBook/dto/user-book-response.dto";
+import { UserBook, Book, ReadingStatus } from "@prisma/client";
+import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-response.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { QueryTrackedBookDto } from "@/modules/userBook/dto/query-tracked-book.dto";
-import { UserBooksResponseDto } from "@/modules/userBook/dto/user-books-response.dto";
-import { BookProgressDto } from "@/modules/userBook/dto/book-progress.dto";
-import { UserBookUpdateDto } from "@/modules/userBook/dto/user-book-update.dto";
+import { QueryTrackedBookDto } from "@/modules/reading/userBook/dto/query-tracked-book.dto";
+import { UserBooksResponseDto } from "@/modules/reading/userBook/dto/user-books-response.dto";
+import { BookProgressDto } from "@/modules/reading/userBook/dto/book-progress.dto";
+import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-update.dto";
 
 @Injectable()
 export class UserBookService {
@@ -54,11 +54,74 @@ export class UserBookService {
     id: string,
     data: UserBookUpdateDto,
   ): Promise<UserBookResponseDto> {
-    const userBook: UserBookResponseDto = (await this.prisma.userBook.update({
-      where: { id },
-      data,
-    })) as UserBookResponseDto;
-    return userBook;
+    // get the user book
+    const userBook: UserBookResponseDto | null = await this.findById(id);
+    if (!userBook) {
+      throw new NotFoundException("User book not found");
+    }
+
+    // get the book
+    const book: Book | null = await this.bookService.findByID(userBook.book_id);
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
+
+    let updatedUserBookData: UserBookResponseDto | null = null;
+
+    if (data.pages + userBook.current_page >= book.pages) {
+      // if the book is completed after the update
+      updatedUserBookData = {
+        ...userBook,
+        status: ReadingStatus.COMPLETED,
+        completed_date: new Date(),
+        total_minutes: userBook.total_minutes + data.minutes,
+        total_days: userBook.total_days + data.days,
+        current_page: book.pages,
+        updatedAt: new Date(),
+      };
+    } else if (userBook.start_date === null) {
+      // if the book is the first time being tracked
+      updatedUserBookData = {
+        ...userBook,
+        start_date: new Date(),
+        total_minutes: userBook.total_minutes + data.minutes,
+        total_days: userBook.total_days + data.days,
+        current_page: userBook.current_page + data.pages,
+        updatedAt: new Date(),
+      };
+    } else if (
+      userBook.current_page + data.pages <= 0 ||
+      userBook.total_minutes + data.minutes <= 0 ||
+      userBook.total_days + data.days <= 0
+    ) {
+      // if after the update the book will has no recording
+      updatedUserBookData = {
+        ...userBook,
+        total_minutes: userBook.total_minutes + data.minutes,
+        total_days: userBook.total_days + data.days,
+        current_page: userBook.current_page + data.pages,
+        start_date: null,
+        updatedAt: new Date(),
+      };
+    } else {
+      // if the book is already being tracked and normal update
+      updatedUserBookData = {
+        ...userBook,
+        total_minutes: userBook.total_minutes + data.minutes,
+        total_days: userBook.total_days + data.days,
+        current_page: userBook.current_page + data.pages,
+        updatedAt: new Date(),
+      };
+    }
+
+    // update the user book
+    const updatedUserBook: UserBookResponseDto =
+      (await this.prisma.userBook.update({
+        where: { id },
+        data: updatedUserBookData,
+      })) as UserBookResponseDto;
+
+    return updatedUserBook;
   }
 
   /**
@@ -68,10 +131,7 @@ export class UserBookService {
    * @returns The user book
    * @public
    */
-  async trackBook(
-    book_id: string,
-    user_id: string,
-  ): Promise<UserBookResponseDto> {
+  async create(book_id: string, user_id: string): Promise<UserBookResponseDto> {
     const user: UserResponseDto = (await this.userService.findByID(
       user_id,
       false,
@@ -99,8 +159,13 @@ export class UserBookService {
       throw new BadRequestException("You have already tracked this book");
     }
 
+    // create the user book
     const newUserBook: UserBook = await this.prisma.userBook.create({
-      data: { user_id, book_id },
+      data: {
+        user_id,
+        book_id,
+        status: ReadingStatus.IN_PROGRESS,
+      },
     });
 
     return newUserBook as UserBookResponseDto;
@@ -113,10 +178,7 @@ export class UserBookService {
    * @returns The user book
    * @public
    */
-  async untrackBook(
-    book_id: string,
-    user_id: string,
-  ): Promise<UserBookResponseDto> {
+  async delete(book_id: string, user_id: string): Promise<UserBookResponseDto> {
     const compositeUniqueKey = { book_id, user_id };
     const userBook: UserBook | null = await this.prisma.userBook.findUnique({
       where: { book_id_user_id: compositeUniqueKey },
@@ -131,6 +193,7 @@ export class UserBookService {
       throw new ForbiddenException("Permission denied");
     }
 
+    // delete the user book
     await this.prisma.userBook.delete({
       where: { book_id_user_id: compositeUniqueKey },
     });
@@ -139,13 +202,13 @@ export class UserBookService {
   }
 
   /**
-   * Get tracked books for a user
+   * Get all user books for a user
    * @param user_id - The user id
    * @param query - The query
    * @returns The books
    * @public
    */
-  async getTrackedBooks(
+  async getAll(
     user_id: string,
     query: QueryTrackedBookDto,
   ): Promise<UserBooksResponseDto> {

@@ -21,15 +21,15 @@ import {
 } from "@nestjs/swagger";
 
 // import services
-import { UserBookService } from "@/modules/userBook/userBook.service";
+import { UserBookService } from "@/modules/reading/userBook/userBook.service";
 
 // import dto
 import type { Request } from "express";
 import { ObjectIdDto } from "@common/dto/object-id.dto";
-import { UserBookResponseDto } from "@/modules/userBook/dto/user-book-response.dto";
+import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-response.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
-import { UserBooksResponseDto } from "@/modules/userBook/dto/user-books-response.dto";
-import { QueryTrackedBookDto } from "@/modules/userBook/dto/query-tracked-book.dto";
+import { UserBooksResponseDto } from "@/modules/reading/userBook/dto/user-books-response.dto";
+import { QueryTrackedBookDto } from "@/modules/reading/userBook/dto/query-tracked-book.dto";
 
 @Controller("user-books")
 export class UserBookController {
@@ -53,7 +53,7 @@ export class UserBookController {
     @Req() req: Request,
   ): Promise<UserBookResponseDto> {
     const user_id: string = (req.user as UserResponseDto).id;
-    const userBook: UserBookResponseDto = await this.userBookService.trackBook(
+    const userBook: UserBookResponseDto = await this.userBookService.create(
       objectIdDto.id,
       user_id,
     );
@@ -78,8 +78,10 @@ export class UserBookController {
     @Req() req: Request,
   ): Promise<UserBookResponseDto> {
     const user_id: string = (req.user as UserResponseDto).id;
-    const userBook: UserBookResponseDto =
-      await this.userBookService.untrackBook(id, user_id);
+    const userBook: UserBookResponseDto = await this.userBookService.delete(
+      id,
+      user_id,
+    );
     return userBook;
   }
 
@@ -102,8 +104,10 @@ export class UserBookController {
     const query: QueryTrackedBookDto = req.query as QueryTrackedBookDto;
 
     // get the user books
-    const userBooks: UserBooksResponseDto =
-      await this.userBookService.getTrackedBooks(user_id, query);
+    const userBooks: UserBooksResponseDto = await this.userBookService.getAll(
+      user_id,
+      query,
+    );
     return userBooks;
   }
 }

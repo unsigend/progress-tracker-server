@@ -2,7 +2,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 // import dto
-import { RecordingResponseDto } from "@modules/readingRecording/dto/recording-response.dto";
+import { RecordingResponseDto } from "@/modules/reading/readingRecording/dto/recording-response.dto";
 
 export class RecordingsResponseDto {
   @ApiProperty({ description: "The recordings", type: [RecordingResponseDto] })

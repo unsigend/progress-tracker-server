@@ -20,12 +20,12 @@ import {
 } from "@nestjs/swagger";
 
 // import services
-import { ReadingRecordingService } from "@modules/readingRecording/readingRecording.service";
+import { ReadingRecordingService } from "@/modules/reading/readingRecording/readingRecording.service";
 
 // import dto
-import { CreateRecordingDto } from "@modules/readingRecording/dto/create-recording.dto";
-import { RecordingResponseDto } from "@modules/readingRecording/dto/recording-response.dto";
-import { RecordingsResponseDto } from "@modules/readingRecording/dto/recordings-response.dto";
+import { CreateRecordingDto } from "@/modules/reading/readingRecording/dto/create-recording.dto";
+import { RecordingResponseDto } from "@/modules/reading/readingRecording/dto/recording-response.dto";
+import { RecordingsResponseDto } from "@/modules/reading/readingRecording/dto/recordings-response.dto";
 
 @Controller("reading-recordings")
 export class ReadingRecordingController {
@@ -50,7 +50,7 @@ export class ReadingRecordingController {
   async create(
     @Body() createRecordingDto: CreateRecordingDto,
   ): Promise<RecordingResponseDto> {
-    return this.readingRecordingService.createRecording(createRecordingDto);
+    return this.readingRecordingService.create(createRecordingDto);
   }
 
   /**
@@ -67,7 +67,7 @@ export class ReadingRecordingController {
   async findById(
     @Param("id", ParseUUIDPipe) id: string,
   ): Promise<RecordingsResponseDto> {
-    return this.readingRecordingService.getRecordingsByUserBookId(id);
+    return this.readingRecordingService.getAll(id);
   }
 
   /**
@@ -84,6 +84,6 @@ export class ReadingRecordingController {
   async deleteById(
     @Param("id", ParseUUIDPipe) id: string,
   ): Promise<RecordingResponseDto> {
-    return this.readingRecordingService.deleteRecording(id);
+    return this.readingRecordingService.delete(id);
   }
 }
