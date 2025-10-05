@@ -19,6 +19,7 @@ import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 import { QueryTrackedBookDto } from "@/modules/userBook/dto/query-tracked-book.dto";
 import { UserBooksResponseDto } from "@/modules/userBook/dto/user-books-response.dto";
 import { BookProgressDto } from "@/modules/userBook/dto/book-progress.dto";
+import { UserBookUpdateDto } from "@/modules/userBook/dto/user-book-update.dto";
 
 @Injectable()
 export class UserBookService {
@@ -27,6 +28,38 @@ export class UserBookService {
     private readonly userService: UserService,
     private readonly bookService: BookService,
   ) {}
+
+  /**
+   * Find a user book by id
+   * @param id - The id of the user book
+   * @returns The user book or null if the user book is not found
+   * @public
+   */
+  async findById(id: string): Promise<UserBookResponseDto | null> {
+    const userBook: UserBookResponseDto =
+      (await this.prisma.userBook.findUnique({
+        where: { id },
+      })) as UserBookResponseDto;
+    return userBook;
+  }
+
+  /**
+   * Update a user book
+   * @param id - The id of the user book
+   * @param data - The data to update the user book
+   * @returns The user book
+   * @public
+   */
+  async update(
+    id: string,
+    data: UserBookUpdateDto,
+  ): Promise<UserBookResponseDto> {
+    const userBook: UserBookResponseDto = (await this.prisma.userBook.update({
+      where: { id },
+      data,
+    })) as UserBookResponseDto;
+    return userBook;
+  }
 
   /**
    * Track a book for a user
