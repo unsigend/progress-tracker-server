@@ -13,4 +13,10 @@ export class UserBookUpdateDto {
 
   @ApiProperty({ description: "The added days of the user book" })
   days: number;
+
+  @ApiProperty({
+    description: "The updated date of the user book",
+    type: Date,
+  })
+  date?: Date | null;
 }

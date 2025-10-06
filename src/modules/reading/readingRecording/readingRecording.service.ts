@@ -53,6 +53,7 @@ export class ReadingRecordingService {
       userBookUpdateDto = {
         pages: createRecordingDto.pages,
         minutes: createRecordingDto.minutes,
+        date: createRecordingDto.date,
         days: 0,
       };
     } else {
@@ -64,6 +65,7 @@ export class ReadingRecordingService {
       userBookUpdateDto = {
         pages: createRecordingDto.pages,
         minutes: createRecordingDto.minutes,
+        date: createRecordingDto.date,
         days: 1,
       };
     }
@@ -107,6 +109,12 @@ export class ReadingRecordingService {
       throw new NotFoundException("Recording not found");
     }
 
+    // delete the recording
+    const deletedRecording: RecordingResponseDto =
+      (await this.prisma.readingRecord.delete({
+        where: { id },
+      })) as RecordingResponseDto;
+
     // update the user book data
     const userBookUpdateDto: UserBookUpdateDto = {
       pages: -recording.pages,
@@ -118,11 +126,6 @@ export class ReadingRecordingService {
       userBookUpdateDto,
     );
 
-    // delete the recording
-    const deletedRecording: RecordingResponseDto =
-      (await this.prisma.readingRecord.delete({
-        where: { id },
-      })) as RecordingResponseDto;
     return deletedRecording;
   }
 }

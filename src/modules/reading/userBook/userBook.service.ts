@@ -76,7 +76,7 @@ export class UserBookService {
       updatedUserBookData = {
         ...userBook,
         status: ReadingStatus.COMPLETED,
-        completed_date: new Date(),
+        completed_date: data.date ?? new Date(),
         total_minutes: userBook.total_minutes + data.minutes,
         total_days: userBook.total_days + data.days,
         current_page: book.pages,
@@ -86,7 +86,7 @@ export class UserBookService {
       // if the book is the first time being tracked
       updatedUserBookData = {
         ...userBook,
-        start_date: new Date(),
+        start_date: data.date ?? new Date(),
         total_minutes: userBook.total_minutes + data.minutes,
         total_days: userBook.total_days + data.days,
         current_page: userBook.current_page + data.pages,
@@ -108,11 +108,16 @@ export class UserBookService {
       };
     } else {
       // if the book is already being tracked and normal update
+      let earliestDate = userBook.start_date;
+      if (data.date && data.date < userBook.start_date) {
+        earliestDate = data.date;
+      }
       updatedUserBookData = {
         ...userBook,
         total_minutes: userBook.total_minutes + data.minutes,
         total_days: userBook.total_days + data.days,
         current_page: userBook.current_page + data.pages,
+        start_date: earliestDate,
         updatedAt: new Date(),
       };
     }
