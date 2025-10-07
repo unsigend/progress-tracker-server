@@ -9,6 +9,7 @@ import {
   Param,
   Body,
   Patch,
+  Res,
 } from "@nestjs/common";
 import {
   ApiForbiddenResponse,
@@ -25,7 +26,7 @@ import {
 import { UserBookService } from "@/modules/reading/userBook/userBook.service";
 
 // import dto
-import type { Request } from "express";
+import type { Request, Response } from "express";
 import { ObjectIdDto } from "@common/dto/object-id.dto";
 import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-response.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
@@ -100,7 +101,10 @@ export class UserBookController {
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @ApiQuery({ type: QueryTrackedBookDto })
   @Get()
-  async findAll(@Req() req: Request): Promise<UserBooksResponseDto> {
+  async findAll(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<UserBooksResponseDto> {
     // get the user id and query
     const user_id: string = (req.user as UserResponseDto).id;
     const query: QueryTrackedBookDto = req.query as QueryTrackedBookDto;
@@ -110,6 +114,8 @@ export class UserBookController {
       user_id,
       query,
     );
+    // set header x-total-count
+    res.setHeader("x-total-count", userBooks.totalCount.toString());
     return userBooks;
   }
 
