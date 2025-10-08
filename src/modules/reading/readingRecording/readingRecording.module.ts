@@ -1,5 +1,5 @@
 // import dependencies
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 
 // import modules
 import { DatabaseModule } from "@modules/database/database.module";
@@ -12,7 +12,7 @@ import { ReadingRecordingService } from "@/modules/reading/readingRecording/read
 import { ReadingRecordingController } from "@/modules/reading/readingRecording/readingRecording.controller";
 
 @Module({
-  imports: [DatabaseModule, UserBookModule],
+  imports: [DatabaseModule, forwardRef(() => UserBookModule)],
   providers: [ReadingRecordingService],
   controllers: [ReadingRecordingController],
   exports: [ReadingRecordingService],

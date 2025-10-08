@@ -128,4 +128,21 @@ export class ReadingRecordingService {
 
     return deletedRecording;
   }
+
+  /**
+   * Delete all recordings by user book id
+   * @param user_book_id - The user book id
+   * @returns The boolean if the recordings were deleted successfully
+   */
+  async deleteAll(user_book_id: string): Promise<boolean> {
+    // delete all recordings
+    try {
+      await this.prisma.readingRecord.deleteMany({
+        where: { user_book_id },
+      });
+    } catch {
+      return false;
+    }
+    return true;
+  }
 }
