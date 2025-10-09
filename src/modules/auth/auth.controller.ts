@@ -58,6 +58,10 @@ export class AuthController {
    * @returns The user
    */
   @ApiOperation({ summary: "Login a user" })
+  @ApiOkResponse({
+    type: LoginResponseDto,
+    description: "User logged in successfully",
+  })
   @ApiResponse({ status: 201, description: "User logged in successfully" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiBody({ type: LoginRequestDto })
@@ -71,19 +75,22 @@ export class AuthController {
 
   /**
    * Logout a user
-   * @returns void
+   * @returns boolean
    */
   @ApiOperation({ summary: "Logout a user" })
-  @ApiOkResponse({ description: "User logged out successfully" })
+  @ApiOkResponse({ description: "User logged out successfully", type: Boolean })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
   @Post("logout")
   @Public()
-  public logout(@Req() req: Request): void {
-    req.logOut((err) => {
-      if (err) {
-        throw new UnauthorizedException();
-      }
-    });
+  public logout(@Req() req: Request): Promise<boolean> {
+    if (typeof req.logOut === "function") {
+      req.logOut((err) => {
+        if (err) {
+          throw new UnauthorizedException();
+        }
+      });
+    }
+    return Promise.resolve(true);
   }
 
   /**
