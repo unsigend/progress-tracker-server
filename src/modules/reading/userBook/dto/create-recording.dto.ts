@@ -2,7 +2,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
-  IsUUID,
   IsDate,
   IsInt,
   Min,
@@ -12,10 +11,6 @@ import {
 } from "class-validator";
 
 export class CreateRecordingDto {
-  @ApiProperty({ description: "The user book id", type: String })
-  @IsUUID()
-  user_book_id: string;
-
   @ApiProperty({ description: "The date of the recording", type: Date })
   @Type(() => Date)
   @IsDate()

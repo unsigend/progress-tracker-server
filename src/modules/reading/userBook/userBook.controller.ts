@@ -24,7 +24,6 @@ import {
 
 // import services
 import { UserBookService } from "@/modules/reading/userBook/userBook.service";
-import { ReadingRecordingService } from "@/modules/reading/readingRecording/readingRecording.service";
 
 // import dto
 import type { Request, Response } from "express";
@@ -37,10 +36,7 @@ import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-upda
 
 @Controller("user-books")
 export class UserBookController {
-  constructor(
-    private readonly userBookService: UserBookService,
-    private readonly readingRecordingService: ReadingRecordingService,
-  ) {}
+  constructor(private readonly userBookService: UserBookService) {}
 
   /**
    * Track a new book for current user
@@ -90,25 +86,6 @@ export class UserBookController {
       user_id,
     );
     return userBook;
-  }
-
-  /**
-   * Delete all recordings by user book id
-   * @param id - The user book id
-   * @returns The void
-   * @public
-   */
-  @ApiOperation({ summary: "Delete all recordings by user book id" })
-  @ApiOkResponse({ type: Boolean })
-  @ApiNotFoundResponse({ description: "User book not found" })
-  @ApiUnauthorizedResponse({ description: "Unauthorized" })
-  @Delete(":id/recordings")
-  async deleteAllRecordings(
-    @Param("id", ParseUUIDPipe) id: string,
-  ): Promise<boolean> {
-    const deletedRecordings: boolean =
-      await this.readingRecordingService.deleteAll(id);
-    return deletedRecordings;
   }
 
   /**
