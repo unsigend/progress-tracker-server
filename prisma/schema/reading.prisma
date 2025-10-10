@@ -12,7 +12,7 @@ model Book {
   description String?
   ISBN10    String? @unique
   ISBN13    String? @unique
-  pages     Int     @default(0)
+  pages     Int
   cover_url String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -3,7 +3,6 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsInt,
   MaxLength,
   IsISBN,
   Min,
@@ -48,9 +47,9 @@ export class CreateBookDto {
   @IsOptional()
   ISBN13?: string | null;
 
-  @ApiPropertyOptional({ description: "The pages of the book", type: Number })
+  @ApiProperty({ description: "The pages of the book", type: Number })
+  @IsNotEmpty({ message: "Pages is required" })
   @Type(() => Number)
-  @IsInt({ message: "Pages must be an integer" })
   @Min(1, { message: "Pages must be greater than 0" })
   @Max(4000, { message: "Pages must be less than 4000" })
   pages: number;

@@ -48,6 +48,7 @@ export class CreateUserDto {
   @ApiPropertyOptional({
     description: "The avatar url of the user",
     example: "https://example.com/avatar.png",
+    type: String,
   })
   @TrimString()
   @IsString()
