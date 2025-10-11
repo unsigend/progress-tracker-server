@@ -15,6 +15,7 @@ import { AuthModule } from "@modules/auth/auth.module";
 import { S3Module } from "@modules/S3/S3.module";
 import { FileModule } from "@modules/file/file.module";
 import { UserBookModule } from "@modules/userBook/userBook.module";
+import { StatisticsModule } from "@modules/statistics/statistics.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserBookModule } from "@modules/userBook/userBook.module";
     S3Module,
     FileModule,
     UserBookModule,
+    StatisticsModule,
   ],
   controllers: [],
   providers: [],
