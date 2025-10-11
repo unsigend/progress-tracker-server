@@ -13,7 +13,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { TrimString } from "@common/transform/trim-string";
 
-export class CreateBookDto {
+export class BookCreateDto {
   @ApiProperty({ description: "The title of the book", type: String })
   @TrimString()
   @IsString({ message: "Title must be a string" })

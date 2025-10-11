@@ -8,10 +8,10 @@ import { PrismaService } from "@modules/database/prisma.service";
 import { Prisma, Book } from "@prisma/client";
 
 // import dto
-import { CreateBookDto } from "@modules/book/dto/create-book.dto";
-import { UpdateBookDto } from "@modules/book/dto/update-book.dto";
-import { QueryBookDto } from "@modules/book/dto/query-book.dto";
-import { AllBookResponseDto } from "@modules/book/dto/all-book-response.dto";
+import { BookCreateDto } from "@modules/book/dto/book-create.dto";
+import { BookUpdateDto } from "@modules/book/dto/book-update.dto";
+import { BookQueryDto } from "@modules/book/dto/book-query.dto";
+import { BooksResponseDto } from "@modules/book/dto/books-response.dto";
 
 @Injectable()
 export class BookService {
@@ -48,10 +48,10 @@ export class BookService {
    * @param createBookDto - The data to create the book
    * @returns The book or null if the book is not found
    */
-  public async create(createBookDto: CreateBookDto): Promise<Book | null> {
+  public async create(bookCreateDto: BookCreateDto): Promise<Book | null> {
     try {
       const book: Book | null = await this.prisma.book.create({
-        data: createBookDto,
+        data: bookCreateDto,
       });
 
       return book;
@@ -68,12 +68,12 @@ export class BookService {
    */
   public async update(
     id: string,
-    updateBookDto: UpdateBookDto,
+    bookUpdateDto: BookUpdateDto,
   ): Promise<Book | null> {
     try {
       const book: Book | null = await this.prisma.book.update({
         where: { id },
-        data: { ...updateBookDto, updatedAt: new Date() },
+        data: { ...bookUpdateDto, updatedAt: new Date() },
       });
 
       return book;
@@ -118,9 +118,7 @@ export class BookService {
    * @param queryBookDto - The query parameters
    * @returns The books or null if the books are not found
    */
-  public async findAll(
-    queryBookDto: QueryBookDto,
-  ): Promise<AllBookResponseDto> {
+  public async findAll(queryBookDto: BookQueryDto): Promise<BooksResponseDto> {
     // set default values
     if (!queryBookDto.page) {
       queryBookDto.page = 1;

@@ -1,5 +1,5 @@
 // import dependencies
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
   IsDate,
@@ -10,7 +10,7 @@ import {
   MaxLength,
 } from "class-validator";
 
-export class CreateRecordingDto {
+export class RecordingCreateDto {
   @ApiProperty({ description: "The date of the recording", type: Date })
   @Type(() => Date)
   @IsDate()
@@ -22,11 +22,12 @@ export class CreateRecordingDto {
   @Min(1, { message: "Pages must be greater than 0" })
   pages: number;
 
-  @ApiProperty({ description: "The minutes", type: Number })
+  @ApiPropertyOptional({ description: "The minutes", type: Number })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1, { message: "Minutes must be greater than 0" })
-  minutes: number;
+  @Min(0, { message: "Minutes must be greater than or equal to 0" })
+  minutes?: number;
 
   @ApiProperty({ description: "The notes", type: String })
   @IsString()

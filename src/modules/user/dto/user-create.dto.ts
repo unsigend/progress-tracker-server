@@ -11,9 +11,9 @@ import {
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
-import { TrimString } from "@/common/transform/trim-string";
+import { TrimString } from "@common/transform/trim-string";
 
-export class CreateUserDto {
+export class UserCreateDto {
   @ApiProperty({
     description: "The username of the user",
     example: "JohnDoe",

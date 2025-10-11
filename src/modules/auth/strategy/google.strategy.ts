@@ -6,7 +6,7 @@ import * as crypto from "crypto";
 
 // import services
 import { ConfigService } from "@nestjs/config";
-import { CreateUserDto } from "@/modules/user/dto/create-user.dto";
+import { UserCreateDto } from "@modules/user/dto/user-create.dto";
 import { UserService } from "@/modules/user/user.service";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 
@@ -43,7 +43,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
   ) {
     const { name, emails, photos } = profile;
     const randomPassword = crypto.randomBytes(16).toString("hex");
-    const createUserDto: CreateUserDto = {
+    const createUserDto: UserCreateDto = {
       username: name.givenName + " " + name.familyName,
       email: emails[0].value,
       password: randomPassword,

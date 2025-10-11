@@ -23,16 +23,18 @@ import {
 } from "@nestjs/swagger";
 
 // import services
-import { UserBookService } from "@/modules/reading/userBook/userBook.service";
+import { UserBookService } from "@modules/userBook/userBook.service";
 
 // import dto
 import type { Request, Response } from "express";
 import { ObjectIdDto } from "@common/dto/object-id.dto";
-import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-response.dto";
+import { UserBookResponseDto } from "@modules/userBook/dto/user-book-response.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
-import { UserBooksResponseDto } from "@/modules/reading/userBook/dto/user-books-response.dto";
-import { QueryTrackedBookDto } from "@/modules/reading/userBook/dto/query-tracked-book.dto";
-import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-update.dto";
+import { UserBooksResponseDto } from "@modules/userBook/dto/user-books-response.dto";
+import { UserBookQueryDto } from "@modules/userBook/dto/user-book-query.dto";
+import { UserBookUpdateDto } from "@modules/userBook/dto/user-book-update.dto";
+import { RecordingResponseDto } from "@modules/userBook/dto/recording-response.dto";
+import { RecordingCreateDto } from "@modules/userBook/dto/recording-create.dto";
 
 @Controller("user-books")
 export class UserBookController {
@@ -99,7 +101,7 @@ export class UserBookController {
   @ApiOkResponse({ type: UserBooksResponseDto })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
-  @ApiQuery({ type: QueryTrackedBookDto })
+  @ApiQuery({ type: UserBookQueryDto })
   @Get()
   async findAll(
     @Req() req: Request,
@@ -107,7 +109,7 @@ export class UserBookController {
   ): Promise<UserBooksResponseDto> {
     // get the user id and query
     const user_id: string = (req.user as UserResponseDto).id;
-    const query: QueryTrackedBookDto = req.query as QueryTrackedBookDto;
+    const query: UserBookQueryDto = req.query as UserBookQueryDto;
 
     // get the user books
     const userBooks: UserBooksResponseDto = await this.userBookService.getAll(
@@ -160,5 +162,71 @@ export class UserBookController {
       data,
     );
     return userBook;
+  }
+
+  /**
+   * Create a recording for a user book
+   * @param user_book_id - The user book id
+   * @param data - The data to create the recording
+   * @returns The recording
+   * @public
+   */
+  @ApiOperation({ summary: "Create a recording for a user book" })
+  @ApiOkResponse({ type: RecordingResponseDto })
+  @ApiNotFoundResponse({ description: "User book not found" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @ApiBody({ type: RecordingCreateDto })
+  @Post(":id/recordings")
+  async createRecording(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() data: RecordingCreateDto,
+  ): Promise<RecordingResponseDto> {
+    const recording: RecordingResponseDto =
+      await this.userBookService.createRecording(id, data);
+    return recording;
+  }
+
+  /**
+   * Get all recordings for a user book
+   * @param user_book_id - The user book id
+   * @returns The recordings
+   * @public
+   */
+  @ApiOperation({ summary: "Get all recordings for a user book" })
+  @ApiOkResponse({ type: RecordingResponseDto })
+  @ApiNotFoundResponse({ description: "User book not found" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Get(":id/recordings")
+  async getRecordings(
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<RecordingResponseDto[]> {
+    const recordings: RecordingResponseDto[] =
+      await this.userBookService.getRecordings(id);
+    return recordings;
+  }
+
+  /**
+   * Delete all recordings for a user book
+   * @param user_book_id - The user book id
+   * @returns The void
+   * @public
+   */
+  @ApiOperation({ summary: "Delete all recordings for a user book" })
+  @ApiNotFoundResponse({ description: "User book not found" })
+  @ApiOkResponse({
+    description: "Recordings deleted successfully",
+    type: Boolean,
+  })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @Delete(":id/recordings")
+  async deleteRecordings(
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<boolean> {
+    try {
+      await this.userBookService.deleteRecordings(id);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

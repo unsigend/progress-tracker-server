@@ -4,9 +4,9 @@ import { IsOptional, IsString } from "class-validator";
 import { ReadingStatus } from "@prisma/client";
 
 /**
- * This dto is used to store the query tracked book dto.
+ * This dto is used to store the query user book dto.
  */
-export class QueryTrackedBookDto {
+export class UserBookQueryDto {
   @ApiPropertyOptional({
     description: "The search value for status",
     type: ReadingStatus,

@@ -10,7 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserService } from "@/modules/user/user.service";
 
 // import dto
-import { CreateUserDto } from "@/modules/user/dto/create-user.dto";
+import { UserCreateDto } from "@modules/user/dto/user-create.dto";
 import { UserResponseDto } from "@/modules/user/dto/user-response.dto";
 
 @Injectable()
@@ -44,7 +44,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, "github") {
     done,
   ) {
     const randomPassword = crypto.randomBytes(16).toString("hex");
-    const createUserDto: CreateUserDto = {
+    const createUserDto: UserCreateDto = {
       username: profile.displayName,
       email: profile.emails[0]?.value,
       avatar_url: profile.photos[0]?.value,

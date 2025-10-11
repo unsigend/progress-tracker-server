@@ -1,5 +1,5 @@
 // import dependencies
-import { TrimString } from "@/common/transform/trim-string";
+import { TrimString } from "@common/transform/trim-string";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
@@ -9,7 +9,7 @@ import {
   MinLength,
 } from "class-validator";
 
-export class RegisterUserDto {
+export class RegisterRequestDto {
   @ApiProperty({ description: "The username of the user" })
   @TrimString()
   @IsString()

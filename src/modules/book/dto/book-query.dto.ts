@@ -4,7 +4,7 @@ import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { TrimString } from "@common/transform/trim-string";
 
-export class QueryBookDto {
+export class BookQueryDto {
   @ApiPropertyOptional({
     description: "Value to filter books by title, author, ISBN10 or ISBN13",
     example: "",

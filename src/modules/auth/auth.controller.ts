@@ -31,8 +31,8 @@ import { ConfigService } from "@nestjs/config";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
 import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
-import { RegisterUserDto } from "@/modules/auth/dto/register-user.dto";
-import { CreateUserDto } from "@modules/user/dto/create-user.dto";
+import { RegisterRequestDto } from "@/modules/auth/dto/register-request.dto";
+import { UserCreateDto } from "@/modules/user/dto/user-create.dto";
 import { EmailCheckResponseDto } from "@/modules/auth/dto/email-check-response.dto";
 import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
 
@@ -99,7 +99,7 @@ export class AuthController {
    * @returns The login response dto
    */
   @ApiOperation({ summary: "Register a user" })
-  @ApiBody({ type: RegisterUserDto })
+  @ApiBody({ type: RegisterRequestDto })
   @ApiOkResponse({
     type: LoginResponseDto,
     description: "User registered successfully",
@@ -109,7 +109,7 @@ export class AuthController {
   @Post("register")
   @Public()
   public async register(
-    @Body() registerUserDto: RegisterUserDto,
+    @Body() registerUserDto: RegisterRequestDto,
   ): Promise<LoginResponseDto> {
     const userEmail = registerUserDto.email;
 
@@ -123,7 +123,7 @@ export class AuthController {
     }
 
     // create the user
-    const newUser: CreateUserDto = {
+    const newUser: UserCreateDto = {
       ...registerUserDto,
     };
 

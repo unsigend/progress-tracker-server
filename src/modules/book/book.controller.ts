@@ -28,11 +28,11 @@ import { ParseUUIDPipe } from "@nestjs/common";
 // import services
 import { BookService } from "@modules/book/book.service";
 // import dto
-import { CreateBookDto } from "@modules/book/dto/create-book.dto";
+import { BookCreateDto } from "@modules/book/dto/book-create.dto";
 import { BookResponseDto } from "@modules/book/dto/book-response.dto";
-import { UpdateBookDto } from "@modules/book/dto/update-book.dto";
-import { QueryBookDto } from "@modules/book/dto/query-book.dto";
-import { AllBookResponseDto } from "@modules/book/dto/all-book-response.dto";
+import { BookUpdateDto } from "@modules/book/dto/book-update.dto";
+import { BookQueryDto } from "@modules/book/dto/book-query.dto";
+import { BooksResponseDto } from "@modules/book/dto/books-response.dto";
 import { Book } from "@prisma/client";
 
 @Controller("books")
@@ -47,7 +47,7 @@ export class BookController {
    * @returns The book or null if the book is not found
    */
   @ApiOperation({ summary: "Create a book" })
-  @ApiBody({ type: CreateBookDto })
+  @ApiBody({ type: BookCreateDto })
   @ApiCreatedResponse({
     type: BookResponseDto,
     description: "The book created successfully",
@@ -56,7 +56,7 @@ export class BookController {
     description: "Book not created",
   })
   @Post()
-  async create(@Body() createBookDto: CreateBookDto): Promise<BookResponseDto> {
+  async create(@Body() createBookDto: BookCreateDto): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.create(createBookDto);
     return book as BookResponseDto;
   }
@@ -96,7 +96,7 @@ export class BookController {
    */
   @ApiOperation({ summary: "Update a book by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: UpdateBookDto })
+  @ApiBody({ type: BookUpdateDto })
   @ApiOkResponse({
     type: BookResponseDto,
     description: "The book updated successfully",
@@ -107,7 +107,7 @@ export class BookController {
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateBookDto: UpdateBookDto,
+    @Body() updateBookDto: BookUpdateDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
     return book as BookResponseDto;
@@ -145,7 +145,7 @@ export class BookController {
    */
   @ApiOperation({ summary: "Get all books and set header x-total-count" })
   @ApiOkResponse({
-    type: AllBookResponseDto,
+    type: BooksResponseDto,
     description: "The books retrieved successfully",
   })
   @ApiBadRequestResponse({
@@ -154,10 +154,10 @@ export class BookController {
   @Get()
   async findAll(
     @Res({ passthrough: true }) res: Response,
-    @Query() queryBookDto: QueryBookDto,
-  ): Promise<AllBookResponseDto> {
+    @Query() queryBookDto: BookQueryDto,
+  ): Promise<BooksResponseDto> {
     // get books
-    const books: AllBookResponseDto =
+    const books: BooksResponseDto =
       await this.bookService.findAll(queryBookDto);
     // set header x-total-count
     res.setHeader("x-total-count", books.totalCount.toString());
@@ -173,7 +173,7 @@ export class BookController {
    */
   @ApiOperation({ summary: "Replace a book by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: UpdateBookDto })
+  @ApiBody({ type: BookUpdateDto })
   @ApiOkResponse({
     type: BookResponseDto,
     description: "The book replaced successfully",
@@ -184,7 +184,7 @@ export class BookController {
   @Put(":id")
   async replace(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateBookDto: UpdateBookDto,
+    @Body() updateBookDto: BookUpdateDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
     return book as BookResponseDto;
@@ -199,7 +199,7 @@ export class BookController {
    */
   @ApiOperation({ summary: "Patch a book by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: UpdateBookDto })
+  @ApiBody({ type: BookUpdateDto })
   @ApiOkResponse({
     type: BookResponseDto,
     description: "The book patched successfully",
@@ -210,7 +210,7 @@ export class BookController {
   @Patch(":id")
   async patch(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateBookDto: UpdateBookDto,
+    @Body() updateBookDto: BookUpdateDto,
   ): Promise<BookResponseDto> {
     const book: Book | null = await this.bookService.update(id, updateBookDto);
     return book as BookResponseDto;

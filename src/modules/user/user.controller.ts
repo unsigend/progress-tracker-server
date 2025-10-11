@@ -29,8 +29,8 @@ import { UserService } from "@modules/user/user.service";
 // import pipes
 import { ParseUUIDPipe } from "@nestjs/common";
 // import dto
-import { CreateUserDto } from "@modules/user/dto/create-user.dto";
-import { UpdateUserDto } from "@modules/user/dto/update-user.dto";
+import { UserCreateDto } from "@modules/user/dto/user-create.dto";
+import { UserUpdateDto } from "@modules/user/dto/user-update.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Controller("users")
@@ -75,7 +75,7 @@ export class UserController {
    * @returns The user
    */
   @ApiOperation({ summary: "Update the current user" })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UserUpdateDto })
   @ApiOkResponse({
     type: UserResponseDto,
     description: "The user updated successfully",
@@ -89,7 +89,7 @@ export class UserController {
   @Patch("me")
   async updateMe(
     @Req() req: Request,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UserUpdateDto,
   ): Promise<UserResponseDto> {
     const userID: string = (req.user as UserResponseDto).id;
     const user: UserResponseDto | null = (await this.userService.update(
@@ -142,7 +142,7 @@ export class UserController {
    */
   @Put("me")
   @ApiOperation({ summary: "Replace the current user" })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UserUpdateDto })
   @ApiOkResponse({
     type: UserResponseDto,
     description: "The user replaced successfully",
@@ -155,7 +155,7 @@ export class UserController {
   })
   async replaceMe(
     @Req() req: Request,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UserUpdateDto,
   ): Promise<UserResponseDto> {
     const userID: string = (req.user as UserResponseDto).id;
     const user: UserResponseDto | null = (await this.userService.update(
@@ -176,7 +176,7 @@ export class UserController {
    * @returns The user or null if the user is not found
    */
   @ApiOperation({ summary: "Create a user" })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: UserCreateDto })
   @ApiCreatedResponse({
     type: UserResponseDto,
     description: "The user created successfully",
@@ -185,7 +185,7 @@ export class UserController {
     description: "User not created",
   })
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  async create(@Body() createUserDto: UserCreateDto): Promise<UserResponseDto> {
     const user: UserResponseDto | null = (await this.userService.create(
       createUserDto,
       false,
@@ -235,7 +235,7 @@ export class UserController {
    */
   @ApiOperation({ summary: "Update a user by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UserUpdateDto })
   @ApiOkResponse({
     type: UserResponseDto,
     description: "The user updated successfully",
@@ -246,7 +246,7 @@ export class UserController {
   @Patch(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UserUpdateDto,
   ): Promise<UserResponseDto> {
     const user: UserResponseDto | null = (await this.userService.update(
       id,
@@ -299,7 +299,7 @@ export class UserController {
    */
   @ApiOperation({ summary: "Replace a user by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UserUpdateDto })
   @ApiOkResponse({
     type: UserResponseDto,
     description: "The user replaced successfully",
@@ -310,7 +310,7 @@ export class UserController {
   @Put(":id")
   async replace(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UserUpdateDto,
   ): Promise<UserResponseDto> {
     const user: UserResponseDto | null = (await this.userService.update(
       id,

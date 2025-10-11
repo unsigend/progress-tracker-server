@@ -11,8 +11,8 @@ import { Prisma, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
 // import dto
-import { CreateUserDto } from "@modules/user/dto/create-user.dto";
-import { UpdateUserDto } from "@modules/user/dto/update-user.dto";
+import { UserCreateDto } from "@modules/user/dto/user-create.dto";
+import { UserUpdateDto } from "@modules/user/dto/user-update.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Injectable()
@@ -89,7 +89,7 @@ export class UserService {
    * @returns The user or throw exception if the user is not found
    */
   public async create(
-    createUserDto: CreateUserDto,
+    createUserDto: UserCreateDto,
     full: boolean = false,
   ): Promise<UserResponseDto | User> {
     // hash the password if it is provided
@@ -155,7 +155,7 @@ export class UserService {
    */
   public async update(
     id: string,
-    updateUserDto: UpdateUserDto,
+    updateUserDto: UserUpdateDto,
     full: boolean = false,
   ): Promise<UserResponseDto | User> {
     // hash the password if it is provided
@@ -224,7 +224,7 @@ export class UserService {
    * @public
    */
   public async createOrLinkUser(
-    createUserDto: CreateUserDto,
+    createUserDto: UserCreateDto,
     provider: string,
   ): Promise<UserResponseDto> {
     const existingUser: UserResponseDto = (await this.findByEmail(
@@ -234,7 +234,7 @@ export class UserService {
 
     if (existingUser) {
       // if the user exists, link the user to the provider
-      const updatedUserDto: UpdateUserDto = {};
+      const updatedUserDto: UserUpdateDto = {};
 
       // update the avatar url only if it is different
       if (
@@ -256,7 +256,7 @@ export class UserService {
       return this.filterUser(updatedUser);
     } else {
       // if the user does not exist, create the user
-      const newCreateUserDto: CreateUserDto = {
+      const newCreateUserDto: UserCreateDto = {
         ...createUserDto,
         avatar_url: createUserDto.avatar_url ?? null,
         provider: [provider],

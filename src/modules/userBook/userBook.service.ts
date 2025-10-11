@@ -13,13 +13,15 @@ import { UserService } from "@modules/user/user.service";
 import { BookService } from "@modules/book/book.service";
 
 // import dto
-import { UserBook, Book, ReadingStatus } from "@prisma/client";
-import { UserBookResponseDto } from "@/modules/reading/userBook/dto/user-book-response.dto";
+import { UserBook, Book, ReadingStatus, ReadingRecord } from "@prisma/client";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { QueryTrackedBookDto } from "@/modules/reading/userBook/dto/query-tracked-book.dto";
-import { UserBooksResponseDto } from "@/modules/reading/userBook/dto/user-books-response.dto";
-import { BookProgressDto } from "@/modules/reading/userBook/dto/book-progress.dto";
-import { UserBookUpdateDto } from "@/modules/reading/userBook/dto/user-book-update.dto";
+import { UserBookResponseDto } from "@modules/userBook/dto/user-book-response.dto";
+import { UserBookUpdateDto } from "@modules/userBook/dto/user-book-update.dto";
+import { UserBookQueryDto } from "@modules/userBook/dto/user-book-query.dto";
+import { UserBooksResponseDto } from "@modules/userBook/dto/user-books-response.dto";
+import { BookResponseDto } from "@modules/book/dto/book-response.dto";
+import { RecordingCreateDto } from "@modules/userBook/dto/recording-create.dto";
+import { RecordingResponseDto } from "@modules/userBook/dto/recording-response.dto";
 
 @Injectable()
 export class UserBookService {
@@ -71,8 +73,8 @@ export class UserBookService {
 
     let updatedUserBookData: UserBookResponseDto | null = null;
 
+    // if the book is completed after the update
     if (data.pages + userBook.current_page >= book.pages) {
-      // if the book is completed after the update
       updatedUserBookData = {
         ...userBook,
         status: ReadingStatus.COMPLETED,
@@ -82,8 +84,9 @@ export class UserBookService {
         current_page: book.pages,
         updatedAt: new Date(),
       };
-    } else if (userBook.start_date === null) {
-      // if the book is the first time being tracked
+    }
+    // if the book is the first time being tracked
+    else if (userBook.start_date === null) {
       updatedUserBookData = {
         ...userBook,
         start_date: data.date ?? new Date(),
@@ -92,22 +95,9 @@ export class UserBookService {
         current_page: userBook.current_page + data.pages,
         updatedAt: new Date(),
       };
-    } else if (
-      userBook.current_page + data.pages <= 0 ||
-      userBook.total_minutes + data.minutes <= 0 ||
-      userBook.total_days + data.days <= 0
-    ) {
-      // if after the update the book will has no recording
-      updatedUserBookData = {
-        ...userBook,
-        total_minutes: userBook.total_minutes + data.minutes,
-        total_days: userBook.total_days + data.days,
-        current_page: userBook.current_page + data.pages,
-        start_date: null,
-        updatedAt: new Date(),
-      };
-    } else {
-      // if the book is already being tracked and normal update
+    }
+    // if the book is already being tracked and normal update
+    else {
       let earliestDate = userBook.start_date;
       if (data.date && data.date < userBook.start_date) {
         earliestDate = data.date;
@@ -220,7 +210,7 @@ export class UserBookService {
    */
   async getAll(
     user_id: string,
-    query: QueryTrackedBookDto,
+    query: UserBookQueryDto,
   ): Promise<UserBooksResponseDto> {
     // check if the user exists
     const user: UserResponseDto = (await this.userService.findByID(
@@ -240,9 +230,9 @@ export class UserBookService {
         include: { book: true },
       });
 
-      const books: BookProgressDto[] = userBooksWithBooks.map((userBook) => ({
-        book: userBook.book as any,
-        userBook: userBook as any,
+      const books = userBooksWithBooks.map((userBook) => ({
+        book: userBook.book as BookResponseDto,
+        userBook: userBook as UserBookResponseDto,
       }));
 
       return {
@@ -257,7 +247,7 @@ export class UserBookService {
       include: { book: true },
     });
 
-    const books: BookProgressDto[] = userBooksWithBooks.map((userBook) => ({
+    const books = userBooksWithBooks.map((userBook) => ({
       book: userBook.book as any,
       userBook: userBook as any,
     }));
@@ -266,5 +256,111 @@ export class UserBookService {
       books,
       totalCount: books.length,
     };
+  }
+
+  /**
+   * Create a recording for a user book
+   * @param user_book_id - The user book id
+   * @param data - The data to create the recording
+   * @returns The recording
+   * @public
+   */
+  async createRecording(
+    user_book_id: string,
+    data: RecordingCreateDto,
+  ): Promise<RecordingResponseDto> {
+    const userBook: UserBook | null = await this.prisma.userBook.findUnique({
+      where: { id: user_book_id },
+    });
+    if (!userBook) {
+      throw new NotFoundException("User book not found");
+    }
+
+    const book: Book | null = await this.bookService.findByID(userBook.book_id);
+    if (!book) {
+      throw new NotFoundException("Book not found");
+    }
+
+    const existingRecording: ReadingRecord | null =
+      await this.prisma.readingRecord.findUnique({
+        where: { user_book_id_date: { user_book_id, date: data.date } },
+      });
+
+    let resultRecording: RecordingResponseDto | null = null;
+    let realReadPage = 0;
+
+    // if the pages is greater than the remaining pages of the book,
+    // set the real read page to the remaining pages of the book
+    if (data.pages > book.pages - userBook.current_page) {
+      realReadPage = book.pages - userBook.current_page;
+    } else {
+      realReadPage = data.pages;
+    }
+
+    // if the recording exists merge the recording
+    if (existingRecording) {
+      resultRecording = await this.prisma.readingRecord.update({
+        where: { id: existingRecording.id },
+        data: {
+          pages: existingRecording.pages + realReadPage,
+          minutes: existingRecording.minutes + (data.minutes ?? 0),
+          notes: data.notes ?? existingRecording.notes,
+        },
+      });
+
+      await this.update(user_book_id, {
+        pages: realReadPage,
+        minutes: data.minutes ?? 0,
+        days: 0,
+        date: data.date,
+      } as UserBookUpdateDto);
+    }
+    // else create a new recording
+    else {
+      resultRecording = (await this.prisma.readingRecord.create({
+        data: {
+          ...data,
+          user_book_id,
+          pages: realReadPage,
+        },
+      })) as RecordingResponseDto;
+
+      await this.update(user_book_id, {
+        pages: realReadPage,
+        minutes: data.minutes ?? 0,
+        days: 1,
+        date: data.date,
+      } as UserBookUpdateDto);
+    }
+
+    return resultRecording;
+  }
+
+  /**
+   * Get all recordings for a user book
+   * @param user_book_id - The user book id
+   * @returns The recordings
+   * @public
+   */
+  async getRecordings(user_book_id: string): Promise<RecordingResponseDto[]> {
+    const recordings: ReadingRecord[] =
+      await this.prisma.readingRecord.findMany({
+        where: { user_book_id },
+        orderBy: { date: "asc" },
+      });
+
+    return recordings as RecordingResponseDto[];
+  }
+
+  /**
+   * Delete all recordings for a user book
+   * @param user_book_id - The user book id
+   * @returns The void
+   * @public
+   */
+  async deleteRecordings(user_book_id: string): Promise<void> {
+    await this.prisma.readingRecord.deleteMany({
+      where: { user_book_id },
+    });
   }
 }
