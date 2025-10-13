@@ -8,6 +8,7 @@ import { S3Service } from "@modules/S3/S3.service";
 @Module({
   imports: [ConfigModule],
   providers: [S3Service],
+  exports: [S3Service],
   controllers: [],
 })
 export class S3Module {}

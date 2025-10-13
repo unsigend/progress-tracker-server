@@ -15,9 +15,17 @@ import { UserCreateDto } from "@modules/user/dto/user-create.dto";
 import { UserUpdateDto } from "@modules/user/dto/user-update.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
+// import services
+import { ConfigService } from "@nestjs/config";
+import { S3Service } from "../S3/S3.service";
+
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+    private readonly s3Service: S3Service,
+  ) {}
 
   /**
    * Filter out sensitive fields from user
@@ -164,6 +172,25 @@ export class UserService {
     }
 
     try {
+      // if the user has a avatar url and the old avatar url is in AWS S3
+      const bucketName: string = this.configService.get(
+        "s3.AWS_S3_BUCKET_NAME",
+      )!;
+      const region: string = this.configService.get("s3.AWS_S3_REGION")!;
+      const AWS_S3_prefix = `https://${bucketName}.s3.${region}.amazonaws.com/`;
+      const oldUser = await this.findByID(id, true);
+      if (!oldUser) {
+        throw new NotFoundException("User not found");
+      }
+      if (
+        updateUserDto.avatar_url &&
+        oldUser.avatar_url &&
+        oldUser.avatar_url.startsWith(AWS_S3_prefix)
+      ) {
+        // delete the old AWS S3 avatar file
+        await this.s3Service.deleteFile(oldUser.avatar_url);
+      }
+
       // update the user
       const user: User = await this.prisma.user.update({
         where: { id },
@@ -236,11 +263,8 @@ export class UserService {
       // if the user exists, link the user to the provider
       const updatedUserDto: UserUpdateDto = {};
 
-      // update the avatar url only if it is different
-      if (
-        createUserDto.avatar_url &&
-        createUserDto.avatar_url !== existingUser.avatar_url
-      ) {
+      // update the avatar url only if the old avatar url is null
+      if (createUserDto.avatar_url && !existingUser.avatar_url) {
         updatedUserDto.avatar_url = createUserDto.avatar_url;
       }
 

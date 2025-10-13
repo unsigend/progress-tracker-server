@@ -13,7 +13,7 @@ import { UserModule } from "@modules/user/user.module";
 import { BookModule } from "@modules/book/book.module";
 import { AuthModule } from "@modules/auth/auth.module";
 import { S3Module } from "@modules/S3/S3.module";
-import { FileModule } from "@modules/file/file.module";
+import { CloudModule } from "@/modules/cloud/cloud.module";
 import { UserBookModule } from "@modules/userBook/userBook.module";
 import { StatisticsModule } from "@modules/statistics/statistics.module";
 
@@ -27,7 +27,7 @@ import { StatisticsModule } from "@modules/statistics/statistics.module";
     BookModule,
     AuthModule,
     S3Module,
-    FileModule,
+    CloudModule,
     UserBookModule,
     StatisticsModule,
   ],

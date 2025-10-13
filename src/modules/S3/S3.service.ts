@@ -29,21 +29,28 @@ export class S3Service {
   }
 
   /**
-   * Upload a file to AWS S3
-   * @param file - The file to upload
+   * Upload a file to AWS S3 with auto-generated filename
+   * @param buffer - The buffer to upload
+   * @param contentType - The content type of the file
+   * @param prefix - Optional prefix for the filename
    * @returns The file url
    */
-  async uploadFile(file: Express.Multer.File): Promise<string> {
-    // generate a unique file name: current timestamp + original file name
-    const fileName = `${Date.now()}-${file.originalname}`;
+  async upload(
+    buffer: Buffer,
+    contentType: string,
+    prefix: string = "file",
+  ): Promise<string> {
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 8);
+    const fileName = `${timestamp}-${randomId}-${prefix}`;
 
     // upload the file to S3
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
         Key: fileName,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Body: buffer,
+        ContentType: contentType,
       }),
     );
 
@@ -61,7 +68,7 @@ export class S3Service {
    * @param fileUrl - The url of the file to delete
    * @returns Whether the file was deleted successfully
    */
-  async deleteFile(fileUrl: string): Promise<boolean> {
+  async delete(fileUrl: string): Promise<boolean> {
     // Extract the file name/key from the full URL
     const fileName = fileUrl.split("/").pop();
     if (!fileName) {
