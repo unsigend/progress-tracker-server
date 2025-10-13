@@ -188,7 +188,7 @@ export class UserService {
         oldUser.avatar_url.startsWith(AWS_S3_prefix)
       ) {
         // delete the old AWS S3 avatar file
-        await this.s3Service.deleteFile(oldUser.avatar_url);
+        await this.s3Service.delete(oldUser.avatar_url);
       }
 
       // update the user

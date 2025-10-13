@@ -25,7 +25,9 @@ import type { Request, Response } from "express";
 // import services
 import { AuthService } from "@modules/auth/auth.service";
 import { UserService } from "@modules/user/user.service";
+import { MailerService } from "@modules/mailer/mailer.service";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
@@ -34,7 +36,11 @@ import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
 import { RegisterRequestDto } from "@/modules/auth/dto/register-request.dto";
 import { UserCreateDto } from "@/modules/user/dto/user-create.dto";
 import { EmailCheckResponseDto } from "@/modules/auth/dto/email-check-response.dto";
-import { EmailCheckRequestDto } from "./dto/email-check-request.dto";
+import { EmailCheckRequestDto } from "@/modules/auth/dto/email-check-request.dto";
+import { SendVerifyCodeRequestDto } from "@/modules/auth/dto/send-verify-code-request.dto";
+import { SendVerifyCodeResponseDto } from "@/modules/auth/dto/send-verify-code-response";
+import { ResetPasswordRequestDto } from "@/modules/auth/dto/reset-password-request.dto";
+import { ResetPasswordResponseDto } from "@/modules/auth/dto/reset-password-response.dto";
 
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";
@@ -50,6 +56,8 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    private readonly mailerService: MailerService,
+    private readonly jwtService: JwtService,
   ) {}
 
   /**
@@ -249,5 +257,131 @@ export class AuthController {
     let redirectUrl = `${this.configService.get<string>("auth.GITHUB_FRONTEND_REDIRECT_URL")!}?`;
     redirectUrl += `access_token=${accessToken.access_token}`;
     res.redirect(redirectUrl);
+  }
+
+  /**
+   * Send verification code to the email address
+   * @param sendVerifyCodeRequest - The send verify code request
+   * @returns The send verify code response
+   */
+  @ApiOperation({ summary: "Send verification code" })
+  @ApiBody({ type: SendVerifyCodeRequestDto })
+  @ApiOkResponse({
+    description: "Verification code sent successfully",
+    type: SendVerifyCodeResponseDto,
+  })
+  @Post("verify-code")
+  @Public()
+  public async sendVerifyCode(
+    @Body() sendVerifyCodeRequest: SendVerifyCodeRequestDto,
+  ): Promise<SendVerifyCodeResponseDto> {
+    // check if the user exists
+    const user: UserResponseDto | null = (await this.userService.findByEmail(
+      sendVerifyCodeRequest.email,
+      false,
+    )) as UserResponseDto | null;
+    if (!user) {
+      throw new BadRequestException("User not found");
+    }
+
+    // send the verification code
+    const verificationCode: string =
+      await this.mailerService.sendVerificationCode(
+        sendVerifyCodeRequest.email,
+      );
+
+    // generate the JWT token
+    const token = this.jwtService.sign(
+      {
+        email: sendVerifyCodeRequest.email,
+        code: verificationCode,
+        type: "password-reset",
+      },
+      {
+        expiresIn: "5m",
+        secret: this.configService.get<string>("auth.JWT_SECRET"),
+      },
+    );
+
+    return {
+      resetToken: token,
+    };
+  }
+
+  /**
+   * Reset password
+   * @param resetPasswordRequest - The reset password request
+   * @returns The reset password response
+   */
+  @ApiOperation({ summary: "Reset password" })
+  @ApiBody({ type: ResetPasswordRequestDto })
+  @ApiOkResponse({
+    description: "Password reset successfully",
+    type: ResetPasswordResponseDto,
+  })
+  @Post("reset-password")
+  @Public()
+  public async resetPassword(
+    @Body() resetPasswordRequest: ResetPasswordRequestDto,
+  ): Promise<ResetPasswordResponseDto> {
+    // verify the reset token
+    try {
+      const playload: { email: string; code: string; type: string } =
+        this.jwtService.verify(resetPasswordRequest.resetToken, {
+          secret: this.configService.get<string>("auth.JWT_SECRET"),
+        });
+
+      if (playload.type !== "password-reset") {
+        return Promise.resolve({
+          message: "Invalid token type",
+          success: false,
+        });
+      }
+
+      if (playload.code !== resetPasswordRequest.code) {
+        return Promise.resolve({
+          message: "Invalid verification code",
+          success: false,
+        });
+      }
+
+      const user: UserResponseDto | null = (await this.userService.findByEmail(
+        playload.email,
+        false,
+      )) as UserResponseDto | null;
+      if (!user) {
+        return Promise.resolve({
+          message: "User not found",
+          success: false,
+        });
+      }
+
+      // update the password
+      await this.userService.update(user.id, {
+        password: resetPasswordRequest.newPassword,
+      });
+
+      return Promise.resolve({
+        message: "Password reset successfully",
+        success: true,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === "JsonWebTokenError") {
+        return Promise.resolve({
+          message: "Invalid verification code",
+          success: false,
+        });
+      }
+      if (error instanceof Error && error.name === "TokenExpiredError") {
+        return Promise.resolve({
+          message: "Verification code expired (5 minutes)",
+          success: false,
+        });
+      }
+      return Promise.resolve({
+        message: "Failed to reset password",
+        success: false,
+      });
+    }
   }
 }
