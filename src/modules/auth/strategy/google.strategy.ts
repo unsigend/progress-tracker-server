@@ -17,9 +17,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     private readonly userService: UserService,
   ) {
     let fullDomain = configService.get<string>("app.DOMAIN")!;
-    if (configService.get<number>("app.PORT")!) {
-      fullDomain += `:${configService.get<number>("app.PORT")!}`;
-    }
     fullDomain += `/api/${configService.get<string>("app.API_VERSION")!}/auth/google/callback`;
 
     super({
