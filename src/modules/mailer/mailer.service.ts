@@ -1,7 +1,9 @@
 // import dependencies
 import { Injectable } from "@nestjs/common";
+import nodemailer from "nodemailer";
+
+// import services
 import { ConfigService } from "@nestjs/config";
-import * as nodemailer from "nodemailer";
 
 // import types
 import { CONFIG_MAILER } from "@modules/mailer/config/mailer.config.type";
@@ -19,7 +21,7 @@ export class MailerService {
     this.transporter = nodemailer.createTransport({
       host: config.SMTP_HOST,
       port: config.SMTP_PORT,
-      secure: config.SMTP_PORT === 465, // true for 465, false for other ports
+      secure: config.SMTP_PORT === 465,
       auth: {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,

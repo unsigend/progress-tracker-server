@@ -334,14 +334,16 @@ export class AuthController {
       if (playload.type !== "password-reset") {
         return Promise.resolve({
           message: "Invalid token type",
-          success: false,
+          reset_success: false,
+          valid: false,
         });
       }
 
       if (playload.code !== resetPasswordRequest.code) {
         return Promise.resolve({
           message: "Invalid verification code",
-          success: false,
+          reset_success: false,
+          valid: false,
         });
       }
 
@@ -352,35 +354,50 @@ export class AuthController {
       if (!user) {
         return Promise.resolve({
           message: "User not found",
-          success: false,
+          reset_success: false,
+          valid: false,
         });
       }
 
-      // update the password
-      await this.userService.update(user.id, {
-        password: resetPasswordRequest.newPassword,
-      });
+      // only new password is provided reset the password
+      // if no new password is provided, only verify the verification code
+      if (resetPasswordRequest.newPassword) {
+        // update the password
+        await this.userService.update(user.id, {
+          password: resetPasswordRequest.newPassword,
+        });
 
-      return Promise.resolve({
-        message: "Password reset successfully",
-        success: true,
-      });
+        return Promise.resolve({
+          message: "Password reset successfully",
+          reset_success: true,
+          valid: true,
+        });
+      } else {
+        return Promise.resolve({
+          message: "Verification code is valid",
+          reset_success: false,
+          valid: true,
+        });
+      }
     } catch (error) {
       if (error instanceof Error && error.name === "JsonWebTokenError") {
         return Promise.resolve({
           message: "Invalid verification code",
-          success: false,
+          reset_success: false,
+          valid: false,
         });
       }
       if (error instanceof Error && error.name === "TokenExpiredError") {
         return Promise.resolve({
           message: "Verification code expired (5 minutes)",
-          success: false,
+          reset_success: false,
+          valid: false,
         });
       }
       return Promise.resolve({
         message: "Failed to reset password",
-        success: false,
+        reset_success: false,
+        valid: false,
       });
     }
   }

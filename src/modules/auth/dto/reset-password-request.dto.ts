@@ -1,6 +1,13 @@
 // import dependencies
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+  ValidateIf,
+} from "class-validator";
 
 export class ResetPasswordRequestDto {
   @ApiProperty({ description: "The reset password token" })
@@ -13,8 +20,11 @@ export class ResetPasswordRequestDto {
   @IsNotEmpty()
   code: string;
 
-  @ApiProperty({ description: "The new password" })
+  @ApiPropertyOptional({ description: "The new password", required: false })
   @IsString()
-  @IsNotEmpty()
-  newPassword: string;
+  @IsOptional()
+  @ValidateIf((object: ResetPasswordRequestDto) => object.newPassword !== "")
+  @MinLength(8)
+  @MaxLength(20)
+  newPassword?: string;
 }
