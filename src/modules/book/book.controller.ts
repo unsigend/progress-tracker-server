@@ -11,6 +11,9 @@ import {
   Patch,
   NotFoundException,
   Res,
+  UseInterceptors,
+  UploadedFile,
+  Logger,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -20,8 +23,11 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiConsumes,
 } from "@nestjs/swagger";
+import { FileInterceptor } from "@nestjs/platform-express";
 import type { Response } from "express";
+import { Public } from "@common/decorators/public.decorator";
 
 // import pipes
 import { ParseUUIDPipe } from "@nestjs/common";
@@ -44,9 +50,11 @@ export class BookController {
    * Create a book
    * @route POST api/v1/books
    * @param createBookDto - The data to create the book
+   * @param cover - The cover image file
    * @returns The book or null if the book is not found
    */
   @ApiOperation({ summary: "Create a book" })
+  @ApiConsumes("multipart/form-data")
   @ApiBody({ type: BookCreateDto })
   @ApiCreatedResponse({
     type: BookResponseDto,
@@ -55,8 +63,31 @@ export class BookController {
   @ApiBadRequestResponse({
     description: "Book not created",
   })
+  @Public()
   @Post()
-  async create(@Body() createBookDto: BookCreateDto): Promise<BookResponseDto> {
+  @UseInterceptors(
+    FileInterceptor("cover", {
+      limits: {
+        fileSize: 1 * 1024 * 1024,
+      },
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          Logger.log("File type mismatch with : ", file.mimetype);
+          return callback(new Error("Only image files are allowed!"), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async create(
+    @Body() createBookDto: BookCreateDto,
+    @UploadedFile() cover?: Express.Multer.File,
+  ): Promise<BookResponseDto> {
+    // Attach the file to the DTO if it exists
+    if (cover) {
+      createBookDto.cover = cover;
+    }
+
     const book: Book | null = await this.bookService.create(createBookDto);
     return book as BookResponseDto;
   }
@@ -97,6 +128,7 @@ export class BookController {
   @ApiOperation({ summary: "Update a book by id" })
   @ApiParam({ name: "id", type: "string", format: "uuid" })
   @ApiBody({ type: BookUpdateDto })
+  @ApiConsumes("multipart/form-data")
   @ApiOkResponse({
     type: BookResponseDto,
     description: "The book updated successfully",
@@ -105,10 +137,75 @@ export class BookController {
     description: "Book not updated",
   })
   @Put(":id")
+  @UseInterceptors(
+    FileInterceptor("cover", {
+      limits: {
+        fileSize: 1 * 1024 * 1024,
+      },
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          return callback(new Error("Only image files are allowed!"), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
   async update(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() updateBookDto: BookUpdateDto,
+    @UploadedFile() cover?: Express.Multer.File,
   ): Promise<BookResponseDto> {
+    // Attach the file to the DTO if it exists
+    if (cover) {
+      updateBookDto.cover = cover;
+    }
+
+    const book: Book | null = await this.bookService.update(id, updateBookDto);
+    return book as BookResponseDto;
+  }
+
+  /**
+   * Patch a book by id
+   * @route PATCH api/v1/books/:id
+   * @param id - The id of the book
+   * @param updateBookDto - The data to update the book
+   * @returns The book or null if the book is not found
+   */
+  @ApiOperation({ summary: "Patch a book by id" })
+  @ApiParam({ name: "id", type: "string", format: "uuid" })
+  @ApiBody({ type: BookUpdateDto })
+  @ApiConsumes("multipart/form-data")
+  @ApiOkResponse({
+    type: BookResponseDto,
+    description: "The book patched successfully",
+  })
+  @ApiBadRequestResponse({
+    description: "Book not patched",
+  })
+  @Patch(":id")
+  @UseInterceptors(
+    FileInterceptor("cover", {
+      limits: {
+        fileSize: 1 * 1024 * 1024,
+      },
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          return callback(new Error("Only image files are allowed!"), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async patch(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() updateBookDto: BookUpdateDto,
+    @UploadedFile() cover?: Express.Multer.File,
+  ): Promise<BookResponseDto> {
+    // Attach the file to the DTO if it exists
+    if (cover) {
+      updateBookDto.cover = cover;
+    }
+
     const book: Book | null = await this.bookService.update(id, updateBookDto);
     return book as BookResponseDto;
   }
@@ -162,57 +259,5 @@ export class BookController {
     // set header x-total-count
     res.setHeader("x-total-count", books.totalCount.toString());
     return books;
-  }
-
-  /**
-   * Replace a book by id
-   * @route PUT api/v1/books/:id
-   * @param id - The id of the book
-   * @param updateBookDto - The data to update the book
-   * @returns The book or null if the book is not found
-   */
-  @ApiOperation({ summary: "Replace a book by id" })
-  @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: BookUpdateDto })
-  @ApiOkResponse({
-    type: BookResponseDto,
-    description: "The book replaced successfully",
-  })
-  @ApiBadRequestResponse({
-    description: "Book not found",
-  })
-  @Put(":id")
-  async replace(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateBookDto: BookUpdateDto,
-  ): Promise<BookResponseDto> {
-    const book: Book | null = await this.bookService.update(id, updateBookDto);
-    return book as BookResponseDto;
-  }
-
-  /**
-   * Patch a book by id
-   * @route PATCH api/v1/books/:id
-   * @param id - The id of the book
-   * @param updateBookDto - The data to update the book
-   * @returns The book or null if the book is not found
-   */
-  @ApiOperation({ summary: "Patch a book by id" })
-  @ApiParam({ name: "id", type: "string", format: "uuid" })
-  @ApiBody({ type: BookUpdateDto })
-  @ApiOkResponse({
-    type: BookResponseDto,
-    description: "The book patched successfully",
-  })
-  @ApiBadRequestResponse({
-    description: "Book not patched",
-  })
-  @Patch(":id")
-  async patch(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateBookDto: BookUpdateDto,
-  ): Promise<BookResponseDto> {
-    const book: Book | null = await this.bookService.update(id, updateBookDto);
-    return book as BookResponseDto;
   }
 }

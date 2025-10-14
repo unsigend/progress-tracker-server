@@ -26,7 +26,10 @@ export class BookCreateDto {
   @IsOptional()
   author?: string | null;
 
-  @ApiProperty({ description: "The description of the book", type: String })
+  @ApiPropertyOptional({
+    description: "The description of the book",
+    type: String,
+  })
   @TrimString()
   @IsString({ message: "Description must be a string" })
   @IsOptional()
@@ -63,4 +66,12 @@ export class BookCreateDto {
   @IsOptional()
   @IsUrl(undefined, { message: "Invalid cover url" })
   cover_url?: string | null;
+
+  @ApiPropertyOptional({
+    description: "The cover image file",
+    type: "string",
+    format: "binary",
+  })
+  @IsOptional()
+  cover?: Express.Multer.File;
 }

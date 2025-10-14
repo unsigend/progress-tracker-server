@@ -13,9 +13,27 @@ import { BookUpdateDto } from "@modules/book/dto/book-update.dto";
 import { BookQueryDto } from "@modules/book/dto/book-query.dto";
 import { BooksResponseDto } from "@modules/book/dto/books-response.dto";
 
+// import services
+import { ImagesService } from "@modules/images/images.service";
+import { S3Service } from "@modules/S3/S3.service";
+import { ConfigService } from "@nestjs/config";
+
 @Injectable()
 export class BookService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly AWS_S3_PREFIX: string;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+    private readonly imagesService: ImagesService,
+    private readonly s3Service: S3Service,
+  ) {
+    const AWS_BUCKET_NAME: string = this.configService.get(
+      "s3.AWS_S3_BUCKET_NAME",
+    )!;
+    const AWS_REGION: string = this.configService.get("s3.AWS_S3_REGION")!;
+    this.AWS_S3_PREFIX = `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/`;
+  }
 
   /**
    * Find a book by a unique key
@@ -50,8 +68,35 @@ export class BookService {
    */
   public async create(bookCreateDto: BookCreateDto): Promise<Book | null> {
     try {
+      // if the cover image file is provided
+      if (bookCreateDto.cover) {
+        // compress the cover image
+        const compressedImage: Buffer = await this.imagesService.compressImage(
+          bookCreateDto.cover.buffer,
+          {
+            quality: 80,
+            width: 800,
+            height: 800,
+            format: bookCreateDto.cover.mimetype.split("/")[1] as
+              | "jpeg"
+              | "png"
+              | "webp",
+          },
+        );
+
+        // upload the cover image to AWS S3
+        bookCreateDto.cover_url = await this.s3Service.upload(
+          compressedImage,
+          bookCreateDto.cover.mimetype,
+          "book-cover",
+        );
+      }
+      // create the book
+      const bookData = { ...bookCreateDto };
+      delete bookData.cover;
+
       const book: Book | null = await this.prisma.book.create({
-        data: bookCreateDto,
+        data: bookData,
       });
 
       return book;
@@ -71,20 +116,53 @@ export class BookService {
     bookUpdateDto: BookUpdateDto,
   ): Promise<Book | null> {
     try {
+      // if the cover image file is provided
+      if (bookUpdateDto.cover) {
+        // compress the cover image
+        const compressedImage: Buffer = await this.imagesService.compressImage(
+          bookUpdateDto.cover.buffer,
+          {
+            quality: 80,
+            width: 800,
+            height: 800,
+            format: bookUpdateDto.cover.mimetype.split("/")[1] as
+              | "jpeg"
+              | "png"
+              | "webp",
+          },
+        );
+        // upload the cover image to AWS S3
+        bookUpdateDto.cover_url = await this.s3Service.upload(
+          compressedImage,
+          bookUpdateDto.cover.mimetype,
+          "book-cover",
+        );
+
+        // get the old book
+        const oldBook: Book | null = await this.findByID(id);
+        if (!oldBook) {
+          throw new NotFoundException("Book not found");
+        }
+
+        // if the old cover image url is in AWS S3
+        if (
+          oldBook.cover_url &&
+          oldBook.cover_url.startsWith(this.AWS_S3_PREFIX)
+        ) {
+          // delete the old AWS S3 cover image
+          await this.s3Service.delete(oldBook.cover_url);
+        }
+      }
+      // update the book (exclude the cover file from the data)
+      const bookData = { ...bookUpdateDto };
+      delete bookData.cover;
       const book: Book | null = await this.prisma.book.update({
         where: { id },
-        data: { ...bookUpdateDto, updatedAt: new Date() },
+        data: { ...bookData, updatedAt: new Date() },
       });
 
       return book;
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2025"
-      ) {
-        // Record not found
-        throw new NotFoundException("Book not found");
-      }
+    } catch {
       throw new BadRequestException("Failed to update book");
     }
   }
@@ -96,19 +174,27 @@ export class BookService {
    */
   public async delete(id: string): Promise<Book | null> {
     try {
+      // get the book
+      const oldBook: Book | null = await this.findByID(id);
+      if (!oldBook) {
+        throw new NotFoundException("Book not found");
+      }
+
+      // if the cover image url is in AWS S3
+      if (
+        oldBook.cover_url &&
+        oldBook.cover_url.startsWith(this.AWS_S3_PREFIX)
+      ) {
+        // delete the AWS S3 cover image
+        await this.s3Service.delete(oldBook.cover_url);
+      }
+
       const book: Book | null = await this.prisma.book.delete({
         where: { id },
       });
 
       return book;
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2025"
-      ) {
-        // Record not found
-        throw new NotFoundException("Book not found");
-      }
+    } catch {
       throw new BadRequestException("Failed to delete book");
     }
   }
