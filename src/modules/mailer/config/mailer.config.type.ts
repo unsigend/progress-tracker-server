@@ -2,17 +2,8 @@
  * Mailer configuration interface
  */
 export interface CONFIG_MAILER {
-  // SMTP host
-  SMTP_HOST: string;
-
-  // SMTP port
-  SMTP_PORT: number;
-
-  // SMTP username
-  SMTP_USER: string;
-
-  // SMTP password
-  SMTP_PASS: string;
+  // Resend API key
+  RESEND_API_KEY: string;
 
   // From email address
   FROM_EMAIL: string;
