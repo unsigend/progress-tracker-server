@@ -7,14 +7,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MailerModule } from "@modules/mailer/mailer.module";
 // import services
-import { AuthService } from "@modules/auth/auth.service";
+import { AuthService } from "@modules/authentication/auth.service";
 // import controllers
-import { AuthController } from "@modules/auth/auth.controller";
+import { AuthController } from "@modules/authentication/auth.controller";
 // import strategies
-import { LocalStrategy } from "@modules/auth/strategy/local.strategy";
-import { JwtStrategy } from "@modules/auth/strategy/jwt.strategy";
-import { GoogleStrategy } from "@modules/auth/strategy/google.strategy";
-import { GithubStrategy } from "@modules/auth/strategy/github.strategy";
+import { LocalStrategy } from "@modules/authentication/strategy/local.strategy";
+import { JwtStrategy } from "@modules/authentication/strategy/jwt.strategy";
+import { GoogleStrategy } from "@modules/authentication/strategy/google.strategy";
+import { GithubStrategy } from "@modules/authentication/strategy/github.strategy";
 
 @Module({
   imports: [

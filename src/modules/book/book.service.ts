@@ -64,9 +64,13 @@ export class BookService {
   /**
    * Create a book
    * @param createBookDto - The data to create the book
+   * @param userId - The id of the user who created the book
    * @returns The book or null if the book is not found
    */
-  public async create(bookCreateDto: BookCreateDto): Promise<Book | null> {
+  public async create(
+    bookCreateDto: BookCreateDto,
+    userId: string,
+  ): Promise<Book | null> {
     try {
       // if the cover image file is provided
       if (bookCreateDto.cover) {
@@ -96,7 +100,7 @@ export class BookService {
       delete bookData.cover;
 
       const book: Book | null = await this.prisma.book.create({
-        data: bookData,
+        data: { ...bookData, createdById: userId },
       });
 
       return book;
@@ -153,8 +157,9 @@ export class BookService {
           await this.s3Service.delete(oldBook.cover_url);
         }
       }
-      // update the book (exclude the cover file from the data)
+      // update the book
       const bookData = { ...bookUpdateDto };
+      // exclude the cover file from the data
       delete bookData.cover;
       const book: Book | null = await this.prisma.book.update({
         where: { id },

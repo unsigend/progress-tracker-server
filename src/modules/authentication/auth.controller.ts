@@ -23,7 +23,7 @@ import {
 import type { Request, Response } from "express";
 
 // import services
-import { AuthService } from "@modules/auth/auth.service";
+import { AuthService } from "@modules/authentication/auth.service";
 import { UserService } from "@modules/user/user.service";
 import { MailerService } from "@modules/mailer/mailer.service";
 import { ConfigService } from "@nestjs/config";
@@ -31,16 +31,16 @@ import { JwtService } from "@nestjs/jwt";
 
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
-import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
-import { RegisterRequestDto } from "@/modules/auth/dto/register-request.dto";
+import { LoginRequestDto } from "@modules/authentication/dto/login-request.dto";
+import { LoginResponseDto } from "@modules/authentication/dto/login-response.dto";
+import { RegisterRequestDto } from "@modules/authentication/dto/register-request.dto";
 import { UserCreateDto } from "@/modules/user/dto/user-create.dto";
-import { EmailCheckResponseDto } from "@/modules/auth/dto/email-check-response.dto";
-import { EmailCheckRequestDto } from "@/modules/auth/dto/email-check-request.dto";
-import { SendVerifyCodeRequestDto } from "@/modules/auth/dto/send-verify-code-request.dto";
-import { SendVerifyCodeResponseDto } from "@/modules/auth/dto/send-verify-code-response";
-import { ResetPasswordRequestDto } from "@/modules/auth/dto/reset-password-request.dto";
-import { ResetPasswordResponseDto } from "@/modules/auth/dto/reset-password-response.dto";
+import { EmailCheckResponseDto } from "@modules/authentication/dto/email-check-response.dto";
+import { EmailCheckRequestDto } from "@modules/authentication/dto/email-check-request.dto";
+import { SendVerifyCodeRequestDto } from "@modules/authentication/dto/send-verify-code-request.dto";
+import { SendVerifyCodeResponseDto } from "@modules/authentication/dto/send-verify-code-response";
+import { ResetPasswordRequestDto } from "@modules/authentication/dto/reset-password-request.dto";
+import { ResetPasswordResponseDto } from "@modules/authentication/dto/reset-password-response.dto";
 
 // import guards
 import { LocalAuthGuard } from "@common/guards/local-auth.guard";

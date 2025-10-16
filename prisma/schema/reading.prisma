@@ -16,12 +16,15 @@ model Book {
   cover_url String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  createdById String
 
   // index optimization
   @@index([title])
+  @@index([createdById])
 
   // relation
   user_books UserBook[]
+  createdBy  User     @relation("CreatedBooks", fields: [createdById], references: [id])
 }
 
 /*

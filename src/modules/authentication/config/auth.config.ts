@@ -6,7 +6,7 @@ import validateConfig from "@common/utils/validate-config";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 // import auth configuration type
-import { CONFIG_AUTH } from "@modules/auth/config/auth-config.type";
+import { CONFIG_AUTH } from "@modules/authentication/config/auth-config.type";
 
 class EnvironmentVariablesValidator {
   @IsString()

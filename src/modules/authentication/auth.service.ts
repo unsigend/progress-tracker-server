@@ -8,8 +8,8 @@ import { JwtService } from "@nestjs/jwt";
 
 // import dto
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
-import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
-import { LoginResponseDto } from "@/modules/auth/dto/login-response.dto";
+import { LoginRequestDto } from "@modules/authentication/dto/login-request.dto";
+import { LoginResponseDto } from "@modules/authentication/dto/login-response.dto";
 import { User } from "@prisma/client";
 
 @Injectable()

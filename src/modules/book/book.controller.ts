@@ -14,6 +14,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Logger,
+  Req,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -26,7 +27,7 @@ import {
   ApiConsumes,
 } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
-import type { Response } from "express";
+import type { Response, Request } from "express";
 import { Public } from "@common/decorators/public.decorator";
 
 // import pipes
@@ -40,6 +41,7 @@ import { BookUpdateDto } from "@modules/book/dto/book-update.dto";
 import { BookQueryDto } from "@modules/book/dto/book-query.dto";
 import { BooksResponseDto } from "@modules/book/dto/books-response.dto";
 import { Book } from "@prisma/client";
+import { UserResponseDto } from "../user/dto/user-response.dto";
 
 @Controller("books")
 @ApiTags("Books")
@@ -80,15 +82,22 @@ export class BookController {
     }),
   )
   async create(
+    @Req() req: Request,
     @Body() createBookDto: BookCreateDto,
     @UploadedFile() cover?: Express.Multer.File,
   ): Promise<BookResponseDto> {
+    // get the user id from the request
+    const user_id: string = (req.user as UserResponseDto).id;
+
     // Attach the file to the DTO if it exists
     if (cover) {
       createBookDto.cover = cover;
     }
 
-    const book: Book | null = await this.bookService.create(createBookDto);
+    const book: Book | null = await this.bookService.create(
+      createBookDto,
+      user_id,
+    );
     return book as BookResponseDto;
   }
 

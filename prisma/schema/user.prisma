@@ -26,4 +26,5 @@ model User {
 
   // relation
   user_books UserBook[]
+  createdBooks Book[] @relation("CreatedBooks")
 }

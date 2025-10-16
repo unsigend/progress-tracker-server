@@ -4,10 +4,10 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-local";
 
 // import services
-import { AuthService } from "@modules/auth/auth.service";
+import { AuthService } from "@modules/authentication/auth.service";
 
 // import dto
-import { LoginRequestDto } from "@/modules/auth/dto/login-request.dto";
+import { LoginRequestDto } from "@modules/authentication/dto/login-request.dto";
 import { UserResponseDto } from "@modules/user/dto/user-response.dto";
 
 @Injectable()
