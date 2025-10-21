@@ -1,4 +1,5 @@
 // import dependencies
+import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 import { ValidationException } from "@domain/exceptions/validation-exception";
 
 /**
@@ -12,15 +13,16 @@ export class ObjectIdValueObject {
    * Constructor
    * @param value - The value of the object id
    */
-  constructor(value: string) {
-    if (!value) {
-      throw new ValidationException("Object id is required");
+  constructor(value?: string) {
+    if (value) {
+      if (!uuidValidate(value.trim())) {
+        throw new ValidationException("Invalid Object ID");
+      }
+      this.value = value.trim();
+    } else {
+      // generate a new UUID
+      this.value = uuidv4() as string;
     }
-    const trimmedValue = value.trim();
-    if (trimmedValue === "") {
-      throw new ValidationException("Object id is required");
-    }
-    this.value = trimmedValue;
   }
 
   /**

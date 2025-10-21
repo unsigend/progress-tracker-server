@@ -6,13 +6,14 @@ import { ConfigModule } from "@nestjs/config";
 
 // import configurations
 import postgresqlConfig from "@/infrastructure/database/postgresql/config/postgresql.config";
+import appConfig from "@/platforms/config/app.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ".env",
       isGlobal: true,
-      load: [postgresqlConfig],
+      load: [postgresqlConfig, appConfig],
     }),
   ],
   controllers: [],

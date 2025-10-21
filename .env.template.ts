@@ -5,6 +5,8 @@ ENVIRONMENT=
 DOMAIN=
 PORT=
 FRONTEND_URL=
+API_PREFIX=
+API_VERSION=
 
 ### Database Related Configuration
 
