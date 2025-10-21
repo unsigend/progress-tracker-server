@@ -38,21 +38,13 @@ export class UserRepository implements IUserRepository {
   async save(user: UserEntity): Promise<void> {
     // map to the prisma user model
     const userModel: UserModel = UserMapper.toModel(user);
-    const userId: string = userModel.id;
 
-    // if the user id is provided, update the user
-    if (userId) {
-      await this.postgresqlService.user.update({
-        where: { id: userId },
-        data: userModel,
-      });
-    }
-    // if the user id is not provided, create a new user
-    else {
-      await this.postgresqlService.user.create({
-        data: userModel,
-      });
-    }
+    // update or create the user
+    await this.postgresqlService.user.upsert({
+      where: { id: userModel.id },
+      update: userModel,
+      create: userModel,
+    });
   }
 
   /**
