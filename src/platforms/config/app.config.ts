@@ -11,6 +11,7 @@ export default registerAs<AppConfigType>("app", () => {
   validateConfig(AppConfigType, process.env);
 
   return {
+    ENVIRONMENT: process.env.ENVIRONMENT! as "development" | "production",
     DOMAIN: process.env.DOMAIN!,
     PORT: process.env.PORT ? parseInt(process.env.PORT) : 3000,
     API_PREFIX: process.env.API_PREFIX!,

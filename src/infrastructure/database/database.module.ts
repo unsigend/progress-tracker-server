@@ -9,7 +9,7 @@ import { MongoDBService } from "@/infrastructure/database/mongodb/service/mongod
  * @description Database Module
  */
 @Module({
-  imports: [PostgreSQLService, MongoDBService],
+  providers: [PostgreSQLService, MongoDBService],
   exports: [PostgreSQLService, MongoDBService],
 })
 export class DatabaseModule {}

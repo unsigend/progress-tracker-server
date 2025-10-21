@@ -40,4 +40,52 @@ export class UserQuery {
     this.limit = limit ?? this.DEFAULT_LIMIT;
     this.page = page ?? this.DEFAULT_PAGE;
   }
+
+  /**
+   * Get the key of the query
+   * @returns The key of the query
+   */
+  getKey(): string | null {
+    return this.key;
+  }
+
+  /**
+   * Get the value of the query
+   * @returns The value of the query
+   */
+  getValue(): string | null {
+    return this.value;
+  }
+
+  /**
+   * Get the sort of the query
+   * @returns The sort of the query
+   */
+  getSort(): string {
+    return this.sort;
+  }
+
+  /**
+   * Get the order of the query
+   * @returns The order of the query
+   */
+  getOrder(): "asc" | "desc" {
+    return this.order;
+  }
+
+  /**
+   * Get the limit of the query
+   * @returns The limit of the query
+   */
+  getLimit(): number {
+    return this.limit;
+  }
+
+  /**
+   * Get the page of the query
+   * @returns The page of the query
+   */
+  getPage(): number {
+    return this.page;
+  }
 }

@@ -39,10 +39,10 @@ export class UserEntity {
    * Private constructor used by the factory methods
    */
   private constructor(
+    id: ObjectIdValueObject,
     username: UsernameValueObject,
     email: EmailValueObject,
     password: PasswordValueObject,
-    id?: ObjectIdValueObject | null,
     provider?: ProviderValueObject | null,
     role?: RoleValueObject | null,
     createdAt?: Date | null,
@@ -50,10 +50,10 @@ export class UserEntity {
     deletedAt?: Date | null,
     avatar_url?: UrlValueObject | null,
   ) {
-    this.id = id ?? null;
-    this.username = username ?? null;
-    this.email = email ?? null;
-    this.password = password ?? null;
+    this.id = id;
+    this.username = username;
+    this.email = email;
+    this.password = password;
     this.provider = provider ?? null;
     this.role = role ?? null;
     this.createdAt = createdAt ?? null;
@@ -78,10 +78,10 @@ export class UserEntity {
     avatar_url?: UrlValueObject,
   ): UserEntity {
     return new UserEntity(
+      new ObjectIdValueObject(),
       username,
       email,
       password,
-      null,
       provider ?? new ProviderValueObject(["local"]),
       role ?? new RoleValueObject(UserRole.USER),
       createdAt ?? new Date(),
@@ -108,12 +108,12 @@ export class UserEntity {
     avatar_url?: UrlValueObject | null,
   ): UserEntity {
     return new UserEntity(
+      id,
       username,
       email,
       password,
-      id,
-      provider,
-      role,
+      provider ?? new ProviderValueObject(["local"]),
+      role ?? new RoleValueObject(UserRole.USER),
       createdAt ?? new Date(),
       updatedAt ?? new Date(),
       deletedAt ?? null,

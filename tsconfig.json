@@ -26,7 +26,8 @@
       "@presentation/*": ["./src/presentation/*"],
       "@application/*": ["./src/application/*"],
       "@domain/*": ["./src/domain/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"]
+      "@infrastructure/*": ["./src/infrastructure/*"],
+      "@platforms/*": ["./src/platforms/*"]
     }
   }
 }

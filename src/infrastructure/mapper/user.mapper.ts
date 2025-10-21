@@ -52,16 +52,16 @@ export class UserMapper {
    */
   public static toModel(user: UserEntity): UserModel {
     return {
-      id: user.getId()?.getValue() ?? "",
-      username: user.getUsername()?.getValue() ?? "",
-      email: user.getEmail()?.getValue() ?? "",
-      password: user.getPassword()?.getValue() ?? "",
+      id: user.getId()!.getValue(),
+      username: user.getUsername()!.getValue(),
+      email: user.getEmail()!.getValue(),
+      password: user.getPassword()!.getValue(),
       avatar_url: user.getAvatarUrl()?.getValue() ?? null,
-      provider: user.getProvider()?.getValue() ?? [],
-      role: this.toUserRoleModel(user.getRole()?.getValue() ?? UserRole.USER),
-      createdAt: user.getCreatedAt() ?? new Date(),
-      updatedAt: user.getUpdatedAt() ?? new Date(),
-      deletedAt: user.getDeletedAt() ?? null,
+      provider: user.getProvider()!.getValue(),
+      role: this.toUserRoleModel(user.getRole()!.getValue()),
+      createdAt: user.getCreatedAt()!,
+      updatedAt: user.getUpdatedAt()!,
+      deletedAt: user.getDeletedAt(),
     };
   }
 
@@ -78,9 +78,9 @@ export class UserMapper {
       new PasswordValueObject(user.password),
       new ProviderValueObject(user.provider),
       new RoleValueObject(this.toUserRoleEntity(user.role)),
-      new Date(user.createdAt),
-      new Date(user.updatedAt),
-      user.deletedAt ? new Date(user.deletedAt) : null,
+      user.createdAt,
+      user.updatedAt,
+      user.deletedAt ?? null,
       user.avatar_url ? new UrlValueObject(user.avatar_url) : null,
     );
   }
