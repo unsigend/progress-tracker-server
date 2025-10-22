@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // import dependencies
 import { plainToInstance } from "class-transformer";
 import { validateSync, ValidationError } from "class-validator";
@@ -25,5 +24,5 @@ export function validateConfig<T extends object>(
     throw new Error(errors.toString());
   }
 
-  return validatedConfig as T;
+  return validatedConfig;
 }

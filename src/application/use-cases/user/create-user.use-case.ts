@@ -60,9 +60,9 @@ export class CreateUserUseCase {
     username: UsernameValueObject,
     email: EmailValueObject,
     password: PasswordValueObject,
-    provider?: ProviderValueObject,
-    role?: RoleValueObject,
-    avatarFile?: ImageValueObject,
+    provider?: ProviderValueObject | null,
+    role?: RoleValueObject | null,
+    avatarFile?: ImageValueObject | null,
   ): Promise<UserEntity> {
     let avatarUrl: UrlValueObject | null = null;
 

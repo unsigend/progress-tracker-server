@@ -1,7 +1,7 @@
 // import dependencies
 import { NestFactory } from "@nestjs/core";
-import { Logger } from "@nestjs/common";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { Logger, BadRequestException } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 // import modules
 import { AppModule } from "@/app.module";
@@ -12,6 +12,9 @@ import { ConfigService } from "@nestjs/config";
 // import platform related components
 import { ValidationPipe } from "@nestjs/common";
 import { DomainExceptionFilter } from "@/platforms/filters/domain-exception.filter";
+
+// import scalar for modern API documentation
+import { apiReference } from "@scalar/nestjs-api-reference";
 
 /**
  * Bootstrap the application
@@ -32,6 +35,16 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
+      exceptionFactory: (errors) => {
+        // Get first error message
+        const firstError = errors[0];
+        const firstMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "Validation failed";
+
+        // return the bad request exception
+        return new BadRequestException(firstMessage);
+      },
     }),
   );
 
@@ -51,21 +64,28 @@ async function bootstrap() {
     exposedHeaders: ["x-total-count", "x-total-pages", "x-total-items"],
   });
 
-  // configure the swagger options
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle("Progress Tracker API Documentation")
+  // configure the OpenAPI specification
+  const config = new DocumentBuilder()
+    .setTitle("Progress Tracker API")
     .setDescription("API documentation for the Progress Tracker application")
     .setVersion("1.0")
     .addBearerAuth()
     .setLicense("MIT", "https://opensource.org/licenses/MIT")
     .build();
 
-  // create the swagger document
-  const document = SwaggerModule.createDocument(
-    applicationInstance,
-    swaggerConfig,
+  // create the OpenAPI document
+  const document = SwaggerModule.createDocument(applicationInstance, config);
+
+  // setup Scalar API documentation UI
+  applicationInstance.use(
+    "/api-docs",
+    apiReference({
+      theme: "purple",
+      darkMode: true,
+      content: document,
+      layout: "classic",
+    }),
   );
-  SwaggerModule.setup("api-docs", applicationInstance, document);
 
   // log the application is running
   const domain = configService.get<string>("app.DOMAIN");

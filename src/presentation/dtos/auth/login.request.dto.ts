@@ -1,5 +1,4 @@
 // import dependencies
-import { ApiProperty } from "@nestjs/swagger";
 import {
   IsEmail,
   IsNotEmpty,
@@ -13,21 +12,13 @@ import {
  * @description Login request dto
  */
 export class LoginRequestDto {
-  @ApiProperty({
-    description: "The email of the user",
-    example: "john.doe@example.com",
-    type: String,
-  })
+  /** The email of the user */
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   email: string;
 
-  @ApiProperty({
-    description: "The password of the user",
-    example: "password123",
-    type: String,
-  })
+  /** The password of the user */
   @IsNotEmpty()
   @IsString()
   @MinLength(8)

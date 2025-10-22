@@ -24,7 +24,6 @@ export class DomainExceptionFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
 
     // map the domain exception to the appropriate HTTP status code
     const httpStatusCode: HttpStatus = this.mapHttpStatus(exception);
@@ -32,8 +31,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
     // return the HTTP response
     response.status(httpStatusCode).json({
       statusCode: httpStatusCode,
-      timestamp: new Date().toISOString(),
-      path: request.url,
+      error: exception.name,
       message: exception.message,
     });
   }

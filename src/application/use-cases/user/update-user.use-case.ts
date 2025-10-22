@@ -60,9 +60,9 @@ export class UpdateUserUseCase {
     username?: UsernameValueObject | null,
     email?: EmailValueObject | null,
     password?: PasswordValueObject | null,
-    avatarFile?: ImageValueObject | null,
-    role?: RoleValueObject | null,
     provider?: ProviderValueObject | null,
+    role?: RoleValueObject | null,
+    avatarFile?: ImageValueObject | null,
   ): Promise<UserEntity> {
     // find the user by id
     const user: UserEntity | null = await this.userRepository.findById(id);

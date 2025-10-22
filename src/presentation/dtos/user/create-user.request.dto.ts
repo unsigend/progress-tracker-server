@@ -1,5 +1,4 @@
 // import dependencies
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
   IsEmail,
   IsArray,
@@ -18,62 +17,37 @@ import { UserRole } from "@/domain/entities/user.entity";
  * @description Create user request dto
  */
 export class CreateUserRequestDto {
-  @ApiProperty({
-    description: "The username of the user",
-    example: "john_doe",
-    type: String,
-  })
+  /** The username of the user */
   @IsNotEmpty()
   @IsString()
   username: string;
 
-  @ApiProperty({
-    description: "The email of the user",
-    example: "john.doe@example.com",
-    type: String,
-  })
+  /** The email of the user */
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   email: string;
 
-  @ApiProperty({
-    description: "The password of the user",
-    example: "password123",
-    type: String,
-  })
+  /** The password of the user (8-128 characters) */
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
   @MaxLength(128)
   password: string;
 
-  @ApiPropertyOptional({
-    description: "The provider of the user",
-    example: ["local", "google", "github"],
-    type: [String],
-  })
+  /** The provider of the user (local, google, github) */
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @IsIn(["local", "google", "github"], { each: true })
   provider?: string[] | null;
 
-  @ApiPropertyOptional({
-    description: "The role of the user",
-    example: "USER",
-    type: UserRole,
-    enum: UserRole,
-    enumName: "UserRole",
-  })
+  /** The role of the user */
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole | null;
 
-  @ApiPropertyOptional({
-    description: "The avatar image file (JPEG, PNG, GIF, or WebP, max 10MB)",
-    type: "string",
-    format: "binary",
-  })
+  /** The avatar image file (JPEG, PNG, GIF, or WebP, max 10MB) */
+  @IsOptional()
   avatar?: Express.Multer.File | null;
 }
