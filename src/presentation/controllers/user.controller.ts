@@ -5,7 +5,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Param,
-  Put,
+  Patch,
   Delete,
   Controller,
   Get,
@@ -26,9 +26,9 @@ import { FindUserByIdUseCase } from "@/application/use-cases/user/find-user-id.u
 import { FindAllUsersUseCase } from "@/application/use-cases/user/find-all-user.use-case";
 
 // import dtos
-import { CreateUserRequestDto } from "@/presentation/dtos/user/create-user.request.dto";
-import { UpdateUserRequestDto } from "@/presentation/dtos/user/update-user.request.dto";
-import { QueryUserRequestDto } from "@/presentation/dtos/user/query-user.request.dto";
+import { UserCreateRequestDto } from "@/presentation/dtos/user/user-create.request";
+import { UserUpdateRequestDto } from "@/presentation/dtos/user/user-update.request.dto";
+import { UserQueryRequestDto } from "@/presentation/dtos/user/user-query.request.dto";
 
 // import value objects
 import { UsernameValueObject } from "@domain/value-objects/user/username.vo";
@@ -61,16 +61,16 @@ export class UserController {
    * Get all users
    */
   @Get()
-  async findAll(@Query() queryUserRequestDto: QueryUserRequestDto) {
+  async findAll(@Query() userQueryRequestDto: UserQueryRequestDto) {
     // get all users
     const { users, totalCount } = await this.findAllUsersUseCase.execute(
       new UserQuery(
-        queryUserRequestDto.key,
-        queryUserRequestDto.value,
-        queryUserRequestDto.sort,
-        queryUserRequestDto.order,
-        queryUserRequestDto.limit,
-        queryUserRequestDto.page,
+        userQueryRequestDto.key,
+        userQueryRequestDto.value,
+        userQueryRequestDto.sort,
+        userQueryRequestDto.order,
+        userQueryRequestDto.limit,
+        userQueryRequestDto.page,
       ),
     );
     // return the users
@@ -86,19 +86,19 @@ export class UserController {
   @Post()
   @UseInterceptors(FileInterceptor("avatar"))
   async create(
-    @Body() createUserRequestDto: CreateUserRequestDto,
+    @Body() userCreateRequestDto: UserCreateRequestDto,
     @UploadedFile() avatar?: Express.Multer.File,
   ) {
     // create a new user
     const user: UserEntity = await this.createUserUseCase.execute(
-      new UsernameValueObject(createUserRequestDto.username),
-      new EmailValueObject(createUserRequestDto.email),
-      new PasswordValueObject(createUserRequestDto.password),
-      createUserRequestDto.provider
-        ? new ProviderValueObject(createUserRequestDto.provider)
+      new UsernameValueObject(userCreateRequestDto.username),
+      new EmailValueObject(userCreateRequestDto.email),
+      new PasswordValueObject(userCreateRequestDto.password),
+      userCreateRequestDto.provider
+        ? new ProviderValueObject(userCreateRequestDto.provider)
         : null,
-      createUserRequestDto.role
-        ? new RoleValueObject(createUserRequestDto.role)
+      userCreateRequestDto.role
+        ? new RoleValueObject(userCreateRequestDto.role)
         : null,
       avatar ? new ImageValueObject(avatar.buffer, avatar.mimetype) : null,
     );
@@ -122,30 +122,30 @@ export class UserController {
   /**
    * Update a user by ID
    */
-  @Put(":id")
+  @Patch(":id")
   @UseInterceptors(FileInterceptor("avatar"))
   async update(
     @Param("id") id: string,
-    @Body() updateUserRequestDto: UpdateUserRequestDto,
+    @Body() userUpdateRequestDto: UserUpdateRequestDto,
     @UploadedFile() avatar?: Express.Multer.File,
   ) {
     // update the user
     const user: UserEntity = await this.updateUserUseCase.execute(
       new ObjectIdValueObject(id),
-      updateUserRequestDto.username
-        ? new UsernameValueObject(updateUserRequestDto.username)
+      userUpdateRequestDto.username
+        ? new UsernameValueObject(userUpdateRequestDto.username)
         : null,
-      updateUserRequestDto.email
-        ? new EmailValueObject(updateUserRequestDto.email)
+      userUpdateRequestDto.email
+        ? new EmailValueObject(userUpdateRequestDto.email)
         : null,
-      updateUserRequestDto.password
-        ? new PasswordValueObject(updateUserRequestDto.password)
+      userUpdateRequestDto.password
+        ? new PasswordValueObject(userUpdateRequestDto.password)
         : null,
-      updateUserRequestDto.provider
-        ? new ProviderValueObject(updateUserRequestDto.provider)
+      userUpdateRequestDto.provider
+        ? new ProviderValueObject(userUpdateRequestDto.provider)
         : null,
-      updateUserRequestDto.role
-        ? new RoleValueObject(updateUserRequestDto.role)
+      userUpdateRequestDto.role
+        ? new RoleValueObject(userUpdateRequestDto.role)
         : null,
       avatar ? new ImageValueObject(avatar.buffer, avatar.mimetype) : null,
     );

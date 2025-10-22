@@ -1,10 +1,11 @@
 // import dependencies
 import { NormalQuery } from "@domain/repositories/queries/normal.query";
+
 /**
- * User query class
- * @description User query class
+ * Book query class
+ * @description Book query class
  */
-export class UserQuery extends NormalQuery {
+export class BookQuery extends NormalQuery {
   /**
    * Constructor
    * @param key - The key of the query

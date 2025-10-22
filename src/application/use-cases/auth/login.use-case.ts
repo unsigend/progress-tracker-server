@@ -63,7 +63,7 @@ export class LoginUseCase {
       user.getPassword()!,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException("Invalid password");
+      throw new UnauthorizedException("Invalid email or password");
     }
 
     // generate an access token

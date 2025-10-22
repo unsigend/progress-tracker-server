@@ -84,6 +84,7 @@ async function bootstrap() {
       darkMode: true,
       content: document,
       layout: "classic",
+      hideModels: true,
     }),
   );
 

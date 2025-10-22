@@ -1,23 +1,34 @@
-import { IsIn, IsNumber, IsOptional, IsString, Min } from "class-validator";
+// import dependencies
+import {
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsIn,
+  Min,
+} from "class-validator";
 
 /**
- * Query user request dto
- * @description Query user request dto
+ * Book query request dto
+ * @description Book query request dto
  */
-export class QueryUserRequestDto {
-  /** The key of the query */
+export class BookQueryRequestDto {
+  /** The key to be used to query the books */
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   key?: string;
 
-  /** The value of the query */
+  /** The value to be used to query the books */
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   value?: string;
 
   /** The sort of the query */
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   sort?: string;
 
   /** The order of the query */

@@ -1,10 +1,10 @@
-// important models
+// import models
 import { User as UserModel, UserRole as UserRoleModel } from "@prisma/client";
 
-// important entities
+// import entities
 import { UserEntity, UserRole } from "@/domain/entities/user.entity";
 
-// important value objects
+// import value objects
 import { ObjectIdValueObject } from "@/domain/value-objects/common/object-id.vo";
 import { UsernameValueObject } from "@/domain/value-objects/user/username.vo";
 import { EmailValueObject } from "@/domain/value-objects/user/email.vo";

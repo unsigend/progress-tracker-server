@@ -77,8 +77,9 @@ export class CreateUserUseCase {
     const hashedPassword: PasswordValueObject =
       await this.passwordHasher.hash(password);
 
-    // if the avatar url is provided, compress the image
+    // if the avatar url is provided
     if (avatarFile) {
+      // compress the image
       const compressedImage: ImageValueObject =
         await this.imageCompressor.compressImage(avatarFile);
 
