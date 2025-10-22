@@ -10,6 +10,7 @@ import { AppModule } from "@/app.module";
 import { ConfigService } from "@nestjs/config";
 
 // import platform related components
+import { ValidationPipe } from "@nestjs/common";
 import { DomainExceptionFilter } from "@/platforms/filters/domain-exception.filter";
 
 /**
@@ -21,6 +22,18 @@ async function bootstrap() {
 
   // get the instance of the config service
   const configService = applicationInstance.get<ConfigService>(ConfigService);
+
+  // enable global validation pipe
+  applicationInstance.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // set the global prefix
   const apiPrefix = configService.get<string>("app.API_PREFIX");

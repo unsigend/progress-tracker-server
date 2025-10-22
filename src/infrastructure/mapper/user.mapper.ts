@@ -78,10 +78,10 @@ export class UserMapper {
       new PasswordValueObject(user.password),
       new ProviderValueObject(user.provider),
       new RoleValueObject(this.toUserRoleEntity(user.role)),
+      user.avatar_url ? new UrlValueObject(user.avatar_url) : null,
       user.createdAt,
       user.updatedAt,
       user.deletedAt ?? null,
-      user.avatar_url ? new UrlValueObject(user.avatar_url) : null,
     );
   }
 }

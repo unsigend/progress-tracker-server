@@ -22,10 +22,10 @@ export interface ICloud {
   upload(file: FileValueObject): Promise<UrlValueObject>;
 
   /**
-   * Delete an image from the cloud
-   * @description Delete an image from the cloud
-   * @param url - The URL of the image to be deleted
+   * Delete a file from the cloud
+   * @description Delete a file from the cloud
+   * @param url - The URL of the file to be deleted
    * @returns void
    */
-  deleteImage(url: UrlValueObject): Promise<void>;
+  delete(url: UrlValueObject): Promise<void>;
 }

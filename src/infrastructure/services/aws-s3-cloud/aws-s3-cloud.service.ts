@@ -82,12 +82,12 @@ export class AwsS3CloudService implements ICloud {
   }
 
   /**
-   * Delete an image from the cloud
-   * @description Delete an image from the cloud
-   * @param url - The URL of the image to be deleted
+   * Delete a file from the cloud
+   * @description Delete a file from the cloud
+   * @param url - The URL of the file to be deleted
    * @returns void
    */
-  async deleteImage(url: UrlValueObject): Promise<void> {
+  async delete(url: UrlValueObject): Promise<void> {
     // extract the file name from the URL
     const fileName = url.getValue().split("/").pop();
 

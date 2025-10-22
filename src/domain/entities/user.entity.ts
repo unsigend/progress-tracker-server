@@ -32,7 +32,7 @@ export class UserEntity {
   private updatedAt: Date | null;
 
   // optional fields
-  private avatar_url: UrlValueObject | null;
+  private avatarUrl: UrlValueObject | null;
   private deletedAt: Date | null;
 
   /**
@@ -45,10 +45,10 @@ export class UserEntity {
     password: PasswordValueObject,
     provider?: ProviderValueObject | null,
     role?: RoleValueObject | null,
+    avatarUrl?: UrlValueObject | null,
     createdAt?: Date | null,
     updatedAt?: Date | null,
     deletedAt?: Date | null,
-    avatar_url?: UrlValueObject | null,
   ) {
     this.id = id;
     this.username = username;
@@ -59,7 +59,7 @@ export class UserEntity {
     this.createdAt = createdAt ?? null;
     this.updatedAt = updatedAt ?? null;
     this.deletedAt = deletedAt ?? null;
-    this.avatar_url = avatar_url ?? null;
+    this.avatarUrl = avatarUrl ?? null;
   }
 
   /**
@@ -72,10 +72,10 @@ export class UserEntity {
     password: PasswordValueObject,
     provider?: ProviderValueObject,
     role?: RoleValueObject,
+    avatarUrl?: UrlValueObject | null,
     createdAt?: Date,
     updatedAt?: Date,
     deletedAt?: Date,
-    avatar_url?: UrlValueObject,
   ): UserEntity {
     return new UserEntity(
       new ObjectIdValueObject(),
@@ -84,10 +84,10 @@ export class UserEntity {
       password,
       provider ?? new ProviderValueObject(["local"]),
       role ?? new RoleValueObject(UserRole.USER),
+      avatarUrl ?? null,
       createdAt ?? new Date(),
       updatedAt ?? new Date(),
       deletedAt ?? null,
-      avatar_url ?? null,
     );
   }
 
@@ -102,10 +102,10 @@ export class UserEntity {
     password: PasswordValueObject,
     provider?: ProviderValueObject,
     role?: RoleValueObject,
+    avatarUrl?: UrlValueObject | null,
     createdAt?: Date,
     updatedAt?: Date,
     deletedAt?: Date | null,
-    avatar_url?: UrlValueObject | null,
   ): UserEntity {
     return new UserEntity(
       id,
@@ -114,10 +114,10 @@ export class UserEntity {
       password,
       provider ?? new ProviderValueObject(["local"]),
       role ?? new RoleValueObject(UserRole.USER),
+      avatarUrl ?? null,
       createdAt ?? new Date(),
       updatedAt ?? new Date(),
       deletedAt ?? null,
-      avatar_url ?? null,
     );
   }
 
@@ -198,7 +198,7 @@ export class UserEntity {
    * @returns The avatar url of the user
    */
   getAvatarUrl(): UrlValueObject | null {
-    return this.avatar_url;
+    return this.avatarUrl;
   }
 
   /**
@@ -248,10 +248,10 @@ export class UserEntity {
 
   /**
    * Set the avatar url of the user
-   * @param avatar_url - The avatar url to be set
+   * @param avatarUrl - The avatar url to be set
    */
-  setAvatarUrl(avatar_url: UrlValueObject): void {
-    this.avatar_url = avatar_url;
+  setAvatarUrl(avatarUrl: UrlValueObject): void {
+    this.avatarUrl = avatarUrl;
     this.updatedAt = new Date();
   }
 
