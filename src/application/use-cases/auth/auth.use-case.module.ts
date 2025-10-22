@@ -6,6 +6,8 @@ import { InfrastructureModule } from "@infrastructure/infrastructure.module";
 
 // import use cases
 import { RegisterUseCase } from "@/application/use-cases/auth/register.use-case";
+import { LoginUseCase } from "@/application/use-cases/auth/login.use-case";
+import { EmailCheckUseCase } from "@/application/use-cases/auth/email-check.use-case";
 
 /**
  * Auth use case module
@@ -13,7 +15,7 @@ import { RegisterUseCase } from "@/application/use-cases/auth/register.use-case"
  */
 @Module({
   imports: [InfrastructureModule],
-  providers: [RegisterUseCase],
-  exports: [RegisterUseCase],
+  providers: [RegisterUseCase, LoginUseCase, EmailCheckUseCase],
+  exports: [RegisterUseCase, LoginUseCase, EmailCheckUseCase],
 })
 export class AuthUseCaseModule {}

@@ -12,6 +12,7 @@ import { DomainException } from "@domain/exceptions/domain-exception";
 import { ValidationException } from "@domain/exceptions/validation-exception";
 import { ConflictException } from "@domain/exceptions/conflict-exception";
 import { NotFoundException } from "@domain/exceptions/not-found-exception";
+import { UnauthorizedException } from "@domain/exceptions/unauthorized-exception";
 
 /**
  * Domain exception filter
@@ -51,6 +52,9 @@ export class DomainExceptionFilter implements ExceptionFilter {
     }
     if (exception instanceof NotFoundException) {
       return HttpStatus.NOT_FOUND;
+    }
+    if (exception instanceof UnauthorizedException) {
+      return HttpStatus.UNAUTHORIZED;
     }
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }

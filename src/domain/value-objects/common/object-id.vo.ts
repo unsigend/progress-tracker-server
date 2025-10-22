@@ -21,7 +21,7 @@ export class ObjectIdValueObject {
       this.value = value.trim();
     } else {
       // generate a new UUID
-      this.value = uuidv4() as string;
+      this.value = uuidv4();
     }
   }
 
