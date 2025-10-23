@@ -7,10 +7,12 @@ import { DatabaseModule } from "@/infrastructure/database/database.module";
 // import repositories
 import { UserRepository } from "@/infrastructure/repositories/user.repository";
 import { BookRepository } from "@/infrastructure/repositories/book.repository";
+import { ReadingRecordingRepository } from "@/infrastructure/repositories/reading-recording.repository";
 
 // import tokens
 import { USER_REPOSITORY_TOKEN } from "@domain/repositories/user.repository";
 import { BOOK_REPOSITORY_TOKEN } from "@domain/repositories/book.repository";
+import { READING_RECORDING_REPOSITORY_TOKEN } from "@domain/repositories/reading-recording.repository";
 
 /**
  * Repository module
@@ -27,7 +29,15 @@ import { BOOK_REPOSITORY_TOKEN } from "@domain/repositories/book.repository";
       provide: BOOK_REPOSITORY_TOKEN,
       useClass: BookRepository,
     },
+    {
+      provide: READING_RECORDING_REPOSITORY_TOKEN,
+      useClass: ReadingRecordingRepository,
+    },
   ],
-  exports: [USER_REPOSITORY_TOKEN, BOOK_REPOSITORY_TOKEN],
+  exports: [
+    USER_REPOSITORY_TOKEN,
+    BOOK_REPOSITORY_TOKEN,
+    READING_RECORDING_REPOSITORY_TOKEN,
+  ],
 })
 export class RepositoryModule {}

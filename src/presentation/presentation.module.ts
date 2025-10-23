@@ -9,6 +9,7 @@ import { UserController } from "@/presentation/controllers/user.controller";
 import { AuthController } from "@/presentation/controllers/auth.controller";
 import { CloudController } from "@/presentation/controllers/cloud.controller";
 import { BookController } from "@/presentation/controllers/book.controller";
+import { ReadingRecordingController } from "@/presentation/controllers/reading-recording.controller";
 
 /**
  * Presentation module
@@ -17,10 +18,11 @@ import { BookController } from "@/presentation/controllers/book.controller";
 @Module({
   imports: [ApplicationModule],
   controllers: [
-    UserController,
     AuthController,
-    CloudController,
+    UserController,
     BookController,
+    ReadingRecordingController,
+    CloudController,
   ],
 })
 export class PresentationModule {}

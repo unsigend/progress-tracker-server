@@ -43,8 +43,8 @@ import { BookMapper } from "@/presentation/mappers/book.mapper";
  * Book controller
  * @description Handles book management operations
  */
-@ApiTags("book")
-@Controller("book")
+@ApiTags("books")
+@Controller("books")
 export class BookController {
   constructor(
     private readonly createBookUseCase: CreateBookUseCase,

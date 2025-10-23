@@ -46,8 +46,8 @@ import { UserMapper } from "@/presentation/mappers/user.mapper";
  * User controller
  * @description Handles user management operations
  */
-@ApiTags("user")
-@Controller("user")
+@ApiTags("users")
+@Controller("users")
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
