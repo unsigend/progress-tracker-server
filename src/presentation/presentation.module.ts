@@ -9,6 +9,7 @@ import { UserController } from "@/presentation/controllers/user.controller";
 import { AuthController } from "@/presentation/controllers/auth.controller";
 import { CloudController } from "@/presentation/controllers/cloud.controller";
 import { BookController } from "@/presentation/controllers/book.controller";
+import { UserBookController } from "@/presentation/controllers/user-book.controller";
 import { ReadingRecordingController } from "@/presentation/controllers/reading-recording.controller";
 
 /**
@@ -21,6 +22,7 @@ import { ReadingRecordingController } from "@/presentation/controllers/reading-r
     AuthController,
     UserController,
     BookController,
+    UserBookController,
     ReadingRecordingController,
     CloudController,
   ],

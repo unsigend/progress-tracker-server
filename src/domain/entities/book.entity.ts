@@ -12,7 +12,7 @@ export class BookEntity {
   // required fields
   private readonly id: ObjectIdValueObject;
   private title: string;
-  private pages: PageValueObject | null;
+  private pages: PageValueObject;
   private readonly createdById: ObjectIdValueObject;
 
   // optional fields
@@ -30,7 +30,7 @@ export class BookEntity {
   private constructor(
     id: ObjectIdValueObject,
     title: string,
-    pages: PageValueObject | null,
+    pages: PageValueObject,
     createdById: ObjectIdValueObject,
     author?: string | null,
     description?: string | null,
@@ -59,7 +59,7 @@ export class BookEntity {
    */
   public static create(
     title: string,
-    pages: PageValueObject | null,
+    pages: PageValueObject,
     createdById: ObjectIdValueObject,
     author?: string | null,
     description?: string | null,
@@ -91,7 +91,7 @@ export class BookEntity {
   public static reconstitute(
     id: ObjectIdValueObject,
     title: string,
-    pages: PageValueObject | null,
+    pages: PageValueObject,
     createdById: ObjectIdValueObject,
     author?: string | null,
     description?: string | null,
@@ -136,7 +136,7 @@ export class BookEntity {
    * Get the pages of the book
    * @returns The pages of the book
    */
-  public getPages(): PageValueObject | null {
+  public getPages(): PageValueObject {
     return this.pages;
   }
 

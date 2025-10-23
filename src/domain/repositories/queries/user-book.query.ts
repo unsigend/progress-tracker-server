@@ -13,14 +13,14 @@ export class UserBookQuery extends NormalQuery {
   private readonly bookId: ObjectIdValueObject | null;
 
   constructor(
-    userId?: ObjectIdValueObject,
-    bookId?: ObjectIdValueObject,
-    key?: string,
-    value?: string,
-    sort?: string,
-    order?: "asc" | "desc",
-    limit?: number,
-    page?: number,
+    userId?: ObjectIdValueObject | null,
+    bookId?: ObjectIdValueObject | null,
+    key?: string | null,
+    value?: string | null,
+    sort?: string | null,
+    order?: "asc" | "desc" | null,
+    limit?: number | null,
+    page?: number | null,
   ) {
     super(key, value, sort, order, limit, page);
     this.userId = userId ?? null;

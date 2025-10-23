@@ -6,6 +6,7 @@ import { UserUseCaseModule } from "@/application/use-cases/user/user.use-case.mo
 import { AuthUseCaseModule } from "@/application/use-cases/auth/auth.use-case.module";
 import { CloudUseCaseModule } from "@/application/use-cases/cloud/cloud.use-case.module";
 import { BookUseCaseModule } from "@/application/use-cases/book/book.use-case.module";
+import { UserBookUseCaseModule } from "@/application/use-cases/user-book/user-book.use-case.module";
 import { ReadingRecordingUseCaseModule } from "@/application/use-cases/reading-recording/reading-recording.use-case.module";
 
 /**
@@ -18,6 +19,7 @@ import { ReadingRecordingUseCaseModule } from "@/application/use-cases/reading-r
     AuthUseCaseModule,
     CloudUseCaseModule,
     BookUseCaseModule,
+    UserBookUseCaseModule,
     ReadingRecordingUseCaseModule,
   ],
   exports: [
@@ -25,6 +27,7 @@ import { ReadingRecordingUseCaseModule } from "@/application/use-cases/reading-r
     AuthUseCaseModule,
     CloudUseCaseModule,
     BookUseCaseModule,
+    UserBookUseCaseModule,
     ReadingRecordingUseCaseModule,
   ],
 })

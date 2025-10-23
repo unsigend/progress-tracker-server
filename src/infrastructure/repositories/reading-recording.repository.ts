@@ -1,5 +1,6 @@
 // import dependencies
 import { Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 
 // import models
 import { ReadingRecord as ReadingRecordModel } from "@prisma/client";
@@ -18,6 +19,9 @@ import { ReadingRecordingMapper } from "@/infrastructure/mapper/reading-recordin
 
 // import value objects
 import { ObjectIdValueObject } from "@/domain/value-objects/common/object-id.vo";
+
+// import queries
+import { ReadingRecordingQuery } from "@domain/repositories/queries/reading-recording.query";
 
 /**
  * Reading recording repository
@@ -64,24 +68,58 @@ export class ReadingRecordingRepository implements IReadingRecordingRepository {
   }
 
   /**
-   * Find a reading recording by user book id
-   * @description Find a reading recording by user book id
-   * @param userBookId - The id of the user book to be found
+   * Find all reading recordings
+   * @description Find all reading recordings
+   * @param query - The query to be used to find the reading recordings
    * @returns The reading recordings and total count
    */
-  async findByUserBookId(userBookId: ObjectIdValueObject): Promise<{
+  async findAll(query: ReadingRecordingQuery): Promise<{
     readingRecordings: ReadingRecordingEntity[];
     totalCount: number;
   }> {
+    const whereClause: Prisma.ReadingRecordWhereInput = {};
+    const sortClause: Prisma.ReadingRecordOrderByWithRelationInput = {};
+
+    // build the where clause
+    if (query.getUserBookId()) {
+      whereClause["user_book_id"] = query.getUserBookId()!.getValue();
+    }
+    if (query.getDate()) {
+      whereClause["date"] = query.getDate()!;
+    }
+
+    // build the sort clause
+    if (query.getOrder() && query.getSort()) {
+      sortClause[query.getSort()] = query.getOrder();
+    } else {
+      sortClause["createdAt"] = "desc";
+    }
+
+    // build the page and limit
+    const page = query.getPage() ?? 1;
+    const limit = query.getLimit() ?? 10;
+    const skip = (page - 1) * limit;
+
+    // get the reading recordings
     const readingRecordings: ReadingRecordModel[] =
       await this.postgresqlService.readingRecord.findMany({
-        where: { user_book_id: userBookId.getValue() },
+        where: whereClause,
+        orderBy: sortClause,
+        skip: skip,
+        take: limit,
       });
+
+    // get the total count
+    const totalCount: number = await this.postgresqlService.readingRecord.count(
+      {
+        where: whereClause,
+      },
+    );
     return {
       readingRecordings: readingRecordings.map((readingRecording) =>
         ReadingRecordingMapper.toEntity(readingRecording),
       ),
-      totalCount: readingRecordings.length,
+      totalCount: totalCount,
     };
   }
 

@@ -7,12 +7,14 @@ import {
   Put,
   Delete,
   Get,
+  Query,
 } from "@nestjs/common";
 
 // import dtos
 import { ReadingRecordingResponseDto } from "@/presentation/dtos/reading-recording/reading-recording.response.dto";
 import { ReadingRecordingCreateRequestDto } from "@/presentation/dtos/reading-recording/reading-recording-create.request.dto";
 import { ReadingRecordingUpdateRequestDto } from "@/presentation/dtos/reading-recording/reading-recording-update.request.dto";
+import { ReadingRecordingQueryRequestDto } from "@/presentation/dtos/reading-recording/reading-recording-query.request.dto";
 
 // import use cases
 import { CreateReadingRecordingUseCase } from "@/application/use-cases/reading-recording/create-recording.use-case";
@@ -21,6 +23,7 @@ import { FindReadingRecordingByUserBookIdUseCase } from "@/application/use-cases
 import { UpdateReadingRecordingUseCase } from "@/application/use-cases/reading-recording/update-recording.use-case";
 import { DeleteReadingRecordingUseCase } from "@/application/use-cases/reading-recording/delete-recording.use-case";
 import { DeleteReadingRecordingUserBookIdUseCase } from "@/application/use-cases/reading-recording/delete-recording-userBook-id.use-case";
+import { FindAllReadingRecordingsUseCase } from "@/application/use-cases/reading-recording/find-all-recording.use-case";
 
 // import value objects
 import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
@@ -29,7 +32,11 @@ import { MinuteValueObject } from "@domain/value-objects/reading-recording/minut
 
 // import mappers
 import { ReadingRecordingMapper } from "@/presentation/mappers/reading-recording.mapper";
-import { ReadingRecordingEntity } from "@/domain/entities/reading-recording.entity";
+
+// import entities
+import { ReadingRecordingEntity } from "@domain/entities/reading-recording.entity";
+import { ReadingRecordingQuery } from "@domain/repositories/queries/reading-recording.query";
+
 /**
  * Reading recording controller
  * @description Reading recording controller
@@ -43,7 +50,43 @@ export class ReadingRecordingController {
     private readonly updateReadingRecordingUseCase: UpdateReadingRecordingUseCase,
     private readonly deleteReadingRecordingUseCase: DeleteReadingRecordingUseCase,
     private readonly deleteReadingRecordingUserBookIdUseCase: DeleteReadingRecordingUserBookIdUseCase,
+    private readonly findAllReadingRecordingsUseCase: FindAllReadingRecordingsUseCase,
   ) {}
+
+  /**
+   * Find all reading recordings
+   */
+  @Get()
+  async findAll(
+    @Query() readingRecordingQueryRequestDto: ReadingRecordingQueryRequestDto,
+  ): Promise<{
+    readingRecordings: ReadingRecordingResponseDto[];
+    totalCount: number;
+  }> {
+    // build the query
+    const query: ReadingRecordingQuery = new ReadingRecordingQuery(
+      readingRecordingQueryRequestDto.userBookId
+        ? new ObjectIdValueObject(readingRecordingQueryRequestDto.userBookId)
+        : null,
+      readingRecordingQueryRequestDto.date
+        ? new Date(readingRecordingQueryRequestDto.date)
+        : null,
+      readingRecordingQueryRequestDto.sort ?? null,
+      readingRecordingQueryRequestDto.order ?? null,
+      readingRecordingQueryRequestDto.limit ?? null,
+      readingRecordingQueryRequestDto.page ?? null,
+    );
+
+    // find all reading recordings
+    const { readingRecordings, totalCount } =
+      await this.findAllReadingRecordingsUseCase.execute(query);
+    return {
+      readingRecordings: readingRecordings.map((readingRecording) =>
+        ReadingRecordingMapper.toResponseDto(readingRecording),
+      ),
+      totalCount,
+    };
+  }
 
   /**
    * Create a new reading recording
@@ -115,7 +158,7 @@ export class ReadingRecordingController {
   }
 
   /**
-   * Delete a reading recording by user book id
+   * Delete reading recordings by user book id
    */
   @Delete("user-book/:id")
   async deleteByUserBookId(@Param("id") id: string): Promise<void> {
@@ -125,7 +168,7 @@ export class ReadingRecordingController {
   }
 
   /**
-   * Find a reading recording by user book id
+   * Find reading recordings by user book id
    */
   @Get("user-book/:id")
   async findByUserBookId(@Param("id") id: string): Promise<{

@@ -4,6 +4,9 @@ import { ReadingRecordingEntity } from "@domain/entities/reading-recording.entit
 // import value objects
 import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
 
+// import queries
+import { ReadingRecordingQuery } from "@domain/repositories/queries/reading-recording.query";
+
 /**
  * Reading recording repository token
  * @description Reading recording repository token
@@ -33,12 +36,12 @@ export interface IReadingRecordingRepository {
   findById(id: ObjectIdValueObject): Promise<ReadingRecordingEntity | null>;
 
   /**
-   * Find a reading recording by user book id
-   * @description Find a reading recording by user book id
-   * @param userBookId - The id of the user book to be found
+   * Find all reading recordings
+   * @description Find all reading recordings
+   * @param query - The query to be used to find the reading recordings
    * @returns The reading recordings and total count
    */
-  findByUserBookId(userBookId: ObjectIdValueObject): Promise<{
+  findAll(query: ReadingRecordingQuery): Promise<{
     readingRecordings: ReadingRecordingEntity[];
     totalCount: number;
   }>;

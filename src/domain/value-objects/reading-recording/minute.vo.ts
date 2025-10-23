@@ -8,7 +8,6 @@ import { ValidationException } from "@domain/exceptions/validation-exception";
 export class MinuteValueObject {
   private readonly minute: number;
   private readonly MIN_MINUTE = 0 as const;
-  private readonly MAX_MINUTE = 600 as const;
 
   /**
    * Constructor
@@ -21,11 +20,6 @@ export class MinuteValueObject {
     if (minute < this.MIN_MINUTE) {
       throw new ValidationException(
         `Minute must be greater than ${this.MIN_MINUTE}`,
-      );
-    }
-    if (minute > this.MAX_MINUTE) {
-      throw new ValidationException(
-        `Minute must be less than ${this.MAX_MINUTE}`,
       );
     }
     this.minute = minute;

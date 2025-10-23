@@ -81,6 +81,28 @@ export class ReadingRecordingEntity {
   }
 
   /**
+   * Merge a reading recording entity with another reading recording entity
+   * @description Merge a reading recording entity with another reading recording entity
+   * @param other - The other reading recording entity to be merged
+   */
+  public merge(other: ReadingRecordingEntity): void {
+    // merge the pages
+    this.pages = new PageValueObject(
+      this.pages.getValue() + other.pages.getValue(),
+    );
+
+    // merge the minutes
+    this.minutes = new MinuteValueObject(
+      this.minutes.getValue() + other.minutes.getValue(),
+    );
+
+    // merge the notes and drop current notes
+    if (other.notes) {
+      this.notes = other.notes;
+    }
+  }
+
+  /**
    * Get the id of the reading recording entity
    * @returns The id of the reading recording entity
    */

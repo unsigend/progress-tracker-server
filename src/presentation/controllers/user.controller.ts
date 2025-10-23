@@ -29,6 +29,7 @@ import { FindAllUsersUseCase } from "@/application/use-cases/user/find-all-user.
 import { UserCreateRequestDto } from "@/presentation/dtos/user/user-create.request";
 import { UserUpdateRequestDto } from "@/presentation/dtos/user/user-update.request.dto";
 import { UserQueryRequestDto } from "@/presentation/dtos/user/user-query.request.dto";
+import { UserResponseDto } from "@/presentation/dtos/user/user.response.dto";
 
 // import value objects
 import { UsernameValueObject } from "@domain/value-objects/user/username.vo";
@@ -61,7 +62,10 @@ export class UserController {
    * Get all users
    */
   @Get()
-  async findAll(@Query() userQueryRequestDto: UserQueryRequestDto) {
+  async findAll(@Query() userQueryRequestDto: UserQueryRequestDto): Promise<{
+    users: UserResponseDto[];
+    totalCount: number;
+  }> {
     // get all users
     const { users, totalCount } = await this.findAllUsersUseCase.execute(
       new UserQuery(
@@ -88,7 +92,7 @@ export class UserController {
   async create(
     @Body() userCreateRequestDto: UserCreateRequestDto,
     @UploadedFile() avatar?: Express.Multer.File,
-  ) {
+  ): Promise<UserResponseDto> {
     // create a new user
     const user: UserEntity = await this.createUserUseCase.execute(
       new UsernameValueObject(userCreateRequestDto.username),
@@ -110,7 +114,7 @@ export class UserController {
    * Get a user by ID
    */
   @Get(":id")
-  async findById(@Param("id") id: string) {
+  async findById(@Param("id") id: string): Promise<UserResponseDto> {
     // get the user
     const user: UserEntity = await this.findUserByIdUseCase.execute(
       new ObjectIdValueObject(id),
@@ -128,7 +132,7 @@ export class UserController {
     @Param("id") id: string,
     @Body() userUpdateRequestDto: UserUpdateRequestDto,
     @UploadedFile() avatar?: Express.Multer.File,
-  ) {
+  ): Promise<UserResponseDto> {
     // update the user
     const user: UserEntity = await this.updateUserUseCase.execute(
       new ObjectIdValueObject(id),

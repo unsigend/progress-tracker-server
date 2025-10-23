@@ -15,6 +15,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 
 // import dtos
+import { BookResponseDto } from "@/presentation/dtos/book/book.response.dto";
 import { BookCreateRequestDto } from "@/presentation/dtos/book/book-create.request.dto";
 import { BookQueryRequestDto } from "@/presentation/dtos/book/book-query.request.dto";
 import { BookUpdateRequestDto } from "@/presentation/dtos/book/book-update.request.dto";
@@ -62,7 +63,7 @@ export class BookController {
   async create(
     @Body() bookCreateRequestDto: BookCreateRequestDto,
     @UploadedFile() cover: Express.Multer.File,
-  ) {
+  ): Promise<BookResponseDto> {
     const book: BookEntity = await this.createBookUseCase.execute(
       bookCreateRequestDto.title,
       new PageValueObject(bookCreateRequestDto.pages),
@@ -85,7 +86,10 @@ export class BookController {
    * Find all books
    */
   @Get()
-  async findAll(@Query() bookQueryRequestDto: BookQueryRequestDto) {
+  async findAll(@Query() bookQueryRequestDto: BookQueryRequestDto): Promise<{
+    books: BookResponseDto[];
+    totalCount: number;
+  }> {
     const { books, totalCount } = await this.findAllBooksUseCase.execute(
       new BookQuery(
         bookQueryRequestDto.key,
@@ -111,7 +115,7 @@ export class BookController {
     @Param("id") id: string,
     @Body() bookUpdateRequestDto: BookUpdateRequestDto,
     @UploadedFile() cover: Express.Multer.File,
-  ) {
+  ): Promise<BookResponseDto> {
     const book: BookEntity = await this.updateBookUseCase.execute(
       new ObjectIdValueObject(id),
       bookUpdateRequestDto.title ?? null,
@@ -135,7 +139,7 @@ export class BookController {
    * Find a book by id
    */
   @Get(":id")
-  async findById(@Param("id") id: string) {
+  async findById(@Param("id") id: string): Promise<BookResponseDto> {
     const book: BookEntity = await this.findBookByIdUseCase.execute(
       new ObjectIdValueObject(id),
     );
@@ -146,7 +150,7 @@ export class BookController {
    * Delete a book by id
    */
   @Delete(":id")
-  async delete(@Param("id") id: string) {
+  async delete(@Param("id") id: string): Promise<{ success: boolean }> {
     await this.deleteBookUseCase.execute(new ObjectIdValueObject(id));
     return { success: true };
   }

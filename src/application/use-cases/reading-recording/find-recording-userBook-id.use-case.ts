@@ -18,6 +18,7 @@ import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
 // import entities
 import { ReadingRecordingEntity } from "@domain/entities/reading-recording.entity";
 import { UserBookEntity } from "@domain/entities/user-book.entity";
+import { ReadingRecordingQuery } from "@domain/repositories/queries/reading-recording.query";
 
 /**
  * Find reading recording by user book id use case
@@ -49,9 +50,12 @@ export class FindReadingRecordingByUserBookIdUseCase {
       throw new NotFoundException("User book not found");
     }
 
+    // create the query
+    const query: ReadingRecordingQuery = new ReadingRecordingQuery(userBookId);
+
     // find the reading recordings by user book id
     const { readingRecordings, totalCount } =
-      await this.readingRecordingRepository.findByUserBookId(userBookId);
+      await this.readingRecordingRepository.findAll(query);
     return { readingRecordings, totalCount };
   }
 }

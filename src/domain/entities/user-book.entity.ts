@@ -2,6 +2,7 @@
 import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
 import { ReadingStatusValueObject } from "@domain/value-objects/user-book/reading-status.vo";
 import { PageValueObject } from "@domain/value-objects/book/page.vo";
+import { MinuteValueObject } from "@domain/value-objects/reading-recording/minute.vo";
 
 /**
  * Reading status enum
@@ -10,6 +11,11 @@ import { PageValueObject } from "@domain/value-objects/book/page.vo";
 export enum ReadingStatus {
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
+}
+
+export enum AddRecordingAction {
+  INCREASE = "INCREASE",
+  SET = "SET",
 }
 
 /**
@@ -118,6 +124,67 @@ export class UserBookEntity {
       createdAt,
       updatedAt,
     );
+  }
+
+  /**
+   * Add a reading recording to the user book
+   * @description Add a reading recording to the user book
+   * @param date - The date of the recording
+   * @param pages - The pages of the recording
+   * @param minutes - The minutes of the recording
+   * @param isNewDay - Whether the day is new
+   * @param action - The action to be performed
+   */
+  public addRecording(
+    date: Date,
+    pages: PageValueObject,
+    minutes: MinuteValueObject,
+    isNewDay: boolean,
+    action: AddRecordingAction = AddRecordingAction.INCREASE,
+  ): void {
+    // update data
+    if (action === AddRecordingAction.INCREASE) {
+      this.totalMinutes += minutes.getValue();
+      this.currentPage = new PageValueObject(
+        this.currentPage.getValue() + pages.getValue(),
+      );
+    } else {
+      this.totalMinutes = minutes.getValue();
+      this.currentPage = pages;
+    }
+
+    // Only increase the total days if the day is new
+    if (isNewDay) {
+      this.totalDays++;
+    }
+
+    // set the start date if not set
+    if (!this.startDate) {
+      this.startDate = date;
+    }
+
+    this.updatedAt = new Date();
+  }
+
+  /**
+   * Check if the user book is completed
+   * @description Check if the user book is completed
+   * @param totalPages - The total pages of the book
+   * @returns True if the user book is completed, false otherwise
+   */
+  public isCompleted(totalPages: PageValueObject): boolean {
+    return this.currentPage.getValue() >= totalPages.getValue();
+  }
+
+  /**
+   * Mark the user book as completed
+   * @description Mark the user book as completed
+   * @param completedDate - The date the book was completed
+   */
+  public markAsCompleted(completedDate: Date): void {
+    this.completedDate = completedDate;
+    this.readingStatus = new ReadingStatusValueObject(ReadingStatus.COMPLETED);
+    this.updatedAt = new Date();
   }
 
   /**

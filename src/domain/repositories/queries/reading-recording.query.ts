@@ -1,42 +1,34 @@
-// import dependencies
+// import value objects
+import { ObjectIdValueObject } from "@/domain/value-objects/common/object-id.vo";
 
 /**
- * Normal query class
- * @description Normal query abstract base class
+ * Reading recording query
+ * @description Reading recording query
  */
-export class NormalQuery {
-  private readonly key: string | null;
-  private readonly value: string | null;
+export class ReadingRecordingQuery {
+  private readonly userBookId: ObjectIdValueObject | null;
+  private readonly date: Date | null;
+
   private readonly sort: string;
   private readonly order: "asc" | "desc";
   private readonly limit: number;
   private readonly page: number;
 
-  // private constants
   private readonly DEFAULT_SORT = "createdAt";
   private readonly DEFAULT_ORDER = "desc";
   private readonly DEFAULT_LIMIT = 10;
   private readonly DEFAULT_PAGE = 1;
 
-  /**
-   * Constructor
-   * @param key - The key of the query
-   * @param value - The value of the query
-   * @param sort - The sort of the query
-   * @param order - The order of the query
-   * @param limit - The limit of the query
-   * @param page - The page of the query
-   */
   constructor(
-    key?: string | null,
-    value?: string | null,
+    userBookId?: ObjectIdValueObject | null,
+    date?: Date | null,
     sort?: string | null,
     order?: "asc" | "desc" | null,
     limit?: number | null,
     page?: number | null,
   ) {
-    this.key = key ?? null;
-    this.value = value ?? null;
+    this.userBookId = userBookId ?? null;
+    this.date = date ?? null;
     this.sort = sort ?? this.DEFAULT_SORT;
     this.order = order ?? this.DEFAULT_ORDER;
     this.limit = limit ?? this.DEFAULT_LIMIT;
@@ -44,19 +36,19 @@ export class NormalQuery {
   }
 
   /**
-   * Get the key of the query
-   * @returns The key of the query
+   * Get the user book id of the query
+   * @returns The user book id of the query
    */
-  getKey(): string | null {
-    return this.key;
+  getUserBookId(): ObjectIdValueObject | null {
+    return this.userBookId;
   }
 
   /**
-   * Get the value of the query
-   * @returns The value of the query
+   * Get the date of the query
+   * @returns The date of the query
    */
-  getValue(): string | null {
-    return this.value;
+  getDate(): Date | null {
+    return this.date;
   }
 
   /**
