@@ -66,6 +66,7 @@ export class BookController {
     const book: BookEntity = await this.createBookUseCase.execute(
       bookCreateRequestDto.title,
       new PageValueObject(bookCreateRequestDto.pages),
+      // TODO: get the user id from the request
       new ObjectIdValueObject("fec34fce-36c3-413e-877c-7dff6f4774b3"),
       bookCreateRequestDto.author,
       bookCreateRequestDto.description,

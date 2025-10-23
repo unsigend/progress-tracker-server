@@ -1,17 +1,23 @@
 // import dependencies
 import { Inject, Injectable } from "@nestjs/common";
 
+// import exceptions
+import { NotFoundException } from "@domain/exceptions/not-found-exception";
+
 // import interfaces
 import type { IReadingRecordingRepository } from "@domain/repositories/reading-recording.repository";
+import type { IUserBookRepository } from "@domain/repositories/user-book.repository";
 
 // import tokens
 import { READING_RECORDING_REPOSITORY_TOKEN } from "@domain/repositories/reading-recording.repository";
+import { USER_BOOK_REPOSITORY_TOKEN } from "@domain/repositories/user-book.repository";
 
 // import value objects
 import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
 
 // import entities
 import { ReadingRecordingEntity } from "@domain/entities/reading-recording.entity";
+import { UserBookEntity } from "@domain/entities/user-book.entity";
 
 /**
  * Find reading recording by user book id use case
@@ -22,6 +28,8 @@ export class FindReadingRecordingByUserBookIdUseCase {
   constructor(
     @Inject(READING_RECORDING_REPOSITORY_TOKEN)
     private readonly readingRecordingRepository: IReadingRecordingRepository,
+    @Inject(USER_BOOK_REPOSITORY_TOKEN)
+    private readonly userBookRepository: IUserBookRepository,
   ) {}
 
   /**
@@ -34,6 +42,14 @@ export class FindReadingRecordingByUserBookIdUseCase {
     readingRecordings: ReadingRecordingEntity[];
     totalCount: number;
   }> {
+    // check whether the user book exists
+    const userBook: UserBookEntity | null =
+      await this.userBookRepository.findById(userBookId);
+    if (!userBook) {
+      throw new NotFoundException("User book not found");
+    }
+
+    // find the reading recordings by user book id
     const { readingRecordings, totalCount } =
       await this.readingRecordingRepository.findByUserBookId(userBookId);
     return { readingRecordings, totalCount };
