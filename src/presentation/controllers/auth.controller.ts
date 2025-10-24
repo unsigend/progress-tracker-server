@@ -2,6 +2,9 @@
 import { Controller, Post, Body, Get, Param } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 
+// import decorators
+import { Public } from "@/platforms/decorators/public.decorator";
+
 // import dtos
 import { RegisterRequestDto } from "@/presentation/dtos/auth/register.request.dto";
 import { LoginRequestDto } from "@/presentation/dtos/auth/login.request.dto";
@@ -31,6 +34,7 @@ export class AuthController {
   /**
    * Register a new user
    */
+  @Public()
   @Post("register")
   async register(@Body() registerRequestDto: RegisterRequestDto) {
     const accessToken: string = await this.registerUseCase.execute(
@@ -45,6 +49,7 @@ export class AuthController {
   /**
    * Login a user
    */
+  @Public()
   @Post("login")
   async login(@Body() loginRequestDto: LoginRequestDto) {
     const accessToken: string = await this.loginUseCase.execute(
@@ -58,6 +63,7 @@ export class AuthController {
   /**
    * Check if an email exists
    */
+  @Public()
   @Get("email-check/:email")
   async emailCheck(@Param("email") email: string) {
     const exists: boolean = await this.emailCheckUseCase.execute(

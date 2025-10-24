@@ -13,6 +13,8 @@ import { ConfigService } from "@nestjs/config";
 // import platform related components
 import { ValidationPipe } from "@nestjs/common";
 import { DomainExceptionFilter } from "@/platforms/filters/domain-exception.filter";
+import { JwtAuthGuard } from "@/platforms/guards/jwt-auth.guard";
+import { Reflector } from "@nestjs/core";
 
 // import scalar for modern API documentation
 import { apiReference } from "@scalar/nestjs-api-reference";
@@ -48,6 +50,9 @@ async function bootstrap() {
       },
     }),
   );
+
+  // use the JWT strategy for the protected routes
+  applicationInstance.useGlobalGuards(new JwtAuthGuard(new Reflector()));
 
   // set the global prefix
   const apiPrefix = configService.get<string>("app.API_PREFIX");
@@ -108,7 +113,9 @@ async function bootstrap() {
   }
 
   // listen to the port
-  await applicationInstance.listen(3000);
+  await applicationInstance.listen(
+    configService.get<number>("app.PORT") ?? 3000,
+  );
 }
 
 bootstrap().catch(() => {

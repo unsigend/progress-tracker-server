@@ -132,10 +132,10 @@ export class UserBookController {
   }
 
   /**
-   * Add a recording to a user book
+   * Create a recording for a user book
    */
   @Post(":id/recordings")
-  async addRecording(
+  async createRecording(
     @Param("id") id: string,
     @Body() readingRecordingCreateRequestDto: ReadingRecordingCreateRequestDto,
   ): Promise<{ success: boolean }> {
