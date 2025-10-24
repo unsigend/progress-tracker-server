@@ -14,7 +14,7 @@ export class ReadingRecordingQuery {
   private readonly limit: number;
   private readonly page: number;
 
-  private readonly DEFAULT_SORT = "createdAt";
+  private readonly DEFAULT_SORT = "date";
   private readonly DEFAULT_ORDER = "desc";
   private readonly DEFAULT_LIMIT = 10;
   private readonly DEFAULT_PAGE = 1;

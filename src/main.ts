@@ -1,6 +1,7 @@
 // import dependencies
 import { NestFactory } from "@nestjs/core";
 import { Logger, BadRequestException } from "@nestjs/common";
+import { Request, Response } from "express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 // import modules
@@ -87,6 +88,12 @@ async function bootstrap() {
       hideModels: true,
     }),
   );
+
+  // add JSON endpoint for swagger-typescript-api
+  applicationInstance.use("/api-docs-json", (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(document);
+  });
 
   // log the application is running
   const domain = configService.get<string>("app.DOMAIN");

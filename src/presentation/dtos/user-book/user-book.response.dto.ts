@@ -1,6 +1,3 @@
-// import enums
-import { ReadingStatus } from "@/domain/entities/user-book.entity";
-
 /**
  * User book response dto
  * @description User book response dto
@@ -16,7 +13,7 @@ export class UserBookResponseDto {
   bookId: string;
 
   /** The reading status of the user book */
-  readingStatus: ReadingStatus;
+  status: string;
 
   /** The current page of the user book */
   currentPage: number;

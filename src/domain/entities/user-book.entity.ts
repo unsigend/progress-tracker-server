@@ -182,6 +182,9 @@ export class UserBookEntity {
    * @param completedDate - The date the book was completed
    */
   public markAsCompleted(completedDate: Date): void {
+    if (this.readingStatus.isCompleted()) {
+      return;
+    }
     this.completedDate = completedDate;
     this.readingStatus = new ReadingStatusValueObject(ReadingStatus.COMPLETED);
     this.updatedAt = new Date();

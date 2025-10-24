@@ -10,19 +10,21 @@ import {
 } from "@nestjs/common";
 
 // import use cases
-import { AddRecordingUseCase } from "@/application/use-cases/user-book/add-recording.use-case";
+import { CreateRecordingUseCase } from "@/application/use-cases/reading-recording/create-recording.use-case";
 import { FindAllUserBookUseCase } from "@/application/use-cases/user-book/find-all-user-book.use-case";
 import { FindUserBookByIdUseCase } from "@application/use-cases/user-book/find-user-book-id.use-case";
 import { CreateUserBookUseCase } from "@application/use-cases/user-book/create-user-book.use-case";
 import { DeleteUserBookUseCase } from "@application/use-cases/user-book/delete-user-book.use-case";
-import { FindReadingRecordingByUserBookIdUseCase } from "@application/use-cases/reading-recording/find-recording-userBook-id.use-case";
+import { FindAllReadingRecordingsUseCase } from "@application/use-cases/reading-recording/find-all-recording.use-case";
+import { DeleteReadingRecordingUserBookIdUseCase } from "@application/use-cases/reading-recording/delete-recording-userBook-id.use-case";
 
 // import dtos
 import { UserBookQueryRequestDto } from "@/presentation/dtos/user-book/user-book-query.request.dto";
 import { UserBookResponseDto } from "@presentation/dtos/user-book/user-book.response.dto";
 import { UserBookCreateRequestDto } from "@presentation/dtos/user-book/user-book-create.request.dto";
-import { UserBookAddRecordRequestDto } from "@presentation/dtos/user-book/user-book-add-record.request.dto";
 import { ReadingRecordingResponseDto } from "@presentation/dtos/reading-recording/reading-recording.response.dto";
+import { ReadingRecordingCreateRequestDto } from "@presentation/dtos/reading-recording/reading-recording-create.request.dto";
+import { ReadingRecordingQueryRequestDto } from "@presentation/dtos/reading-recording/reading-recording-query.request.dto";
 
 // import mappers
 import { UserBookMapper } from "@presentation/mappers/user-book.mapper";
@@ -30,6 +32,7 @@ import { ReadingRecordingMapper } from "@presentation/mappers/reading-recording.
 
 // import queries
 import { UserBookQuery } from "@domain/repositories/queries/user-book.query";
+import { ReadingRecordingQuery } from "@domain/repositories/queries/reading-recording.query";
 
 // import value objects
 import { ObjectIdValueObject } from "@domain/value-objects/common/object-id.vo";
@@ -46,12 +49,13 @@ import { UserBookEntity } from "@domain/entities/user-book.entity";
 @Controller("user-books")
 export class UserBookController {
   constructor(
-    private readonly addRecordingUseCase: AddRecordingUseCase,
+    private readonly createRecordingUseCase: CreateRecordingUseCase,
     private readonly findAllUserBookUseCase: FindAllUserBookUseCase,
     private readonly findUserBookByIdUseCase: FindUserBookByIdUseCase,
     private readonly createUserBookUseCase: CreateUserBookUseCase,
     private readonly deleteUserBookUseCase: DeleteUserBookUseCase,
-    private readonly findReadingRecordingsUseCase: FindReadingRecordingByUserBookIdUseCase,
+    private readonly findReadingRecordingsUseCase: FindAllReadingRecordingsUseCase,
+    private readonly deleteReadingRecordingsUseCase: DeleteReadingRecordingUserBookIdUseCase,
   ) {}
 
   /**
@@ -61,10 +65,10 @@ export class UserBookController {
   async findAll(
     @Query() userBookQueryRequestDto: UserBookQueryRequestDto,
   ): Promise<{ userBooks: UserBookResponseDto[]; totalCount: number }> {
+    // build the query object
     const queryObject: UserBookQuery = new UserBookQuery(
-      userBookQueryRequestDto.userId
-        ? new ObjectIdValueObject(userBookQueryRequestDto.userId)
-        : null,
+      // TODO: get the user id from the request
+      new ObjectIdValueObject("8403a368-41ad-47da-8ba5-c194d5dfd9a4"),
       userBookQueryRequestDto.bookId
         ? new ObjectIdValueObject(userBookQueryRequestDto.bookId)
         : null,
@@ -75,6 +79,7 @@ export class UserBookController {
       userBookQueryRequestDto.limit ?? null,
       userBookQueryRequestDto.page ?? null,
     );
+    // find the user books
     const { userBooks, totalCount } =
       await this.findAllUserBookUseCase.execute(queryObject);
     return {
@@ -94,7 +99,7 @@ export class UserBookController {
   ): Promise<UserBookResponseDto> {
     const userId: ObjectIdValueObject = new ObjectIdValueObject(
       // TODO: get the user id from the request
-      "fec34fce-36c3-413e-877c-7dff6f4774b3",
+      "8403a368-41ad-47da-8ba5-c194d5dfd9a4",
     );
     const bookId: ObjectIdValueObject = new ObjectIdValueObject(
       userBookCreateRequestDto.bookId,
@@ -132,14 +137,14 @@ export class UserBookController {
   @Post(":id/recordings")
   async addRecording(
     @Param("id") id: string,
-    @Body() userBookAddRecordRequestDto: UserBookAddRecordRequestDto,
+    @Body() readingRecordingCreateRequestDto: ReadingRecordingCreateRequestDto,
   ): Promise<{ success: boolean }> {
-    await this.addRecordingUseCase.execute(
+    await this.createRecordingUseCase.execute(
       new ObjectIdValueObject(id),
-      new Date(userBookAddRecordRequestDto.date),
-      new PageValueObject(userBookAddRecordRequestDto.pages),
-      new MinuteValueObject(userBookAddRecordRequestDto.minutes),
-      userBookAddRecordRequestDto.notes,
+      new Date(readingRecordingCreateRequestDto.date),
+      new PageValueObject(readingRecordingCreateRequestDto.pages),
+      new MinuteValueObject(readingRecordingCreateRequestDto.minutes),
+      readingRecordingCreateRequestDto.notes,
     );
     return { success: true };
   }
@@ -148,19 +153,43 @@ export class UserBookController {
    * Find recordings by user book id
    */
   @Get(":id/recordings")
-  async findRecordings(@Param("id") id: string): Promise<{
+  async findRecordings(
+    @Param("id") id: string,
+    @Query() readingRecordingQueryRequestDto: ReadingRecordingQueryRequestDto,
+  ): Promise<{
     readingRecordings: ReadingRecordingResponseDto[];
     totalCount: number;
   }> {
+    // build the query object
+    const queryObject: ReadingRecordingQuery = new ReadingRecordingQuery(
+      new ObjectIdValueObject(id),
+      readingRecordingQueryRequestDto.date ?? null,
+      readingRecordingQueryRequestDto.sort ?? null,
+      readingRecordingQueryRequestDto.order ?? null,
+      readingRecordingQueryRequestDto.limit ?? null,
+      readingRecordingQueryRequestDto.page ?? null,
+    );
+    // find the reading recordings
     const { readingRecordings, totalCount } =
-      await this.findReadingRecordingsUseCase.execute(
-        new ObjectIdValueObject(id),
-      );
+      await this.findReadingRecordingsUseCase.execute(queryObject);
     return {
       readingRecordings: readingRecordings.map((readingRecording) =>
         ReadingRecordingMapper.toResponseDto(readingRecording),
       ),
       totalCount,
     };
+  }
+
+  /**
+   * Delete recordings by user book id
+   */
+  @Delete(":id/recordings")
+  async deleteRecordings(
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    await this.deleteReadingRecordingsUseCase.execute(
+      new ObjectIdValueObject(id),
+    );
+    return { success: true };
   }
 }

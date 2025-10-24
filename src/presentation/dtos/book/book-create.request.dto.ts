@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsISBN,
 } from "class-validator";
+import { Type } from "class-transformer";
 
 /**
  * Book create request dto
@@ -22,7 +23,7 @@ export class BookCreateRequestDto {
   title: string;
 
   /** The pages of the book */
-  @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(3000)

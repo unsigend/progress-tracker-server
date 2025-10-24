@@ -7,7 +7,7 @@ import { ValidationException } from "@domain/exceptions/validation-exception";
  */
 export class PageValueObject {
   private readonly page: number;
-  private readonly MIN_PAGE = 1 as const;
+  private readonly MIN_PAGE = 0 as const;
   private readonly MAX_PAGE = 3000 as const;
 
   /**
@@ -15,7 +15,7 @@ export class PageValueObject {
    * @param page - The page to be validated
    */
   constructor(page: number) {
-    if (!page) {
+    if (page === undefined || page === null) {
       throw new ValidationException("Page is required");
     }
     if (page < this.MIN_PAGE) {

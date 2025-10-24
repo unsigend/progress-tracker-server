@@ -10,7 +10,6 @@ import { AuthController } from "@/presentation/controllers/auth.controller";
 import { CloudController } from "@/presentation/controllers/cloud.controller";
 import { BookController } from "@/presentation/controllers/book.controller";
 import { UserBookController } from "@/presentation/controllers/user-book.controller";
-import { ReadingRecordingController } from "@/presentation/controllers/reading-recording.controller";
 
 /**
  * Presentation module
@@ -23,7 +22,6 @@ import { ReadingRecordingController } from "@/presentation/controllers/reading-r
     UserController,
     BookController,
     UserBookController,
-    ReadingRecordingController,
     CloudController,
   ],
 })

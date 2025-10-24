@@ -5,13 +5,12 @@ import { Module } from "@nestjs/common";
 import { InfrastructureModule } from "@/infrastructure/infrastructure.module";
 
 // import use cases
-import { CreateReadingRecordingUseCase } from "@/application/use-cases/reading-recording/create-recording.use-case";
 import { FindReadingRecordingByIdUseCase } from "@/application/use-cases/reading-recording/find-recording-id.use-case";
-import { FindReadingRecordingByUserBookIdUseCase } from "@/application/use-cases/reading-recording/find-recording-userBook-id.use-case";
+import { FindAllReadingRecordingsUseCase } from "@/application/use-cases/reading-recording/find-all-recording.use-case";
+import { CreateRecordingUseCase } from "@/application/use-cases/reading-recording/create-recording.use-case";
 import { UpdateReadingRecordingUseCase } from "@/application/use-cases/reading-recording/update-recording.use-case";
 import { DeleteReadingRecordingUseCase } from "@application/use-cases/reading-recording/delete-recording.use-case";
 import { DeleteReadingRecordingUserBookIdUseCase } from "@/application/use-cases/reading-recording/delete-recording-userBook-id.use-case";
-import { FindAllReadingRecordingsUseCase } from "@/application/use-cases/reading-recording/find-all-recording.use-case";
 
 /**
  * Reading recording use case module
@@ -20,18 +19,16 @@ import { FindAllReadingRecordingsUseCase } from "@/application/use-cases/reading
 @Module({
   imports: [InfrastructureModule],
   providers: [
-    CreateReadingRecordingUseCase,
+    CreateRecordingUseCase,
     FindReadingRecordingByIdUseCase,
-    FindReadingRecordingByUserBookIdUseCase,
     UpdateReadingRecordingUseCase,
     DeleteReadingRecordingUseCase,
     DeleteReadingRecordingUserBookIdUseCase,
     FindAllReadingRecordingsUseCase,
   ],
   exports: [
-    CreateReadingRecordingUseCase,
+    CreateRecordingUseCase,
     FindReadingRecordingByIdUseCase,
-    FindReadingRecordingByUserBookIdUseCase,
     UpdateReadingRecordingUseCase,
     DeleteReadingRecordingUseCase,
     DeleteReadingRecordingUserBookIdUseCase,

@@ -19,8 +19,8 @@ import { ObjectIdValueObject } from "@/domain/value-objects/common/object-id.vo"
 import { UserBookEntity } from "@domain/entities/user-book.entity";
 
 /**
- * Delete reading recording user book id use case
- * @description Delete reading recording user book id use case
+ * Delete reading recordings by user book id use case
+ * @description Delete reading recordings by user book id use case
  */
 @Injectable()
 export class DeleteReadingRecordingUserBookIdUseCase {
@@ -32,8 +32,8 @@ export class DeleteReadingRecordingUserBookIdUseCase {
   ) {}
 
   /**
-   * Execute the delete reading recording user book id use case
-   * @description Execute the delete reading recording user book id use case
+   * Execute the delete reading recordings by user book id use case
+   * @description Execute the delete reading recordings by user book id use case
    * @param userBookId - The id of the user book to be deleted
    * @returns The number of deleted reading recordings
    */

@@ -2,7 +2,10 @@
 import { Injectable } from "@nestjs/common";
 
 // import entities
-import { UserBookEntity } from "@domain/entities/user-book.entity";
+import {
+  ReadingStatus,
+  UserBookEntity,
+} from "@domain/entities/user-book.entity";
 
 // import dto
 import { UserBookResponseDto } from "@presentation/dtos/user-book/user-book.response.dto";
@@ -14,6 +17,21 @@ import { UserBookResponseDto } from "@presentation/dtos/user-book/user-book.resp
 @Injectable()
 export class UserBookMapper {
   /**
+   * Map a reading status entity to a reading status response dto
+   * @param readingStatus - The reading status entity to be mapped
+   * @returns The reading status response dto
+   */
+  private static toReadingStatusResponseDto(
+    readingStatus: ReadingStatus,
+  ): string {
+    switch (readingStatus) {
+      case ReadingStatus.IN_PROGRESS:
+        return "IN_PROGRESS";
+      case ReadingStatus.COMPLETED:
+        return "COMPLETED";
+    }
+  }
+  /**
    * Map a user book entity to a user book response dto
    * @param userBook - The user book entity to be mapped
    * @returns The user book response dto
@@ -23,7 +41,9 @@ export class UserBookMapper {
       id: userBook.getId().getValue(),
       userId: userBook.getUserId().getValue(),
       bookId: userBook.getBookId().getValue(),
-      readingStatus: userBook.getReadingStatus().getValue(),
+      status: this.toReadingStatusResponseDto(
+        userBook.getReadingStatus().getValue(),
+      ),
       currentPage: userBook.getCurrentPage().getValue(),
       startDate: userBook.getStartDate(),
       completedDate: userBook.getCompletedDate(),

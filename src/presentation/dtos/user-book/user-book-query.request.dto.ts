@@ -6,11 +6,6 @@ import { IsIn, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
  * @description User book query request DTO
  */
 export class UserBookQueryRequestDto {
-  /** The user id of the query */
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
-
   /** The book id of the query */
   @IsOptional()
   @IsUUID()

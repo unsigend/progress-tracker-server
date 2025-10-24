@@ -68,7 +68,7 @@ export class BookController {
       bookCreateRequestDto.title,
       new PageValueObject(bookCreateRequestDto.pages),
       // TODO: get the user id from the request
-      new ObjectIdValueObject("fec34fce-36c3-413e-877c-7dff6f4774b3"),
+      new ObjectIdValueObject("8403a368-41ad-47da-8ba5-c194d5dfd9a4"),
       bookCreateRequestDto.author,
       bookCreateRequestDto.description,
       bookCreateRequestDto.isbn10

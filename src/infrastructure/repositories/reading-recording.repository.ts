@@ -92,7 +92,7 @@ export class ReadingRecordingRepository implements IReadingRecordingRepository {
     if (query.getOrder() && query.getSort()) {
       sortClause[query.getSort()] = query.getOrder();
     } else {
-      sortClause["createdAt"] = "desc";
+      sortClause["date"] = "desc";
     }
 
     // build the page and limit

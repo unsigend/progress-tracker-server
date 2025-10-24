@@ -2,6 +2,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 // import exceptions
+import { ConflictException } from "@domain/exceptions/conflict-exception";
+
+// import exceptions
 import { NotFoundException } from "@domain/exceptions/not-found-exception";
 
 // import entities
@@ -23,6 +26,9 @@ import { PageValueObject } from "@domain/value-objects/book/page.vo";
 
 // import enums
 import { ReadingStatus } from "@domain/entities/user-book.entity";
+
+// import queries
+import { UserBookQuery } from "@domain/repositories/queries/user-book.query";
 
 /**
  * Create user book use case
@@ -52,6 +58,14 @@ export class CreateUserBookUseCase {
     const book: BookEntity | null = await this.bookRepository.findById(bookId);
     if (!book) {
       throw new NotFoundException("Book not found");
+    }
+
+    // check whether the user book already exists for the same book
+    const { totalCount } = await this.userBookRepository.findAll(
+      new UserBookQuery(userId, bookId),
+    );
+    if (totalCount > 0) {
+      throw new ConflictException("User book already exists");
     }
 
     // create a new user book
