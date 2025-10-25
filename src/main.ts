@@ -9,7 +9,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { BadRequestException } from "@nestjs/common";
 
 // import types
-import { AppConfigType } from "@/platforms/config/app.config.type";
+import { AppConfigType } from "@shared/platforms/config/app.config.type";
 import { INestApplication } from "@nestjs/common";
 import { Request, Response } from "express";
 

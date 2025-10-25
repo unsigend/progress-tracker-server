@@ -1,6 +1,6 @@
 // import dependencies
 import { registerAs } from "@nestjs/config";
-import { validateConfig } from "@/platforms/util/validate-config";
+import { validateConfig } from "@shared/platforms/util/validate-config";
 
 // import types
 import { AppConfigType, AppEnvironment } from "./app.config.type";

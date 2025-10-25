@@ -1,10 +1,9 @@
 // import dependencies
 import { Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
 
 // import queries
-import { QueryBase } from "@domain/queries/base.query";
-import { FilterLogic, FilterOperator } from "@domain/queries/filter";
+import { QueryBase } from "@shared/domain/queries/base.query";
+import { FilterLogic, FilterOperator } from "@shared/domain/queries/filter";
 
 /**
  * Prisma service for prisma utilities
@@ -12,7 +11,7 @@ import { FilterLogic, FilterOperator } from "@domain/queries/filter";
  */
 @Injectable()
 export class PrismaService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor() {}
 
   /**
    * Map filter operator to prisma operator
