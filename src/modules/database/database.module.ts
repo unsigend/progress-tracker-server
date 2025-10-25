@@ -1,16 +1,16 @@
 // import dependencies
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
 
-// import services
-import { PrismaService } from "@modules/database/prisma.service";
+// import modules
+import { PostgresqlModule } from "./postgresql/postgresql.module";
+import { MongoDBModule } from "./mongodb/mongodb.module";
 
-// import config
-import databaseConfig from "@modules/database/config/database.config";
-
+/**
+ * Database module
+ * @description Database module which provides the database services
+ */
 @Module({
-  imports: [ConfigModule.forFeature(databaseConfig)],
-  providers: [PrismaService],
-  exports: [PrismaService],
+  imports: [PostgresqlModule, MongoDBModule],
+  exports: [PostgresqlModule, MongoDBModule],
 })
 export class DatabaseModule {}

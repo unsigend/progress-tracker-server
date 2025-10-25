@@ -1,10 +1,10 @@
 {
   "name": "server",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "backend for progress tracker",
+  "author": "Yixiang Qiu",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -19,8 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "generate:api": "npx swagger-typescript-api generate -p http://localhost:3000/api-docs-json -o ../client/src/lib/api/ --name api.ts --axios",
-    "prisma:merge": "concat-cli -f prisma/base.prisma prisma/schema/*.prisma -o prisma/schema.prisma",
-    "prisma:generate": "npm run prisma:merge && prisma generate",
+    "prisma:merge": "concat-cli -f src/modules/database/postgresql/prisma/*.prisma -o src/modules/database/postgresql/prisma/schema.prisma",
+    "prisma:generate": "npm run prisma:merge && npx prisma generate --schema=src/modules/database/postgresql/prisma/schema.prisma",
     "prisma:docs": "npm run prisma:generate && npx prisma-docs-generator serve"
   },
   "dependencies": {
@@ -30,10 +30,12 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.0",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.16.2",
+    "@scalar/nestjs-api-reference": "^1.0.5",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -45,7 +47,8 @@
     "reflect-metadata": "^0.2.2",
     "resend": "^6.1.3",
     "rxjs": "^7.8.1",
-    "sharp": "^0.34.4"
+    "sharp": "^0.34.4",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -63,6 +66,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
     "concat-cli": "^4.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",

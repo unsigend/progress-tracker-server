@@ -23,9 +23,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["./src/*"],
-      "@common/*": ["./src/common/*"],
+      "@platforms/*": ["./src/platforms/*"],
       "@domain/*": ["./src/domain/*"],
-      "@application/*": ["./src/application/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
       "@modules/*": ["./src/modules/*"]
     }
