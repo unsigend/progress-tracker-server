@@ -1,0 +1,30 @@
+/*
+  This enum is used to store the user role.
+*/
+enum UserRole {
+  ADMIN
+  USER
+}
+
+/*
+  This model is used to store the user information.
+*/
+model User {
+  // primary key
+  id        String   @id @default(uuid())
+
+  // fields
+  username  String   
+  email     String   @unique
+  password  String
+  avatar_url String?
+  provider  String[] @default(["local"])
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // relation
+  user_books UserBook[]
+  createdBooks Book[] @relation("CreatedBooks")
+}

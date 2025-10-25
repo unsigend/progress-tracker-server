@@ -1,0 +1,36 @@
+### Domain Related Configuration
+
+# Development environment
+APP_PORT=
+APP_NAME=
+APP_ENVIRONMENT=
+APP_API_VERSION=
+APP_BACKEND_URL=
+APP_FRONTEND_URL=
+
+### Database Related Configuration
+
+# PostgreSQL URL
+POSTGRESQL_URL=
+
+# MongoDB
+MONGODB_URL=
+
+### JWT Token Related Configuration
+JWT_ACCESS_TOKEN_SECRET=
+JWT_REFRESH_TOKEN_SECRET=
+JWT_ACCESS_TOKEN_EXPIRATION_TIME=
+JWT_REFRESH_TOKEN_EXPIRATION_TIME=
+
+
+### AWS S3 Related Configuration
+AWS_S3_ACCESS_KEY=
+AWS_S3_BUCKET_NAME=
+AWS_S3_REGION=
+AWS_S3_SECRET_KEY=
+
+
+### Mail Service Related Configuration
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+RESEND_DOMAIN_NAME=
