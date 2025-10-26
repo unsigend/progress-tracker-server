@@ -4,6 +4,8 @@ import { HttpStatus } from "@nestjs/common";
 /**
  * Domain exception class
  * @description Domain exception class
+ * @extends Error
+ * @property status - The HTTP status code of the exception
  */
 export class DomainException extends Error {
   // private properties
@@ -20,5 +22,13 @@ export class DomainException extends Error {
   ) {
     super(message);
     this.status = status;
+  }
+
+  /**
+   * Get the status of the exception
+   * @returns The HTTP status code of the exception
+   */
+  public getStatus(): HttpStatus {
+    return this.status;
   }
 }

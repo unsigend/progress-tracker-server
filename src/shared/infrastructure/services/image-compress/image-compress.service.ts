@@ -1,6 +1,8 @@
 // import dependencies
 import sharp from "sharp";
 import { Injectable } from "@nestjs/common";
+
+// import shared
 import { IImageCompress } from "@shared/domain/services/image-compress.service";
 import { ImageValueObject } from "@shared/domain/value-object/image.vo";
 import { ValidationException } from "@shared/domain/exceptions/validation.exception";

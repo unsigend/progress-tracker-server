@@ -3,8 +3,8 @@ import { Module } from "@nestjs/common";
 
 // import modules
 import { ConfigModule } from "@nestjs/config";
-import { UserModule } from "@/modules/user/user.module";
-import { DatabaseModule } from "@/modules/database/database.module";
+import { UserModule } from "@modules/user/user.module";
+import { DatabaseModule } from "@modules/database/database.module";
 import { InfrastructureModule } from "@shared/infrastructure/infrastructure.module";
 
 // import configurations

@@ -1,7 +1,7 @@
 // import dependencies
 import { Module } from "@nestjs/common";
 
-// import modules
+// import user module
 import { UserInfrastructureModule } from "../infrastructure/infrastructure.module";
 
 /**

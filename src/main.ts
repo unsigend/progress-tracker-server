@@ -7,11 +7,13 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { apiReference } from "@scalar/nestjs-api-reference";
 import { ValidationPipe } from "@nestjs/common";
 import { BadRequestException } from "@nestjs/common";
+import { DomainExceptionFilter } from "@shared/platforms/filters/domain-exception.filter";
 
 // import types
 import { AppConfigType } from "@shared/platforms/config/app.config.type";
 import { INestApplication } from "@nestjs/common";
 import { Request, Response } from "express";
+import { OpenAPIObject } from "@nestjs/swagger";
 
 /**
  * Setup the application configuration
@@ -63,7 +65,7 @@ function setupOpenAPIDocs(
     .build();
 
   // create the OpenAPI document
-  const document = SwaggerModule.createDocument(
+  const document: OpenAPIObject = SwaggerModule.createDocument(
     appInstance,
     openAPISpecification,
   );
@@ -118,6 +120,9 @@ function setupComponents(appInstance: INestApplication): INestApplication {
       },
     }),
   );
+
+  // enable the domain exception filter
+  appInstance.useGlobalFilters(new DomainExceptionFilter());
 
   // return the application instance
   return appInstance;
