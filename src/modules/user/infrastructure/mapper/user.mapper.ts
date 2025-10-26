@@ -10,6 +10,7 @@ import { PasswordValueObject } from "@/modules/user/domain/value-object/password
 import { RoleValueObject } from "@modules/user/domain/value-object/role.vo";
 import { ProviderValueObject } from "@modules/user/domain/value-object/provider.vo";
 import { UrlValueObject } from "@shared/domain/value-object/url.vo";
+import { UserResponseDto } from "../../presentation/dtos/user.response.dto";
 
 /**
  * User mapper
@@ -70,5 +71,23 @@ export class UserMapper {
       user.updatedAt,
       user.deletedAt,
     );
+  }
+
+  /**
+   * Map a user entity to a user response dto
+   * @param user - The user entity to map
+   * @returns The user response dto
+   */
+  public static toResponseDto(user: UserEntity): UserResponseDto {
+    return {
+      id: user.getId().getId(),
+      username: user.getUsername(),
+      email: user.getEmail().getEmail(),
+      avatarUrl: user.getAvatarUrl()?.getUrl() ?? null,
+      provider: user.getProvider().getProvider(),
+      role: user.getRole().getRole(),
+      createdAt: user.getCreatedAt(),
+      updatedAt: user.getUpdatedAt(),
+    };
   }
 }

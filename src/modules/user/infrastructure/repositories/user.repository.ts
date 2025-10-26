@@ -1,14 +1,17 @@
 // import dependencies
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PostgreSQLService } from "@/modules/database/postgresql/service/postgresql.service";
 import { UserMapper } from "../mapper/user.mapper";
 import { PrismaService } from "@/modules/database/postgresql/service/prisma.service";
 import { Prisma, User as UserModel } from "@prisma/client";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { QueryBase } from "@shared/domain/queries/base.query";
 import { ObjectIdValueObject } from "@shared/domain/value-object/object-id.vo";
 import { EmailValueObject } from "@/modules/user/domain/value-object/email.vo";
 import { IUserRepository } from "@/modules/user/domain/repositories/user.repository";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
+import { ServerException } from "@/shared/domain/exceptions/server.exception";
 
 /**
  * User repository implementation
@@ -87,12 +90,21 @@ export class UserRepository implements IUserRepository {
     const skip: number = (query.getPage() - 1) * take;
 
     // find all users
-    const users: UserModel[] = await this.postgresqlService.user.findMany({
-      where: whereClause,
-      orderBy: orderClause,
-      take: take,
-      skip: skip,
-    });
+    let users: UserModel[] = [];
+    try {
+      users = await this.postgresqlService.user.findMany({
+        where: whereClause,
+        orderBy: orderClause,
+        take: take,
+        skip: skip,
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientValidationError) {
+        throw new ValidationException("Invalid query key");
+      }
+      Logger.error(error);
+      throw new ServerException("An unexpected error occurred");
+    }
 
     // get the total count of the users
     const totalCount: number = await this.postgresqlService.user.count({

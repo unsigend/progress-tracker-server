@@ -6,6 +6,10 @@ import { PasswordValueObject } from "../value-object/password.vo";
 import { RoleValueObject } from "../value-object/role.vo";
 import { UrlValueObject } from "@shared/domain/value-object/url.vo";
 
+/**
+ * User role
+ * @description User role
+ */
 export enum UserRole {
   ADMIN = "ADMIN",
   USER = "USER",

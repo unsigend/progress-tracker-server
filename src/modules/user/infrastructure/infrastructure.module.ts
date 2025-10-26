@@ -30,6 +30,6 @@ import { UserRepository } from "./repositories/user.repository";
       useClass: BcryptPasswordHasherService,
     },
   ],
-  exports: [USER_REPOSITORY_TOKEN],
+  exports: [USER_REPOSITORY_TOKEN, PASSWORD_HASHER_TOKEN],
 })
 export class UserInfrastructureModule {}
