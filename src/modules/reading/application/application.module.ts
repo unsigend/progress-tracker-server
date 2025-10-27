@@ -14,11 +14,15 @@ import { DeleteUserBookUseCase } from "./use-case/user-book/delete.use-case";
 import { FindAllUserBooksUseCase } from "./use-case/user-book/find-all.use-case";
 import { FindUserBookIdUseCase } from "./use-case/user-book/find-id.use-case";
 
+// import recording use cases
+import { FindAllRecordingsUseCase } from "./use-case/recording/find-all.use-case";
+import { CreateRecordingUseCase } from "./use-case/recording/create.use-case";
+import { DeleteRecordingsUseCase } from "./use-case/recording/delete.use-case";
+
 // import modules
 import { CloudModule } from "@/modules/cloud/cloud.module";
 import { ReadingInfrastructureModule } from "../infrastructure/infrastructure.module";
 import { InfrastructureModule } from "@/shared/infrastructure/infrastructure.module";
-import { FindAllRecordingsUseCase } from "./use-case/recording/find-all.use-case";
 
 // import user book use cases
 const userBookUseCases = [
@@ -38,7 +42,11 @@ const bookUseCases = [
 ];
 
 // import recording use cases
-const recordingUseCases = [FindAllRecordingsUseCase];
+const recordingUseCases = [
+  FindAllRecordingsUseCase,
+  CreateRecordingUseCase,
+  DeleteRecordingsUseCase,
+];
 
 /**
  * Reading application module

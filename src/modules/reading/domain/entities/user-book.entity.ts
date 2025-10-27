@@ -11,6 +11,15 @@ export enum ReadingStatus {
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
 }
+
+/**
+ * Add recording action
+ * @description Add recording action which is used to store the add recording action.
+ */
+export enum AddRecordingAction {
+  INCREASE = "INCREASE",
+  SET = "SET",
+}
 /**
  * User book entity
  * @description User book entity which is used to store the user book data
@@ -289,15 +298,63 @@ export class UserBookEntity {
   /**
    * Mark the book as completed
    * @param date - The date
-   * @param totalPages - The total pages
    */
-  public markAsCompleted(date: Date, totalPages: PagesValueObject): void {
+  public markAsCompleted(date: Date): void {
     // only if the book is in progress and not completed will be marked as completed
     if (this.status === ReadingStatus.IN_PROGRESS && !this.completedDate) {
       this.completedDate = date;
-      this.currentPage = totalPages;
       this.status = ReadingStatus.COMPLETED;
       this.updatedAt = new Date();
     }
+  }
+
+  /**
+   * Check if the book is completed
+   * @returns True if the book is completed, false otherwise
+   */
+  public isCompleted(): boolean {
+    return this.status === ReadingStatus.COMPLETED;
+  }
+
+  /**
+   * Add a reading recording to the user book
+   * @description Add a reading recording to the user book
+   * @param date - The date of the recording
+   * @param pages - The pages of the recording
+   * @param minutes - The minutes of the recording
+   * @param isNewDay - Whether the day is new
+   * @param action - The action to be performed
+   */
+  public addRecording(
+    date: Date,
+    pages: PagesValueObject,
+    minutes: MinutesValueObject,
+    isNewDay: boolean,
+    action: AddRecordingAction = AddRecordingAction.INCREASE,
+  ): void {
+    // update data
+    if (action === AddRecordingAction.INCREASE) {
+      this.totalMinutes = new MinutesValueObject(
+        this.totalMinutes.getMinutes() + minutes.getMinutes(),
+      );
+      this.currentPage = new PagesValueObject(
+        this.currentPage.getPages() + pages.getPages(),
+      );
+    } else {
+      this.totalMinutes = minutes;
+      this.currentPage = pages;
+    }
+
+    // Only increase the total days if the day is new
+    if (isNewDay) {
+      this.totalDays++;
+    }
+
+    // set the start date is just start the book
+    if (!this.startDate) {
+      this.startDate = date;
+    }
+
+    this.updatedAt = new Date();
   }
 }

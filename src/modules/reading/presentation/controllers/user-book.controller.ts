@@ -22,6 +22,13 @@ import { FindAllRecordingsUseCase } from "../../application/use-case/recording/f
 import { RecordingMapper } from "../../infrastructure/mapper/recording.mapper";
 import { RecordingResponseDto } from "../dtos/recording/recording.response.dto";
 import { RecordingQueryRequestDto } from "../dtos/recording/query.request.dto";
+import { CreateRecordingRequestDto } from "../dtos/recording/create.request.dto";
+import { PagesValueObject } from "../../domain/object-value/pages.vo";
+import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
+import { RecordingEntity } from "../../domain/entities/recording.entity";
+import { CreateRecordingUseCase } from "../../application/use-case/recording/create.use-case";
+import { DeleteRecordingsUseCase } from "../../application/use-case/recording/delete.use-case";
+
 /**
  * User book controller
  * @description User book controller which is used to handle the user book requests.
@@ -39,24 +46,9 @@ export class UserBookController {
     private readonly findAllUserBooksUseCase: FindAllUserBooksUseCase,
     private readonly findUserBookIdUseCase: FindUserBookIdUseCase,
     private readonly findAllRecordingsUseCase: FindAllRecordingsUseCase,
+    private readonly createRecordingUseCase: CreateRecordingUseCase,
+    private readonly deleteRecordingsUseCase: DeleteRecordingsUseCase,
   ) {}
-
-  /**
-   * Create a user book
-   */
-  @Post()
-  public async create(
-    @Body() createUserBookRequestDto: CreateUserBookRequestDto,
-  ): Promise<UserBookResponseDto> {
-    // TODO: replace with actual user id
-    const userId = "327ab385-ae2b-4a11-97cc-d5b631e6e4b4";
-
-    const userBook: UserBookEntity = await this.createUserBookUseCase.execute(
-      new ObjectIdValueObject(createUserBookRequestDto.bookId),
-      new ObjectIdValueObject(userId),
-    );
-    return UserBookMapper.toDtoUserBook(userBook);
-  }
 
   /**
    * Find all user books
@@ -88,6 +80,23 @@ export class UserBookController {
   }
 
   /**
+   * Create a user book
+   */
+  @Post()
+  public async create(
+    @Body() createUserBookRequestDto: CreateUserBookRequestDto,
+  ): Promise<UserBookResponseDto> {
+    // TODO: replace with actual user id
+    const userId = "327ab385-ae2b-4a11-97cc-d5b631e6e4b4";
+
+    const userBook: UserBookEntity = await this.createUserBookUseCase.execute(
+      new ObjectIdValueObject(createUserBookRequestDto.bookId),
+      new ObjectIdValueObject(userId),
+    );
+    return UserBookMapper.toDtoUserBook(userBook);
+  }
+
+  /**
    * Find a user book by id
    */
   @Get(":id")
@@ -102,10 +111,11 @@ export class UserBookController {
    * Delete a user book
    */
   @Delete(":id")
-  public async delete(@Param("id") id: string): Promise<boolean> {
-    return await this.deleteUserBookUseCase.execute(
+  public async delete(@Param("id") id: string): Promise<{ success: boolean }> {
+    const result: boolean = await this.deleteUserBookUseCase.execute(
       new ObjectIdValueObject(id),
     );
+    return { success: result };
   }
 
   /**
@@ -135,5 +145,38 @@ export class UserBookController {
       data: recordingResponseDtos,
       totalCount,
     };
+  }
+
+  /**
+   * Create a recording
+   */
+  @Post(":id/recordings")
+  public async createRecording(
+    @Param("id") id: string,
+    @Body() createRecordingRequestDto: CreateRecordingRequestDto,
+  ): Promise<RecordingResponseDto> {
+    const recording: RecordingEntity =
+      await this.createRecordingUseCase.execute(
+        new ObjectIdValueObject(id),
+        createRecordingRequestDto.date,
+        new PagesValueObject(createRecordingRequestDto.pages),
+        new MinutesValueObject(createRecordingRequestDto.minutes),
+        createRecordingRequestDto.notes ?? null,
+      );
+
+    return RecordingMapper.toDto(recording);
+  }
+
+  /**
+   * Delete recordings
+   */
+  @Delete(":id/recordings")
+  public async deleteRecordings(
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    const result: boolean = await this.deleteRecordingsUseCase.execute(
+      new ObjectIdValueObject(id),
+    );
+    return { success: result };
   }
 }

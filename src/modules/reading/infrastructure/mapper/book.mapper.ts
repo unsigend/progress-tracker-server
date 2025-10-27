@@ -63,6 +63,7 @@ export class BookMapper {
     return {
       id: book.getId().getId(),
       title: book.getTitle(),
+      pages: book.getPages().getPages(),
       author: book.getAuthor(),
       description: book.getDescription(),
       ISBN10: book.getISBN10()?.getISBN() ?? null,

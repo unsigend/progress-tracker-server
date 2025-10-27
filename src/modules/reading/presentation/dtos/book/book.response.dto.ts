@@ -9,6 +9,9 @@ export class BookResponseDto {
   /** The title of the book */
   title: string;
 
+  /** The pages of the book */
+  pages: number;
+
   /** The author of the book */
   author: string | null;
 

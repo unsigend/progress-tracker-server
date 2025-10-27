@@ -5,7 +5,7 @@ import {
   BOOK_REPOSITORY_TOKEN,
   type IBookRepository,
 } from "@/modules/reading/domain/repositories/book.repository";
-import { Inject } from "@nestjs/common";
+import { Inject, NotFoundException } from "@nestjs/common";
 import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 
 /**
@@ -33,7 +33,7 @@ export class DeleteBookUseCase {
     // check if the book exists
     const book: BookEntity | null = await this.bookRepository.findById(id);
     if (book === null) {
-      return false;
+      throw new NotFoundException("Book not found");
     }
 
     // if the cover url is not null

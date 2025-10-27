@@ -18,6 +18,7 @@ export class MinutesValueObject {
     if (minutes < 0) {
       throw new ValidationException("Minutes must be greater than 0");
     }
+    this.minutes = minutes;
   }
 
   /**

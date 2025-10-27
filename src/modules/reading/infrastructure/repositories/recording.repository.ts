@@ -141,4 +141,20 @@ export class RecordingRepository implements IRecordingRepository {
       });
     return result ? true : false;
   }
+
+  /**
+   * Delete recordings by user book id
+   * @param userBookId - The user book id
+   * @returns True if the recordings were deleted, false otherwise
+   */
+  public async deleteByUserBookId(
+    userBookId: ObjectIdValueObject,
+  ): Promise<boolean> {
+    // delete the recordings by user book id
+    const result: { count: number } =
+      await this.postgresqlService.readingRecord.deleteMany({
+        where: { user_book_id: userBookId.getId() },
+      });
+    return result.count > 0 ? true : false;
+  }
 }

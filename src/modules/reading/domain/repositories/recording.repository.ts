@@ -22,4 +22,11 @@ export interface IRecordingRepository extends IBaseRepository<RecordingEntity> {
   findByUserBookId(
     userBookId: ObjectIdValueObject,
   ): Promise<{ data: RecordingEntity[]; totalCount: number }>;
+
+  /**
+   * Delete recordings by user book id
+   * @param userBookId - The user book id
+   * @returns True if the recordings were deleted, false otherwise
+   */
+  deleteByUserBookId(userBookId: ObjectIdValueObject): Promise<boolean>;
 }
