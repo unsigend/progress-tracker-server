@@ -2,12 +2,18 @@
 import { Module } from "@nestjs/common";
 
 // import modules
+import { PassportModule } from "@nestjs/passport";
 import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "@modules/user/user.module";
 import { CloudModule } from "@modules/cloud/cloud.module";
 import { DatabaseModule } from "@modules/database/database.module";
 import { InfrastructureModule } from "@shared/infrastructure/infrastructure.module";
 import { ReadingModule } from "@modules/reading/reading.module";
+import { AuthModule } from "@modules/auth/auth.module";
+
+// import guards
+import { JwtAuthGuard } from "@shared/platforms/guards/jwt-auth.guard";
+import { JwtStrategy } from "@shared/platforms/strategies/jwt.strategy";
 
 // import configurations
 import appConfig from "@shared/platforms/config/app.config";
@@ -32,13 +38,15 @@ import postgresqlConfig from "@modules/database/postgresql/config/postgresql.con
         awsS3CloudConfig,
       ],
     }),
+    PassportModule,
     DatabaseModule,
+    AuthModule,
     InfrastructureModule,
     UserModule,
     ReadingModule,
     CloudModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [JwtAuthGuard, JwtStrategy],
 })
 export class AppModule {}

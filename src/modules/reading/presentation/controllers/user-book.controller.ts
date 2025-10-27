@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Query,
+  Request,
 } from "@nestjs/common";
 import { CreateUserBookUseCase } from "../../application/use-case/user-book/create.use-case";
 import { DeleteUserBookUseCase } from "../../application/use-case/user-book/delete.use-case";
@@ -28,7 +29,8 @@ import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
 import { RecordingEntity } from "../../domain/entities/recording.entity";
 import { CreateRecordingUseCase } from "../../application/use-case/recording/create.use-case";
 import { DeleteRecordingsUseCase } from "../../application/use-case/recording/delete.use-case";
-
+import { type Request as ExpressRequest } from "express";
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 /**
  * User book controller
  * @description User book controller which is used to handle the user book requests.
@@ -55,13 +57,15 @@ export class UserBookController {
    */
   @Get()
   public async findAll(
+    @Request() request: ExpressRequest,
     @Query() userBookQueryRequestDto: UserBookQueryRequestDto,
   ): Promise<{ data: UserBookResponseDto[]; totalCount: number }> {
-    // TODO: replace with actual user id
-    const userId = "327ab385-ae2b-4a11-97cc-d5b631e6e4b4";
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
 
     const { data, totalCount } = await this.findAllUserBooksUseCase.execute(
-      new ObjectIdValueObject(userId),
+      userId,
       userBookQueryRequestDto.field,
       userBookQueryRequestDto.value,
       userBookQueryRequestDto.limit,
@@ -84,14 +88,16 @@ export class UserBookController {
    */
   @Post()
   public async create(
+    @Request() request: ExpressRequest,
     @Body() createUserBookRequestDto: CreateUserBookRequestDto,
   ): Promise<UserBookResponseDto> {
-    // TODO: replace with actual user id
-    const userId = "327ab385-ae2b-4a11-97cc-d5b631e6e4b4";
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
 
     const userBook: UserBookEntity = await this.createUserBookUseCase.execute(
       new ObjectIdValueObject(createUserBookRequestDto.bookId),
-      new ObjectIdValueObject(userId),
+      userId,
     );
     return UserBookMapper.toDtoUserBook(userBook);
   }

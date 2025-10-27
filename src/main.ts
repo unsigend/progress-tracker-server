@@ -8,12 +8,14 @@ import { apiReference } from "@scalar/nestjs-api-reference";
 import { ValidationPipe } from "@nestjs/common";
 import { BadRequestException } from "@nestjs/common";
 import { DomainExceptionFilter } from "@shared/platforms/filters/domain-exception.filter";
+import { JwtAuthGuard } from "@shared/platforms/guards/jwt-auth.guard";
 
 // import types
 import { AppConfigType } from "@shared/platforms/config/app.config.type";
 import { INestApplication } from "@nestjs/common";
 import { Request, Response } from "express";
 import { OpenAPIObject } from "@nestjs/swagger";
+import { Reflector } from "@nestjs/core";
 
 /**
  * Setup the application configuration
@@ -123,6 +125,9 @@ function setupComponents(appInstance: INestApplication): INestApplication {
 
   // enable the domain exception filter
   appInstance.useGlobalFilters(new DomainExceptionFilter());
+
+  // use global guards
+  appInstance.useGlobalGuards(new JwtAuthGuard(new Reflector()));
 
   // return the application instance
   return appInstance;

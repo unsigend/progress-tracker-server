@@ -2,15 +2,31 @@
 // import { Injectable } from "@nestjs/common";
 // import { PassportStrategy } from "@nestjs/passport";
 // import { Strategy } from "passport-github2";
+// import { ConfigService } from "@nestjs/config";
+// import { type IUserRepository } from "@/modules/user/domain/repositories/user.repository";
 
+// /**
+//  * Github strategy
+//  * @description Github strategy which is used to authenticate a user using Github
+//  */
 // @Injectable()
 // export class GithubStrategy extends PassportStrategy(Strategy, "github") {
+//   /**
+//    * Constructor for GithubStrategy
+//    * @param configService - The config service
+//    * @param userRepository - The user repository
+//    */
 //   constructor(
 //     private readonly configService: ConfigService,
-//     private readonly userService: UserService,
+//     private readonly userRepository: IUserRepository,
 //   ) {
-//     let fullDomain = configService.get<string>("app.DOMAIN")!;
-//     fullDomain += `/api/${configService.get<string>("app.API_VERSION")!}/auth/github/callback`;
+//     // get the callback URL
+//     const callBackPostfix = "auth/github/callback";
+//     // get the full domain
+//     let fullDomain = configService.get<string>("app.APP_BACKEND_URL")!;
+//     // add the callback postfix to the full domain
+//     fullDomain += `/api/v${configService.get<string>("app.APP_API_VERSION")!}`;
+//     fullDomain += `/${callBackPostfix}`;
 
 //     super({
 //       clientID: configService.get<string>("auth.GITHUB_CLIENT_ID")!,

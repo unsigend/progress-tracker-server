@@ -6,11 +6,13 @@ import {
   Post,
   Query,
   Body,
+  Request,
   UploadedFile,
   UseInterceptors,
   Put,
   Delete,
 } from "@nestjs/common";
+import { type Request as ExpressRequest } from "express";
 import { FindAllBooksUseCase } from "../../application/use-case/book/find-all.use-case";
 import { BookQueryRequestDto } from "../dtos/book/query.request.dto";
 import { BookResponseDto } from "../dtos/book/book.response.dto";
@@ -27,6 +29,7 @@ import { BookEntity } from "../../domain/entities/book.entity";
 import { UpdateBookRequestDto } from "../dtos/book/update.request.dto";
 import { UpdateBookUseCase } from "../../application/use-case/book/update.use-case";
 import { DeleteBookUseCase } from "../../application/use-case/book/delete.use-case";
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 
 /**
  * Book controller
@@ -76,17 +79,19 @@ export class BookController {
   @Post()
   @UseInterceptors(FileInterceptor("coverImage"))
   public async create(
+    @Request() request: ExpressRequest,
     @Body() createBookRequestDto: CreateBookRequestDto,
     @UploadedFile() coverImage: Express.Multer.File,
   ): Promise<BookResponseDto> {
-    // TODO: replace with actual user id
-    const userId = "327ab385-ae2b-4a11-97cc-d5b631e6e4b4";
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
 
     // create the book entity
     const book: BookEntity = await this.createBookUseCase.execute(
       createBookRequestDto.title,
       new PagesValueObject(createBookRequestDto.pages),
-      new ObjectIdValueObject(userId),
+      userId,
       createBookRequestDto.author,
       createBookRequestDto.description,
       createBookRequestDto.ISBN10

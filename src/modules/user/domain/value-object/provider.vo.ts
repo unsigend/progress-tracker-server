@@ -60,4 +60,12 @@ export class ProviderValueObject {
     }
     this.provider = this.provider.filter((p) => p !== provider);
   }
+
+  /**
+   * Get the allowed providers
+   * @returns The allowed providers
+   */
+  public getAllowedProviders(): string[] {
+    return this.ALLOWED_PROVIDERS;
+  }
 }
