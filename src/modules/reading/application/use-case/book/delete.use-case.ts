@@ -6,10 +6,7 @@ import {
   type IBookRepository,
 } from "@/modules/reading/domain/repositories/book.repository";
 import { Inject } from "@nestjs/common";
-import {
-  CLOUD_TOKEN,
-  type ICloud,
-} from "@shared/domain/services/cloud.service";
+import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 
 /**
  * Delete book use case

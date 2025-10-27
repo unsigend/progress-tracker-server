@@ -10,10 +10,7 @@ import {
   BOOK_REPOSITORY_TOKEN,
   type IBookRepository,
 } from "@/modules/reading/domain/repositories/book.repository";
-import {
-  CLOUD_TOKEN,
-  type ICloud,
-} from "@shared/domain/services/cloud.service";
+import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import {
   IMAGE_COMPRESSOR_TOKEN,
   type IImageCompress,

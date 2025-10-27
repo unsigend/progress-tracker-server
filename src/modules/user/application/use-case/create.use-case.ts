@@ -7,10 +7,7 @@ import { UserEntity } from "../../domain/entities/user.entity";
 import { EmailValueObject } from "../../domain/value-object/email.vo";
 import { PasswordValueObject } from "../../domain/value-object/password.vo";
 import { RoleValueObject } from "../../domain/value-object/role.vo";
-import {
-  CLOUD_TOKEN,
-  type ICloud,
-} from "@/shared/domain/services/cloud.service";
+import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import { Inject } from "@nestjs/common";
 import {
   PASSWORD_HASHER_TOKEN,

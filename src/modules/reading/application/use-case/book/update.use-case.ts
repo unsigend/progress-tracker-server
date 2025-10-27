@@ -15,10 +15,7 @@ import {
   IMAGE_COMPRESSOR_TOKEN,
   type IImageCompress,
 } from "@shared/domain/services/image-compress.service";
-import {
-  CLOUD_TOKEN,
-  type ICloud,
-} from "@shared/domain/services/cloud.service";
+import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 
 /**

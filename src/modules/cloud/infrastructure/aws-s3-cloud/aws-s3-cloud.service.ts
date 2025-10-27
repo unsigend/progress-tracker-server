@@ -12,7 +12,7 @@ import { FileValueObject } from "@shared/domain/value-object/file.vo";
 import { UrlValueObject } from "@shared/domain/value-object/url.vo";
 
 // import services
-import { ICloud } from "@shared/domain/services/cloud.service";
+import { ICloud } from "@/modules/cloud/domain/cloud.service";
 import { ConfigService } from "@nestjs/config";
 
 /**

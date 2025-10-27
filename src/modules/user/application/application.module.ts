@@ -1,8 +1,9 @@
 // import dependencies
 import { Module } from "@nestjs/common";
 
-// import user module
+// import modules
 import { UserInfrastructureModule } from "../infrastructure/infrastructure.module";
+import { CloudModule } from "@/modules/cloud/cloud.module";
 
 // import shared infrastructure module
 import { InfrastructureModule } from "@/shared/infrastructure/infrastructure.module";
@@ -19,7 +20,7 @@ import { DeleteUserUseCase } from "./use-case/delete.use-case";
  * @description User application module which provides the user application services
  */
 @Module({
-  imports: [UserInfrastructureModule, InfrastructureModule],
+  imports: [UserInfrastructureModule, InfrastructureModule, CloudModule],
   providers: [
     FindAllUsersUseCase,
     CreateUserUseCase,

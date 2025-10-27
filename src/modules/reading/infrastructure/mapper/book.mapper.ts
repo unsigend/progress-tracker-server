@@ -5,6 +5,7 @@ import { Book as BookModel } from "@prisma/client";
 import { ISBNValueObject } from "@/modules/reading/domain/object-value/isbn.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
+import { BookResponseDto } from "../../presentation/dtos/book/book.response.dto";
 
 /**
  * Book mapper
@@ -50,6 +51,26 @@ export class BookMapper {
       cover_url: book.getCoverUrl()?.getUrl() ?? null,
       createdAt: book.getCreatedAt(),
       updatedAt: book.getUpdatedAt(),
+    };
+  }
+
+  /**
+   * Map a book entity to a book response dto
+   * @param book - The book entity to map
+   * @returns The book response dto
+   */
+  public static toResponseDto(book: BookEntity): BookResponseDto {
+    return {
+      id: book.getId().getId(),
+      title: book.getTitle(),
+      author: book.getAuthor(),
+      description: book.getDescription(),
+      ISBN10: book.getISBN10()?.getISBN() ?? null,
+      ISBN13: book.getISBN13()?.getISBN() ?? null,
+      coverUrl: book.getCoverUrl()?.getUrl() ?? null,
+      createdAt: book.getCreatedAt(),
+      updatedAt: book.getUpdatedAt(),
+      createdBy: book.getCreatedById().getId(),
     };
   }
 }

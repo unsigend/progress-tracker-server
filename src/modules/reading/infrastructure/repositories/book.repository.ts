@@ -9,12 +9,13 @@ import { BookMapper } from "../mapper/book.mapper";
 import { Book as BookModel, Prisma } from "@prisma/client";
 import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
 import { ServerException } from "@/shared/domain/exceptions/server.exception";
-import { Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 /**
  * Book repository
  * @description Book repository which is used to store the book information.
  */
+@Injectable()
 export class BookRepository implements IBookRepository {
   constructor(
     private readonly postgresqlService: PostgreSQLService,

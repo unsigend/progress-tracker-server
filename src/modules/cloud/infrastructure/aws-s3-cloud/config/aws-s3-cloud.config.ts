@@ -1,6 +1,6 @@
 // import dependencies
 import { registerAs } from "@nestjs/config";
-import { AwsS3CloudConfigType } from "@shared/infrastructure/services/aws-s3-cloud/config/aws-s3-cloud.config.type";
+import { AwsS3CloudConfigType } from "./aws-s3-cloud.config.type";
 import { validateConfig } from "@shared/platforms/util/validate-config";
 
 /**

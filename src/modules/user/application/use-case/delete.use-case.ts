@@ -5,9 +5,9 @@ import {
   USER_REPOSITORY_TOKEN,
 } from "../../domain/repositories/user.repository";
 import { UserEntity } from "../../domain/entities/user.entity";
-import { CLOUD_TOKEN } from "@shared/domain/services/cloud.service";
+import { CLOUD_TOKEN } from "@/modules/cloud/domain/cloud.service";
 import { Inject } from "@nestjs/common";
-import type { ICloud } from "@shared/domain/services/cloud.service";
+import type { ICloud } from "@/modules/cloud/domain/cloud.service";
 
 /**
  * Delete user use case
