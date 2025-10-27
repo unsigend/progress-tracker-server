@@ -6,6 +6,11 @@ import {
 } from "../../domain/repositories/user.repository";
 import { QueryBase } from "@shared/domain/queries/base.query";
 import { Inject } from "@nestjs/common";
+import {
+  FilterLogic,
+  FilterOperator,
+  Filters,
+} from "@/shared/domain/queries/filter";
 
 /**
  * Find all users use case
@@ -27,8 +32,31 @@ export class FindAllUsersUseCase {
    * @returns The users
    */
   public async execute(
-    query: QueryBase,
+    field?: string,
+    value?: string,
+    limit?: number,
+    page?: number,
+    sort?: string,
+    order?: "asc" | "desc",
   ): Promise<{ data: UserEntity[]; totalCount: number }> {
+    const filters: Filters = [];
+    if (field && value) {
+      filters.push({
+        field: field,
+        operator: FilterOperator.EQUALS,
+        value: value,
+      });
+    }
+    // build the query object
+    const query: QueryBase = new QueryBase(
+      filters,
+      FilterLogic.AND,
+      limit,
+      page,
+      sort,
+      order,
+    );
+
     // find all users
     const { data, totalCount } = await this.userRepository.findAll(query);
 

@@ -34,19 +34,7 @@ export class UserEntity {
   private avatarUrl: UrlValueObject | null;
   private deletedAt: Date | null;
 
-  /**
-   * Constructor for UserEntity
-   * @param id - The id of the user
-   * @param username - The username of the user
-   * @param email - The email of the user
-   * @param password - The password of the user
-   * @param role - The role of the user
-   * @param provider - The provider of the user
-   * @param createdAt - The created at date of the user
-   * @param updatedAt - The updated at date of the user
-   * @param avatarUrl - The avatar url of the user
-   * @param deletedAt - The deleted at date of the user
-   */
+  // private constructor
   private constructor(
     username: string,
     email: EmailValueObject,

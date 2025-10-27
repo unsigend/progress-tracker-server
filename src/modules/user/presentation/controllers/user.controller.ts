@@ -12,13 +12,7 @@ import {
   Put,
 } from "@nestjs/common";
 import { FindAllUsersUseCase } from "../../application/use-case/find-all.use-case";
-import { QueryBase } from "@/shared/domain/queries/base.query";
 import { UserQueryRequestDto } from "../dtos/query.request.dto";
-import {
-  FilterLogic,
-  Filters,
-  FilterOperator,
-} from "@/shared/domain/queries/filter";
 import { UserResponseDto } from "../dtos/user.response.dto";
 import { UserMapper } from "../../infrastructure/mapper/user.mapper";
 import { CreateUserRequestDto } from "../dtos/create.request.dto";
@@ -56,27 +50,15 @@ export class UserController {
   public async findAll(
     @Query() query: UserQueryRequestDto,
   ): Promise<{ data: UserResponseDto[]; totalCount: number }> {
-    const filters: Filters = [];
-    if (query.field && query.value) {
-      filters.push({
-        field: query.field,
-        operator: FilterOperator.EQUALS,
-        value: query.value,
-      });
-    }
-    // build the query object
-    const queryObject: QueryBase = new QueryBase(
-      filters,
-      FilterLogic.AND,
+    // find all users
+    const { data, totalCount } = await this.findAllUsersUseCase.execute(
+      query.field,
+      query.value,
       query.limit,
       query.page,
       query.sort,
       query.order,
     );
-
-    // find all users
-    const { data, totalCount } =
-      await this.findAllUsersUseCase.execute(queryObject);
 
     // map the users to the user response dtos
     const userResponseDtos: UserResponseDto[] = data.map((user) =>
