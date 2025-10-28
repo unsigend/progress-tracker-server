@@ -10,12 +10,14 @@ import {
   Delete,
   Param,
   Put,
+  Request,
 } from "@nestjs/common";
+import { type Request as ExpressRequest } from "express";
 import { FindAllUsersUseCase } from "../../application/use-case/find-all.use-case";
 import { UserQueryRequestDto } from "../dtos/query.request.dto";
 import { UserResponseDto } from "../dtos/user.response.dto";
 import { UserMapper } from "../../infrastructure/mapper/user.mapper";
-import { CreateUserRequestDto } from "../dtos/create.request.dto";
+import { UserCreateRequestDto } from "../dtos/create.request.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CreateUserUseCase } from "../../application/use-case/create.use-case";
 import { UserEntity, UserRole } from "../../domain/entities/user.entity";
@@ -25,7 +27,7 @@ import { RoleValueObject } from "../../domain/value-object/role.vo";
 import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { DeleteUserUseCase } from "../../application/use-case/delete.use-case";
-import { UpdateUserRequestDto } from "../dtos/update.request.dto";
+import { UserUpdateRequestDto } from "../dtos/update.request.dto";
 import { UpdateUserUseCase } from "../../application/use-case/update.use-case";
 import { FindUserIdUseCase } from "../../application/use-case/find-id.use-case";
 
@@ -75,7 +77,7 @@ export class UserController {
   @Post()
   @UseInterceptors(FileInterceptor("avatarImage"))
   public async create(
-    @Body() createUserRequestDto: CreateUserRequestDto,
+    @Body() createUserRequestDto: UserCreateRequestDto,
     @UploadedFile() avatarImage: Express.Multer.File,
   ): Promise<UserResponseDto> {
     // create the user entity
@@ -95,6 +97,69 @@ export class UserController {
 
     // return the user response dto
     return userResponseDto;
+  }
+
+  /**
+   * Get the current user
+   */
+  @Get("me")
+  public getCurrentUser(@Request() request: ExpressRequest): UserResponseDto {
+    const userObj: UserEntity = request.user as UserEntity;
+    return UserMapper.toResponseDto(userObj);
+  }
+
+  /**
+   * Update the current user
+   */
+  @Put("me")
+  @UseInterceptors(FileInterceptor("avatarImage"))
+  public async updateCurrentUser(
+    @Request() request: ExpressRequest,
+    @Body() updateUserRequestDto: UserUpdateRequestDto,
+    @UploadedFile() avatarImage: Express.Multer.File,
+  ): Promise<UserResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
+
+    // update the user
+    const updatedUser: UserEntity = await this.updateUserUseCase.execute(
+      userId,
+      updateUserRequestDto.username,
+      updateUserRequestDto.email
+        ? new EmailValueObject(updateUserRequestDto.email)
+        : null,
+      updateUserRequestDto.password
+        ? new PasswordValueObject(updateUserRequestDto.password)
+        : null,
+      updateUserRequestDto.role
+        ? new RoleValueObject(updateUserRequestDto.role)
+        : null,
+      avatarImage
+        ? new ImageValueObject(avatarImage.buffer, avatarImage.mimetype)
+        : null,
+    );
+
+    // map the updated user to the user response dto
+    return UserMapper.toResponseDto(updatedUser);
+  }
+
+  /**
+   * Delete the current user
+   */
+  @Delete("me")
+  public async deleteCurrentUser(
+    @Request() request: ExpressRequest,
+  ): Promise<{ success: boolean }> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
+
+    // delete the user
+    const result: boolean = await this.deleteUserUseCase.execute(userId);
+
+    // return the result
+    return { success: result };
   }
 
   /**
@@ -126,7 +191,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor("avatarImage"))
   public async update(
     @Param("id") id: string,
-    @Body() updateUserRequestDto: UpdateUserRequestDto,
+    @Body() updateUserRequestDto: UserUpdateRequestDto,
     @UploadedFile() avatarImage: Express.Multer.File,
   ): Promise<UserResponseDto> {
     const userEntity: UserEntity = await this.updateUserUseCase.execute(

@@ -18,9 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate:api": "npx swagger-typescript-api generate -p http://localhost:3000/api-docs-json -o ../client/src/lib/api/ --name api.ts --axios",
+    "generate:api": "npx swagger-typescript-api generate -p http://localhost:3000/api-docs-json -o ../progress-tracker-client/src/lib/api/ --name api.ts --axios",
     "prisma:merge": "concat-cli -f src/modules/database/postgresql/prisma/*.prisma -o dist/prisma.prisma",
-    "prisma:generate": "npm run prisma:merge && npx prisma generate --schema=dist/prisma.prisma",
+    "generate:prisma": "npm run prisma:merge && npx prisma generate --schema=dist/prisma.prisma",
     "prisma:docs": "npm run prisma:generate && npx prisma-docs-generator serve"
   },
   "dependencies": {

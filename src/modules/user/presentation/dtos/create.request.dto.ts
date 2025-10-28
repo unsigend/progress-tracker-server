@@ -12,7 +12,7 @@ import { UserRole } from "../../domain/entities/user.entity";
  * Create user request dto
  * @description Create user request dto
  */
-export class CreateUserRequestDto {
+export class UserCreateRequestDto {
   /** The username of the user */
   @IsString()
   @IsNotEmpty()

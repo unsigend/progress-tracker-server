@@ -1,18 +1,12 @@
 // import dependencies
-import {
-  Controller,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-  Delete,
-  Body,
-} from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Controller, Post, UploadedFile, Delete, Body } from "@nestjs/common";
 import { UrlValueObject } from "@shared/domain/value-object/url.vo";
 import { UploadImageUseCase } from "../../application/use-case/upload-image.use-case";
 import { DeleteFileUseCase } from "../../application/use-case/delete-file.use-case";
 import { UploadFileUseCase } from "../../application/use-case/upload-file.use-case";
 import { UploadAvatarUseCase } from "../../application/use-case/upload-avatar.use-case";
+import { ApiFileUpload } from "@shared/platforms/decorators/api-file-upload.decorator";
+import { FileDeleteRequestDto } from "../dtos/file-delete.request.dto";
 
 /**
  * Cloud controller
@@ -40,7 +34,10 @@ export class CloudController {
    * @returns The URL of the uploaded file
    */
   @Post("upload")
-  @UseInterceptors(FileInterceptor("file"))
+  @ApiFileUpload({
+    fieldName: "file",
+    summary: "Upload a file to cloud storage",
+  })
   public async upload(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ url: string }> {
@@ -54,7 +51,10 @@ export class CloudController {
    * @returns The URL of the uploaded image
    */
   @Post("upload/image")
-  @UseInterceptors(FileInterceptor("image"))
+  @ApiFileUpload({
+    fieldName: "image",
+    summary: "Upload an image to cloud storage",
+  })
   public async uploadImage(
     @UploadedFile() image: Express.Multer.File,
   ): Promise<{ url: string }> {
@@ -68,7 +68,10 @@ export class CloudController {
    * @returns The URL of the uploaded avatar
    */
   @Post("upload/avatar")
-  @UseInterceptors(FileInterceptor("avatar"))
+  @ApiFileUpload({
+    fieldName: "avatar",
+    summary: "Upload an avatar to cloud storage",
+  })
   public async uploadAvatar(
     @UploadedFile() avatar: Express.Multer.File,
   ): Promise<{ url: string }> {
@@ -82,8 +85,10 @@ export class CloudController {
    * @returns void
    */
   @Delete("delete")
-  public async delete(@Body("url") url: string): Promise<{ success: boolean }> {
-    await this.deleteFileUseCase.execute(new UrlValueObject(url));
+  public async delete(
+    @Body() body: FileDeleteRequestDto,
+  ): Promise<{ success: boolean }> {
+    await this.deleteFileUseCase.execute(new UrlValueObject(body.url));
     return { success: true };
   }
 }

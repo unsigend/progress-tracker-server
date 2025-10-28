@@ -20,13 +20,13 @@ import { BookMapper } from "../../infrastructure/mapper/book.mapper";
 import { FindBookIdUseCase } from "../../application/use-case/book/find-id.use-case";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { CreateBookRequestDto } from "../dtos/book/create.request.dto";
+import { BookCreateRequestDto } from "../dtos/book/create.request.dto";
 import { CreateBookUseCase } from "../../application/use-case/book/create.use-case";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
 import { ISBNValueObject } from "../../domain/object-value/isbn.vo";
 import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { BookEntity } from "../../domain/entities/book.entity";
-import { UpdateBookRequestDto } from "../dtos/book/update.request.dto";
+import { BookUpdateRequestDto } from "../dtos/book/update.request.dto";
 import { UpdateBookUseCase } from "../../application/use-case/book/update.use-case";
 import { DeleteBookUseCase } from "../../application/use-case/book/delete.use-case";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
@@ -80,7 +80,7 @@ export class BookController {
   @UseInterceptors(FileInterceptor("coverImage"))
   public async create(
     @Request() request: ExpressRequest,
-    @Body() createBookRequestDto: CreateBookRequestDto,
+    @Body() createBookRequestDto: BookCreateRequestDto,
     @UploadedFile() coverImage: Express.Multer.File,
   ): Promise<BookResponseDto> {
     // get the user object from the request
@@ -128,7 +128,7 @@ export class BookController {
   @UseInterceptors(FileInterceptor("coverImage"))
   public async update(
     @Param("id") id: string,
-    @Body() updateBookRequestDto: UpdateBookRequestDto,
+    @Body() updateBookRequestDto: BookUpdateRequestDto,
     @UploadedFile() coverImage: Express.Multer.File,
   ): Promise<BookResponseDto> {
     // update the book entity

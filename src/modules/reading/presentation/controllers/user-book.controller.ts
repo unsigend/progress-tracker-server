@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import { CreateUserBookUseCase } from "../../application/use-case/user-book/create.use-case";
 import { DeleteUserBookUseCase } from "../../application/use-case/user-book/delete.use-case";
-import { CreateUserBookRequestDto } from "../dtos/user-book/create.request.dto";
+import { UserBookCreateRequestDto } from "../dtos/user-book/create.request.dto";
 import { UserBookResponseDto } from "../dtos/user-book/user-book.response.dto";
 import { UserBookEntity } from "../../domain/entities/user-book.entity";
 import { UserBookMapper } from "../../infrastructure/mapper/user-book.mapper";
@@ -23,7 +23,7 @@ import { FindAllRecordingsUseCase } from "../../application/use-case/recording/f
 import { RecordingMapper } from "../../infrastructure/mapper/recording.mapper";
 import { RecordingResponseDto } from "../dtos/recording/recording.response.dto";
 import { RecordingQueryRequestDto } from "../dtos/recording/query.request.dto";
-import { CreateRecordingRequestDto } from "../dtos/recording/create.request.dto";
+import { RecordingCreateRequestDto } from "../dtos/recording/create.request.dto";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
 import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
 import { RecordingEntity } from "../../domain/entities/recording.entity";
@@ -89,7 +89,7 @@ export class UserBookController {
   @Post()
   public async create(
     @Request() request: ExpressRequest,
-    @Body() createUserBookRequestDto: CreateUserBookRequestDto,
+    @Body() createUserBookRequestDto: UserBookCreateRequestDto,
   ): Promise<UserBookResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
@@ -159,7 +159,7 @@ export class UserBookController {
   @Post(":id/recordings")
   public async createRecording(
     @Param("id") id: string,
-    @Body() createRecordingRequestDto: CreateRecordingRequestDto,
+    @Body() createRecordingRequestDto: RecordingCreateRequestDto,
   ): Promise<RecordingResponseDto> {
     const recording: RecordingEntity =
       await this.createRecordingUseCase.execute(

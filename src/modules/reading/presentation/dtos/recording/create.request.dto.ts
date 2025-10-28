@@ -11,7 +11,7 @@ import {
  * Create recording request DTO
  * @description Create recording request DTO which is used to create a recording.
  */
-export class CreateRecordingRequestDto {
+export class RecordingCreateRequestDto {
   /** The date of the recording */
   @IsDate()
   @IsNotEmpty()

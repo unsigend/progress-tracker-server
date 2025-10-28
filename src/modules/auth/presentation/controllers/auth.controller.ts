@@ -58,6 +58,16 @@ export class AuthController {
   }
 
   /**
+   * Logout a user
+   */
+  @Post("logout")
+  @Public()
+  public logout(): { success: boolean } {
+    // Nothing to be done in current implementation
+    return { success: true };
+  }
+
+  /**
    * Check if an email is already in use
    */
   @Get("email-check/:email")

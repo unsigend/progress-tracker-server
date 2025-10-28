@@ -5,7 +5,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
  * Create book request DTO
  * @description Create book request DTO which is used to validate the create book request.
  */
-export class CreateBookRequestDto {
+export class BookCreateRequestDto {
   /** The title of the book */
   @IsString()
   @IsNotEmpty()
