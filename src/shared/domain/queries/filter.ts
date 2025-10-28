@@ -24,6 +24,7 @@ export enum FilterOperator {
   CONTAINS = "CONTAINS",
   STARTS_WITH = "STARTS_WITH",
   ENDS_WITH = "ENDS_WITH",
+  BETWEEN = "BETWEEN",
 }
 
 /**

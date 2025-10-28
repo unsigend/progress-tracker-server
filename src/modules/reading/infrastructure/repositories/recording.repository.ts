@@ -129,6 +129,109 @@ export class RecordingRepository implements IRecordingRepository {
   }
 
   /**
+   * Find recordings by user id
+   * @param userId - The user id
+   * @param query - The query
+   * @returns The recordings and the total count of the recordings
+   */
+  public async findByUserId(
+    userId: ObjectIdValueObject,
+    query: QueryBase,
+  ): Promise<{ data: RecordingEntity[]; totalCount: number }> {
+    const { whereClause, orderClause } = this.prismaBuilder.buildClause<
+      Prisma.ReadingRecordWhereInput,
+      Prisma.ReadingRecordOrderByWithRelationInput
+    >(query);
+
+    // composite the where clause with the user id constrain
+    const compositeWhereClause: Prisma.ReadingRecordWhereInput = {
+      AND: [
+        whereClause,
+        {
+          user_book: {
+            user_id: userId.getId(),
+          },
+        },
+      ],
+    };
+
+    // build limit and page
+    const take: number = query.getLimit();
+    const skip: number = (query.getPage() - 1) * take;
+
+    // find the recordings by user id
+    const [totalCount, recordingsModels] = await Promise.all([
+      this.postgresqlService.readingRecord.count({
+        where: compositeWhereClause,
+      }),
+      this.postgresqlService.readingRecord.findMany({
+        where: compositeWhereClause,
+        orderBy: orderClause,
+        take: take,
+        skip: skip,
+      }),
+    ]);
+
+    return {
+      data: recordingsModels.map((recordingModel) =>
+        RecordingMapper.toEntity(recordingModel),
+      ),
+      totalCount: totalCount,
+    };
+  }
+
+  /**
+   * Find aggregated recordings
+   * @param userId - The user id
+   * @param query - The query
+   * @returns The aggregated recordings
+   */
+  public async findAggregated(
+    userId: ObjectIdValueObject,
+    query: QueryBase,
+  ): Promise<{
+    totalMinutes: number;
+    totalPages: number;
+    totalRecordings: number;
+  }> {
+    const { whereClause } = this.prismaBuilder.buildClause<
+      Prisma.ReadingRecordWhereInput,
+      Prisma.ReadingRecordOrderByWithRelationInput
+    >(query);
+
+    // composite the where clause with the user id constrain
+    const compositeWhereClause: Prisma.ReadingRecordWhereInput = {
+      AND: [
+        whereClause,
+        {
+          user_book: {
+            user_id: userId.getId(),
+          },
+        },
+      ],
+    };
+
+    // aggregate the recordings
+    const aggregatedResult =
+      await this.postgresqlService.readingRecord.aggregate({
+        where: compositeWhereClause,
+        _sum: {
+          minutes: true,
+          pages: true,
+        },
+        _count: {
+          id: true,
+        },
+      });
+
+    return {
+      totalMinutes: aggregatedResult._sum.minutes ?? 0,
+      totalPages: aggregatedResult._sum.pages ?? 0,
+      totalRecordings: aggregatedResult._count.id ?? 0,
+    };
+  }
+
+  /**
    * Delete a recording by id
    * @param id - The id of the recording
    * @returns True if the recording was deleted, false otherwise

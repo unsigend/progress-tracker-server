@@ -9,6 +9,7 @@ import { CloudModule } from "@modules/cloud/cloud.module";
 import { DatabaseModule } from "@modules/database/database.module";
 import { InfrastructureModule } from "@shared/infrastructure/infrastructure.module";
 import { ReadingModule } from "@modules/reading/reading.module";
+import { StatisticsModule } from "@modules/statistics/statistics.module";
 import { AuthModule } from "@modules/auth/auth.module";
 
 // import guards
@@ -45,6 +46,7 @@ import postgresqlConfig from "@modules/database/postgresql/config/postgresql.con
     UserModule,
     ReadingModule,
     CloudModule,
+    StatisticsModule,
   ],
   controllers: [],
   providers: [JwtAuthGuard, JwtStrategy],

@@ -1,4 +1,5 @@
 // import dependencies
+import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
 import { Injectable } from "@nestjs/common";
 
 // import queries
@@ -11,6 +12,7 @@ import { FilterLogic, FilterOperator } from "@shared/domain/queries/filter";
  */
 @Injectable()
 export class PrismaService {
+  private readonly NULL_STRING = "null" as const;
   constructor() {}
 
   /**
@@ -42,13 +44,28 @@ export class PrismaService {
         return "startsWith";
       case FilterOperator.ENDS_WITH:
         return "endsWith";
+      case FilterOperator.BETWEEN:
+        return this.NULL_STRING;
       default:
         return operator;
     }
   }
 
   /**
-   * Build clause from query
+   * Build clauses from query
+   * @param query - The query object
+   * @returns The where clause and the order clause
+   * @description The where clause is an object with the fields and the values to filter on
+   *  will build the where clause and order clause
+   *  the where clause format like eg:
+   *  {
+   *    AND | OR: [
+   *      {
+   *        field: { operator: value },
+   *      },
+   *      ...
+   *    ]
+   *  }
    */
   buildClause<WhereClauseGeneric = any, OrderClauseGeneric = any>(
     query: QueryBase,
@@ -71,26 +88,42 @@ export class PrismaService {
 
     // build where clause items
     for (const filter of query.getFilters()) {
-      const filedClause: Record<string, any> = {
-        [this.mapOperatorToPrisma(filter.operator)]: filter.value as Record<
-          string,
-          any
-        >,
-      };
+      // special case for between operator
+      if (filter.operator === FilterOperator.BETWEEN) {
+        if (!Array.isArray(filter.value) || filter.value.length !== 2) {
+          throw new ValidationException(
+            "BETWEEN operator requires array with [start, end]",
+          );
+        }
 
-      if (
-        [
-          FilterOperator.CONTAINS,
-          FilterOperator.STARTS_WITH,
-          FilterOperator.ENDS_WITH,
-        ].includes(filter.operator)
-      ) {
-        filedClause["mode"] = "insensitive";
+        whereClauseItems.push({
+          [filter.field]: {
+            gte: (filter.value as unknown[])[0],
+            lte: (filter.value as unknown[])[1],
+          },
+        });
+      } else {
+        const filedClause: Record<string, any> = {
+          [this.mapOperatorToPrisma(filter.operator)]: filter.value as Record<
+            string,
+            any
+          >,
+        };
+
+        if (
+          [
+            FilterOperator.CONTAINS,
+            FilterOperator.STARTS_WITH,
+            FilterOperator.ENDS_WITH,
+          ].includes(filter.operator)
+        ) {
+          filedClause["mode"] = "insensitive";
+        }
+
+        whereClauseItems.push({
+          [filter.field]: filedClause,
+        });
       }
-
-      whereClauseItems.push({
-        [filter.field]: filedClause,
-      });
     }
 
     // connect the clauses using logic
