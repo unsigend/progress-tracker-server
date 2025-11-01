@@ -30,6 +30,8 @@ import { BookUpdateRequestDto } from "../dtos/book/update.request.dto";
 import { UpdateBookUseCase } from "../../application/use-case/book/update.use-case";
 import { DeleteBookUseCase } from "../../application/use-case/book/delete.use-case";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { ApiStandardResponse } from "@/shared/platforms/decorators/api-response.decorator";
+import { BooksResponseDto } from "../dtos/book/books.response.dto";
 
 /**
  * Book controller
@@ -56,9 +58,11 @@ export class BookController {
    * Find all books
    */
   @Get()
+  @ApiStandardResponse(BooksResponseDto)
   public async findAll(
     @Query() query: BookQueryRequestDto,
-  ): Promise<{ data: BookResponseDto[]; totalCount: number }> {
+  ): Promise<BooksResponseDto> {
+    // find all books
     const { data, totalCount } = await this.findAllBooksUseCase.execute(
       query.field,
       query.value,
@@ -67,10 +71,12 @@ export class BookController {
       query.sort,
       query.order,
     );
-    return {
-      data: data.map((book) => BookMapper.toResponseDto(book)),
-      totalCount,
-    };
+    // map the books to the book response dtos
+    const bookResponseDtos: BookResponseDto[] = data.map((book) =>
+      BookMapper.toResponseDto(book),
+    );
+    // return the books and the total count of the books
+    return { books: bookResponseDtos, totalCount };
   }
 
   /**

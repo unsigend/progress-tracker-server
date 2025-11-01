@@ -11,6 +11,7 @@ import { EmailValueObject } from "@/modules/user/domain/value-object/email.vo";
 import { PasswordValueObject } from "@/modules/user/domain/value-object/password.vo";
 import { LoginRequestDto } from "../dtos/login.request.dto";
 import { EmailCheckUseCase } from "../../application/use-case/email-check.use-case";
+import { EmailCheckResponseDto } from "../dtos/email-check.response.dto";
 
 /**
  * Auth controller
@@ -74,10 +75,10 @@ export class AuthController {
   @Public()
   public async emailCheck(
     @Param("email") email: string,
-  ): Promise<{ exists: boolean }> {
+  ): Promise<EmailCheckResponseDto> {
     const isEmailInUse: boolean = await this.emailCheckUseCase.execute(
       new EmailValueObject(email),
     );
-    return { exists: isEmailInUse };
+    return { isAvailable: !isEmailInUse };
   }
 }

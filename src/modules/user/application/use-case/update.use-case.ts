@@ -12,10 +12,12 @@ import { RoleValueObject } from "../../domain/value-object/role.vo";
 import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { CLOUD_TOKEN } from "@/modules/cloud/domain/cloud.service";
-import { Inject } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import type { ICloud } from "@/modules/cloud/domain/cloud.service";
 import { IMAGE_COMPRESSOR_TOKEN } from "@shared/domain/services/image-compress.service";
 import type { IImageCompress } from "@shared/domain/services/image-compress.service";
+import { PASSWORD_HASHER_TOKEN } from "../../domain/services/password-hash.service";
+import type { IPasswordHasher } from "../../domain/services/password-hash.service";
 
 /**
  * Update user use case
@@ -32,6 +34,8 @@ export class UpdateUserUseCase {
     @Inject(CLOUD_TOKEN) private readonly cloudService: ICloud,
     @Inject(IMAGE_COMPRESSOR_TOKEN)
     private readonly imageCompressor: IImageCompress,
+    @Inject(PASSWORD_HASHER_TOKEN)
+    private readonly passwordHasher: IPasswordHasher,
   ) {}
 
   /**
@@ -70,7 +74,12 @@ export class UpdateUserUseCase {
 
     // if the password is provided
     if (password) {
-      user.setPassword(password);
+      // hash the password
+      const hashedPassword: PasswordValueObject =
+        await this.passwordHasher.hash(
+          new PasswordValueObject(password.getPassword()),
+        );
+      user.setPassword(hashedPassword);
     }
 
     // if the role is provided

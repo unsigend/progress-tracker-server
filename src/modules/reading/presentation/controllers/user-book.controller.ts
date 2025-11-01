@@ -31,6 +31,9 @@ import { CreateRecordingUseCase } from "../../application/use-case/recording/cre
 import { DeleteRecordingsUseCase } from "../../application/use-case/recording/delete.use-case";
 import { type Request as ExpressRequest } from "express";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { UserBooksResponseDto } from "../dtos/user-book/user-books.response.dto";
+import { ApiStandardResponse } from "@/shared/platforms/decorators/api-response.decorator";
+
 /**
  * User book controller
  * @description User book controller which is used to handle the user book requests.
@@ -56,10 +59,11 @@ export class UserBookController {
    * Find all user books
    */
   @Get()
+  @ApiStandardResponse(UserBooksResponseDto)
   public async findAll(
     @Request() request: ExpressRequest,
     @Query() userBookQueryRequestDto: UserBookQueryRequestDto,
-  ): Promise<{ data: UserBookResponseDto[]; totalCount: number }> {
+  ): Promise<UserBooksResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
     const userId: ObjectIdValueObject = userObj.getId();
@@ -80,7 +84,7 @@ export class UserBookController {
     );
 
     // return the user books and the total count of the user books
-    return { data: userBookResponseDtos, totalCount };
+    return { userBooks: userBookResponseDtos, totalCount };
   }
 
   /**
