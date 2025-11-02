@@ -17,6 +17,7 @@ import {
 } from "@shared/domain/services/image-compress.service";
 import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
+import { ConflictException } from "@/shared/domain/exceptions/conflict.exception";
 
 /**
  * Update book use case
@@ -79,11 +80,23 @@ export class UpdateBookUseCase {
 
     // if the ISBN10 is provided
     if (isbn10) {
+      // check if the same book with this ISBN10 already exists
+      const existingBook: BookEntity | null =
+        await this.bookRepository.findByISBN10(isbn10.getISBN());
+      if (existingBook) {
+        throw new ConflictException("Book with ISBN10 already exists");
+      }
       book.setISBN10(isbn10);
     }
 
     // if the ISBN13 is provided
     if (isbn13) {
+      // check if the same book with this ISBN13 already exists
+      const existingBook: BookEntity | null =
+        await this.bookRepository.findByISBN13(isbn13.getISBN());
+      if (existingBook) {
+        throw new ConflictException("Book with ISBN13 already exists");
+      }
       book.setISBN13(isbn13);
     }
 

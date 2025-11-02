@@ -11,7 +11,6 @@ import {
   Param,
   Put,
   Request,
-  Logger,
 } from "@nestjs/common";
 import { type Request as ExpressRequest } from "express";
 import { FindAllUsersUseCase } from "../../application/use-case/find-all.use-case";

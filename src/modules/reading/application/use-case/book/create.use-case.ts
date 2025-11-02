@@ -6,6 +6,7 @@ import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { Inject } from "@nestjs/common";
+import { ConflictException } from "@/shared/domain/exceptions/conflict.exception";
 import {
   BOOK_REPOSITORY_TOKEN,
   type IBookRepository,
@@ -49,6 +50,24 @@ export class CreateBookUseCase {
     isbn13?: ISBNValueObject | null,
     coverImage?: ImageValueObject | null,
   ): Promise<BookEntity> {
+    // check if the book with ISBN10 exists
+    if (isbn10) {
+      const existingBook: BookEntity | null =
+        await this.bookRepository.findByISBN10(isbn10.getISBN());
+      if (existingBook) {
+        throw new ConflictException("Book with ISBN10 already exists");
+      }
+    }
+
+    // check if the book with ISBN13 exists
+    if (isbn13) {
+      const existingBook: BookEntity | null =
+        await this.bookRepository.findByISBN13(isbn13.getISBN());
+      if (existingBook) {
+        throw new ConflictException("Book with ISBN13 already exists");
+      }
+    }
+
     // if the cover image is provided
     let coverUrl: UrlValueObject | null = null;
 
