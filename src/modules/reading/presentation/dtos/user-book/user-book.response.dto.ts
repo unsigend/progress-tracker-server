@@ -1,4 +1,5 @@
 import { ReadingStatus } from "@/modules/reading/domain/entities/user-book.entity";
+import { BookResponseDto } from "../book/book.response.dto";
 
 /**
  * User book response dto
@@ -34,4 +35,7 @@ export class UserBookResponseDto {
 
   /** The updated at of the user book */
   updatedAt: Date;
+
+  /** The book of the user book */
+  book: BookResponseDto | null;
 }

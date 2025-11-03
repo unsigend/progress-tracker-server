@@ -59,7 +59,7 @@ export class BookMapper {
    * @param book - The book entity to map
    * @returns The book response dto
    */
-  public static toResponseDto(book: BookEntity): BookResponseDto {
+  public static toDto(book: BookEntity): BookResponseDto {
     return {
       id: book.getId().getId(),
       title: book.getTitle(),

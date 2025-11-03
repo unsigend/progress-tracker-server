@@ -73,7 +73,7 @@ export class BookController {
     );
     // map the books to the book response dtos
     const bookResponseDtos: BookResponseDto[] = data.map((book) =>
-      BookMapper.toResponseDto(book),
+      BookMapper.toDto(book),
     );
     // return the books and the total count of the books
     return { books: bookResponseDtos, totalCount };
@@ -112,7 +112,7 @@ export class BookController {
     );
 
     // map the book entity to the book response dto
-    return BookMapper.toResponseDto(book);
+    return BookMapper.toDto(book);
   }
 
   /**
@@ -124,7 +124,7 @@ export class BookController {
       new ObjectIdValueObject(id),
     );
     // map the book entity to the book response dto
-    return BookMapper.toResponseDto(book);
+    return BookMapper.toDto(book);
   }
 
   /**
@@ -156,7 +156,7 @@ export class BookController {
         ? new ImageValueObject(coverImage.buffer, coverImage.mimetype)
         : null,
     );
-    return BookMapper.toResponseDto(book);
+    return BookMapper.toDto(book);
   }
 
   /**

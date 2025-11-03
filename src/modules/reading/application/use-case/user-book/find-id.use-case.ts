@@ -1,10 +1,10 @@
-// import dependencies
 import { Inject, Injectable } from "@nestjs/common";
 import { USER_BOOK_REPOSITORY_TOKEN } from "@/modules/reading/domain/repositories/user-book.repository";
 import { type IUserBookRepository } from "@/modules/reading/domain/repositories/user-book.repository";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { UserBookEntity } from "@/modules/reading/domain/entities/user-book.entity";
 import { NotFoundException } from "@/shared/domain/exceptions/not-found.exception";
+
 /**
  * Find user book id use case
  * @description Find user book by id use case which is used to find a user book by id.

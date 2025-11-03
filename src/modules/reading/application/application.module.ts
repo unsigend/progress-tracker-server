@@ -13,6 +13,8 @@ import { CreateUserBookUseCase } from "./use-case/user-book/create.use-case";
 import { DeleteUserBookUseCase } from "./use-case/user-book/delete.use-case";
 import { FindAllUserBooksUseCase } from "./use-case/user-book/find-all.use-case";
 import { FindUserBookIdUseCase } from "./use-case/user-book/find-id.use-case";
+import { FindAllUserBooksWithBookUseCase } from "./use-case/user-book/find-all-with-book.use-case";
+import { FindUserBookIdWithBookUseCase } from "./use-case/user-book/find-id-with-book.use-case";
 
 // import recording use cases
 import { FindAllRecordingsUseCase } from "./use-case/recording/find-all.use-case";
@@ -30,6 +32,8 @@ const userBookUseCases = [
   DeleteUserBookUseCase,
   FindAllUserBooksUseCase,
   FindUserBookIdUseCase,
+  FindAllUserBooksWithBookUseCase,
+  FindUserBookIdWithBookUseCase,
 ];
 
 // import book use cases

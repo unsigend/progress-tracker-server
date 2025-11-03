@@ -11,6 +11,8 @@ import {
 import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
 import { UserBookResponseDto } from "../../presentation/dtos/user-book/user-book.response.dto";
+import { BookMapper } from "./book.mapper";
+import { BookEntity } from "@/modules/reading/domain/entities/book.entity";
 /**
  * User book mapper
  * @description User book mapper which is used to map the user book
@@ -90,9 +92,13 @@ export class UserBookMapper {
   /**
    * Map a user book entity to a user book response dto
    * @param userBook - The user book entity to map
+   * @param book - The book entity to map
    * @returns The user book response dto
    */
-  public static toDtoUserBook(userBook: UserBookEntity): UserBookResponseDto {
+  public static toDto(
+    userBook: UserBookEntity,
+    book?: BookEntity,
+  ): UserBookResponseDto {
     return {
       id: userBook.getId().getId(),
       bookId: userBook.getBookId().getId(),
@@ -104,6 +110,27 @@ export class UserBookMapper {
       totalDays: userBook.getTotalDays(),
       createdAt: userBook.getCreatedAt(),
       updatedAt: userBook.getUpdatedAt(),
+      book: book ? BookMapper.toDto(book) : null,
     };
+  }
+
+  /**
+   * Map a sort to a sort model
+   * @param sort - The sort to map
+   * @returns The sort model
+   */
+  public static toSort(
+    sort: "createdAt" | "updatedAt" | "completedDate" | "startDate",
+  ): string {
+    switch (sort) {
+      case "createdAt":
+        return "createdAt";
+      case "updatedAt":
+        return "updatedAt";
+      case "completedDate":
+        return "completed_date";
+      case "startDate":
+        return "start_date";
+    }
   }
 }

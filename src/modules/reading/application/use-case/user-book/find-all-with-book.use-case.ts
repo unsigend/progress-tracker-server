@@ -1,24 +1,26 @@
-// import dependencies
+import { Injectable } from "@nestjs/common";
 import { type IUserBookRepository } from "@/modules/reading/domain/repositories/user-book.repository";
-import { Inject, Injectable } from "@nestjs/common";
 import { USER_BOOK_REPOSITORY_TOKEN } from "@/modules/reading/domain/repositories/user-book.repository";
-import { UserBookEntity } from "@/modules/reading/domain/entities/user-book.entity";
-import { QueryBase } from "@/shared/domain/queries/base.query";
+import { Inject } from "@nestjs/common";
 import {
   FilterLogic,
   FilterOperator,
   Filters,
 } from "@/shared/domain/queries/filter";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
+import { QueryBase } from "@/shared/domain/queries/base.query";
+import { UserBookEntity } from "@/modules/reading/domain/entities/user-book.entity";
+import { BookEntity } from "@/modules/reading/domain/entities/book.entity";
 import { UserBookMapper } from "@/modules/reading/infrastructure/mapper/user-book.mapper";
+
 /**
- * Find all user books use case
- * @description Find all user books use case which is used to find all user books.
+ * Find all user books with book use case
+ * @description Find all user books with book use case which is used to find all user books with book.
  */
 @Injectable()
-export class FindAllUserBooksUseCase {
+export class FindAllUserBooksWithBookUseCase {
   /**
-   * Constructor for FindAllUserBooksUseCase
+   * Constructor for FindAllUserBooksWithBookUseCase
    * @param userBookRepository - The user book repository
    */
   constructor(
@@ -27,9 +29,15 @@ export class FindAllUserBooksUseCase {
   ) {}
 
   /**
-   * Execute the find all user books use case
-   * @param query - The query to find the user books
-   * @returns The user books
+   * Execute the find all user books with book use case
+   * @param userId - The user id
+   * @param field - The field to query
+   * @param value - The value to query
+   * @param limit - The limit of the user books
+   * @param page - The page of the user books
+   * @param sort - The sort of the user books
+   * @param order - The order of the user books
+   * @returns The user books and the total count of the user books
    */
   public async execute(
     userId: ObjectIdValueObject,
@@ -39,7 +47,10 @@ export class FindAllUserBooksUseCase {
     page?: number,
     sort?: "createdAt" | "updatedAt" | "completedDate" | "startDate",
     order?: "asc" | "desc",
-  ): Promise<{ data: UserBookEntity[]; totalCount: number }> {
+  ): Promise<{
+    data: Array<{ userBook: UserBookEntity; book: BookEntity }>;
+    totalCount: number;
+  }> {
     // build the filters
     const filters: Filters = [];
     if (field && value) {
@@ -67,8 +78,9 @@ export class FindAllUserBooksUseCase {
       order,
     );
 
-    // find all user books
-    const { data, totalCount } = await this.userBookRepository.findAll(query);
+    // find all user books with book
+    const { data, totalCount } =
+      await this.userBookRepository.findAllWithBook(query);
 
     // return the user books and the total count of the user books
     return { data, totalCount };

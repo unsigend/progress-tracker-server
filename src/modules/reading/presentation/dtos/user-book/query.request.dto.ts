@@ -1,5 +1,6 @@
 // import dependencies
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform } from "class-transformer";
 
 /**
  * User book query request DTO
@@ -19,7 +20,8 @@ export class UserBookQueryRequestDto {
   /** The sort to query */
   @IsOptional()
   @IsString()
-  sort?: string;
+  @IsIn(["createdAt", "updatedAt", "completedDate", "startDate"] as const)
+  sort?: "createdAt" | "updatedAt" | "completedDate" | "startDate";
 
   /** The order to query */
   @IsOptional()
@@ -35,4 +37,11 @@ export class UserBookQueryRequestDto {
   @IsOptional()
   @IsNumber()
   page?: number;
+
+  /** The expand to query */
+  @IsOptional()
+  @Transform(({ value }) => {
+    return value === "true" || value === true;
+  })
+  expand: boolean = false;
 }

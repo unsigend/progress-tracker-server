@@ -33,6 +33,11 @@ import { type Request as ExpressRequest } from "express";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 import { UserBooksResponseDto } from "../dtos/user-book/user-books.response.dto";
 import { ApiStandardResponse } from "@/shared/platforms/decorators/api-response.decorator";
+import { FindAllUserBooksWithBookUseCase } from "../../application/use-case/user-book/find-all-with-book.use-case";
+import { FindUserBookIdWithBookUseCase } from "../../application/use-case/user-book/find-id-with-book.use-case";
+import { BookEntity } from "../../domain/entities/book.entity";
+import { FindIdQueryRequestDto } from "../dtos/user-book/find-id-query.request.dto";
+import { RecordingsResponseDto } from "../dtos/recording/recordings.response.dto";
 
 /**
  * User book controller
@@ -50,6 +55,8 @@ export class UserBookController {
     private readonly deleteUserBookUseCase: DeleteUserBookUseCase,
     private readonly findAllUserBooksUseCase: FindAllUserBooksUseCase,
     private readonly findUserBookIdUseCase: FindUserBookIdUseCase,
+    private readonly findAllUserBooksWithBookUseCase: FindAllUserBooksWithBookUseCase,
+    private readonly findUserBookIdWithBookUseCase: FindUserBookIdWithBookUseCase,
     private readonly findAllRecordingsUseCase: FindAllRecordingsUseCase,
     private readonly createRecordingUseCase: CreateRecordingUseCase,
     private readonly deleteRecordingsUseCase: DeleteRecordingsUseCase,
@@ -62,29 +69,53 @@ export class UserBookController {
   @ApiStandardResponse(UserBooksResponseDto)
   public async findAll(
     @Request() request: ExpressRequest,
-    @Query() userBookQueryRequestDto: UserBookQueryRequestDto,
+    @Query() queryRequestDto: UserBookQueryRequestDto,
   ): Promise<UserBooksResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
     const userId: ObjectIdValueObject = userObj.getId();
 
-    const { data, totalCount } = await this.findAllUserBooksUseCase.execute(
-      userId,
-      userBookQueryRequestDto.field,
-      userBookQueryRequestDto.value,
-      userBookQueryRequestDto.limit,
-      userBookQueryRequestDto.page,
-      userBookQueryRequestDto.sort,
-      userBookQueryRequestDto.order,
-    );
+    if (queryRequestDto.expand) {
+      const { data, totalCount } =
+        await this.findAllUserBooksWithBookUseCase.execute(
+          userId,
+          queryRequestDto.field,
+          queryRequestDto.value,
+          queryRequestDto.limit,
+          queryRequestDto.page,
+          queryRequestDto.sort,
+          queryRequestDto.order,
+        );
 
-    // map the user books to the user book response dtos
-    const userBookResponseDtos: UserBookResponseDto[] = data.map((userBook) =>
-      UserBookMapper.toDtoUserBook(userBook),
-    );
+      // map the user books to the user book response dtos
+      const userBookResponseDtos: UserBookResponseDto[] = data.map(
+        (userBookWithBook) =>
+          UserBookMapper.toDto(
+            userBookWithBook.userBook,
+            userBookWithBook.book,
+          ),
+      );
 
-    // return the user books and the total count of the user books
-    return { userBooks: userBookResponseDtos, totalCount };
+      // return the user books with books and the total count of the user books with books
+      return { userBooks: userBookResponseDtos, totalCount };
+    } else {
+      const { data, totalCount } = await this.findAllUserBooksUseCase.execute(
+        userId,
+        queryRequestDto.field,
+        queryRequestDto.value,
+        queryRequestDto.limit,
+        queryRequestDto.page,
+        queryRequestDto.sort,
+        queryRequestDto.order,
+      );
+      // map the user books to the user book response dtos
+      const userBookResponseDtos: UserBookResponseDto[] = data.map((userBook) =>
+        UserBookMapper.toDto(userBook),
+      );
+
+      // return the user books and the total count of the user books
+      return { userBooks: userBookResponseDtos, totalCount };
+    }
   }
 
   /**
@@ -103,18 +134,32 @@ export class UserBookController {
       new ObjectIdValueObject(createUserBookRequestDto.bookId),
       userId,
     );
-    return UserBookMapper.toDtoUserBook(userBook);
+    return UserBookMapper.toDto(userBook);
   }
 
   /**
    * Find a user book by id
    */
   @Get(":id")
-  public async findById(@Param("id") id: string): Promise<UserBookResponseDto> {
-    const userBook: UserBookEntity = await this.findUserBookIdUseCase.execute(
-      new ObjectIdValueObject(id),
-    );
-    return UserBookMapper.toDtoUserBook(userBook);
+  public async findById(
+    @Query() findIdQueryRequestDto: FindIdQueryRequestDto,
+    @Param("id") id: string,
+  ): Promise<UserBookResponseDto> {
+    if (findIdQueryRequestDto.expand) {
+      const userBookWithBook: { userBook: UserBookEntity; book: BookEntity } =
+        await this.findUserBookIdWithBookUseCase.execute(
+          new ObjectIdValueObject(id),
+        );
+      return UserBookMapper.toDto(
+        userBookWithBook.userBook,
+        userBookWithBook.book,
+      );
+    } else {
+      const userBook: UserBookEntity = await this.findUserBookIdUseCase.execute(
+        new ObjectIdValueObject(id),
+      );
+      return UserBookMapper.toDto(userBook);
+    }
   }
 
   /**
@@ -132,10 +177,11 @@ export class UserBookController {
    * Find all recordings
    */
   @Get(":id/recordings")
+  @ApiStandardResponse(RecordingsResponseDto)
   public async findRecordings(
     @Param("id") id: string,
     @Query() recordingQueryRequestDto: RecordingQueryRequestDto,
-  ): Promise<{ data: RecordingResponseDto[]; totalCount: number }> {
+  ): Promise<RecordingsResponseDto> {
     // get all recordings based on the user book id
     const { data, totalCount } = await this.findAllRecordingsUseCase.execute(
       new ObjectIdValueObject(id),
@@ -152,7 +198,7 @@ export class UserBookController {
 
     // return the recordings and the total count of the recordings
     return {
-      data: recordingResponseDtos,
+      recordings: recordingResponseDtos,
       totalCount,
     };
   }
