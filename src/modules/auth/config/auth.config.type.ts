@@ -13,4 +13,20 @@ export class AuthConfigType {
   @IsString()
   @IsNotEmpty()
   GITHUB_CLIENT_SECRET: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GITHUB_FRONTEND_CALLBACK_POSTFIX: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_ID: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_SECRET: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_FRONTEND_CALLBACK_POSTFIX: string;
 }

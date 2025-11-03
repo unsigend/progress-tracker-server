@@ -74,6 +74,7 @@ export class UserEntity {
     password: PasswordValueObject,
     role?: RoleValueObject | null,
     avatarUrl?: UrlValueObject | null,
+    provider?: ProviderValueObject | null,
   ): UserEntity {
     return new UserEntity(
       username,
@@ -81,7 +82,7 @@ export class UserEntity {
       password,
       null,
       role,
-      null,
+      provider,
       avatarUrl,
     );
   }

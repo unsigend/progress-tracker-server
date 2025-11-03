@@ -22,6 +22,7 @@ import jwtTokenConfig from "@modules/auth/infrastructure/services/jwt-token/conf
 import resendMailerConfig from "@shared/infrastructure/services/resend-mailer/config/resend-mailer.config";
 import awsS3CloudConfig from "@modules/cloud/infrastructure/aws-s3-cloud/config/aws-s3-cloud.config";
 import postgresqlConfig from "@modules/database/postgresql/config/postgresql.config";
+import authConfig from "@modules/auth/config/auth.config";
 
 /**
  * Application module
@@ -34,6 +35,7 @@ import postgresqlConfig from "@modules/database/postgresql/config/postgresql.con
       load: [
         appConfig,
         postgresqlConfig,
+        authConfig,
         jwtTokenConfig,
         resendMailerConfig,
         awsS3CloudConfig,

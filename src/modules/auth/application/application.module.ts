@@ -10,6 +10,7 @@ import { AuthInfrastructureModule } from "../infrastructure/infrastructure.modul
 import { RegisterUseCase } from "./use-case/register.use-case";
 import { LoginUseCase } from "./use-case/login.use-case";
 import { EmailCheckUseCase } from "./use-case/email-check.use-case";
+import { ConnectUserUseCase } from "./use-case/connect.use-case";
 
 /**
  * Auth application module
@@ -17,7 +18,17 @@ import { EmailCheckUseCase } from "./use-case/email-check.use-case";
  */
 @Module({
   imports: [UserModule, UserInfrastructureModule, AuthInfrastructureModule],
-  providers: [RegisterUseCase, LoginUseCase, EmailCheckUseCase],
-  exports: [RegisterUseCase, LoginUseCase, EmailCheckUseCase],
+  providers: [
+    RegisterUseCase,
+    LoginUseCase,
+    EmailCheckUseCase,
+    ConnectUserUseCase,
+  ],
+  exports: [
+    RegisterUseCase,
+    LoginUseCase,
+    EmailCheckUseCase,
+    ConnectUserUseCase,
+  ],
 })
 export class AuthApplicationModule {}

@@ -130,6 +130,11 @@ export class CreateRecordingUseCase {
       userBook.markAsCompleted(date);
     }
 
+    // check if the recording is early than the start date
+    if (userBook.getStartDate() && userBook.getStartDate()! > date) {
+      userBook.setStartDate(date);
+    }
+
     // save the user book
     await this.userBookRepository.save(userBook);
 

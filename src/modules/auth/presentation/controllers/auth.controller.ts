@@ -1,8 +1,16 @@
 // import dependencies
-import { Controller, Post, Body, Get, Param } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  UseGuards,
+  Req,
+  Res,
+  Inject,
+} from "@nestjs/common";
 import { Public } from "@shared/platforms/decorators/public.decorator";
-
-// import use cases
 import { RegisterUseCase } from "../../application/use-case/register.use-case";
 import { LoginUseCase } from "../../application/use-case/login.use-case";
 import { RegisterRequestDto } from "../dtos/register.request.dto";
@@ -12,7 +20,16 @@ import { PasswordValueObject } from "@/modules/user/domain/value-object/password
 import { LoginRequestDto } from "../dtos/login.request.dto";
 import { EmailCheckUseCase } from "../../application/use-case/email-check.use-case";
 import { EmailCheckResponseDto } from "../dtos/email-check.response.dto";
-
+import { GithubAuthGuard } from "@/shared/platforms/guards/github-auth.guard";
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { type Request as ExpressRequest } from "express";
+import { type Response as ExpressResponse } from "express";
+import {
+  type ITokenService,
+  TOKEN_SERVICE_TOKEN,
+} from "@/modules/auth/domain/services/token.service";
+import { ConfigService } from "@nestjs/config";
+import { GoogleAuthGuard } from "@/shared/platforms/guards/google-auth.guard";
 /**
  * Auth controller
  * @description Auth controller which is used to handle the auth requests
@@ -23,6 +40,9 @@ export class AuthController {
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly emailCheckUseCase: EmailCheckUseCase,
+    @Inject(TOKEN_SERVICE_TOKEN)
+    private readonly tokenService: ITokenService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -80,5 +100,81 @@ export class AuthController {
       new EmailValueObject(email),
     );
     return { isAvailable: !isEmailInUse };
+  }
+
+  /**
+   * Github login entry point
+   */
+  @Get("/login/github")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public github(): void {
+    return;
+  }
+
+  /**
+   * Github callback with access token
+   */
+  @Get("/login/github/callback")
+  @Public()
+  @UseGuards(GithubAuthGuard)
+  public async githubCallback(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ): Promise<void> {
+    // get the user from the request
+    const user: UserEntity = req.user as UserEntity;
+    // generate the access token
+    const accessToken: string = await this.tokenService.generateAccessToken({
+      userId: user.getId().getId(),
+      email: user.getEmail().getEmail(),
+      role: user.getRole().getRole(),
+    });
+    // redirect to the frontend
+    const frontendUrl: string = this.configService.get<string>(
+      "app.APP_FRONTEND_URL",
+    )!;
+    const postfix: string = this.configService.get<string>(
+      "auth.GITHUB_FRONTEND_CALLBACK_POSTFIX",
+    )!;
+    res.redirect(`${frontendUrl}/${postfix}?accessToken=${accessToken}`);
+  }
+
+  /**
+   * Google login entry point
+   */
+  @Get("/login/google")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public google(): void {
+    return;
+  }
+
+  /**
+   * Google callback with access token
+   */
+  @Get("/login/google/callback")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public async googleCallback(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ): Promise<void> {
+    // get the user from the request
+    const user: UserEntity = req.user as UserEntity;
+    // generate the access token
+    const accessToken: string = await this.tokenService.generateAccessToken({
+      userId: user.getId().getId(),
+      email: user.getEmail().getEmail(),
+      role: user.getRole().getRole(),
+    });
+    // redirect to the frontend
+    const frontendUrl: string = this.configService.get<string>(
+      "app.APP_FRONTEND_URL",
+    )!;
+    const postfix: string = this.configService.get<string>(
+      "auth.GOOGLE_FRONTEND_CALLBACK_POSTFIX",
+    )!;
+    res.redirect(`${frontendUrl}/${postfix}?accessToken=${accessToken}`);
   }
 }
