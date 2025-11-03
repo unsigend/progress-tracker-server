@@ -9,6 +9,7 @@ import {
   Req,
   Res,
   Inject,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { Public } from "@shared/platforms/decorators/public.decorator";
 import { RegisterUseCase } from "../../application/use-case/register.use-case";
@@ -30,6 +31,14 @@ import {
 } from "@/modules/auth/domain/services/token.service";
 import { ConfigService } from "@nestjs/config";
 import { GoogleAuthGuard } from "@/shared/platforms/guards/google-auth.guard";
+import { SendCodeRequestDto } from "../dtos/send-code.request.dto";
+import { SendCodeResponseDto } from "../dtos/send-code.response.dto";
+import { VerifyCodeResponseDto } from "../dtos/verify-code.response.dto";
+import { VerifyCodeRequestDto } from "../dtos/verify-code.request.dto";
+import { SendCodeUseCase } from "../../application/use-case/send-code.use-case";
+import { VerifyCodeUseCase } from "../../application/use-case/verify-code.use-case";
+import { ResetPasswordUseCase } from "../../application/use-case/reset-password.use-case";
+import { ResetPasswordRequestDto } from "../dtos/reset-password.request.dto";
 /**
  * Auth controller
  * @description Auth controller which is used to handle the auth requests
@@ -43,6 +52,9 @@ export class AuthController {
     @Inject(TOKEN_SERVICE_TOKEN)
     private readonly tokenService: ITokenService,
     private readonly configService: ConfigService,
+    private readonly sendCodeUseCase: SendCodeUseCase,
+    private readonly verifyCodeUseCase: VerifyCodeUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
   /**
@@ -113,6 +125,16 @@ export class AuthController {
   }
 
   /**
+   * Google login entry point
+   */
+  @Get("/login/google")
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  public google(): void {
+    return;
+  }
+
+  /**
    * Github callback with access token
    */
   @Get("/login/github/callback")
@@ -141,16 +163,6 @@ export class AuthController {
   }
 
   /**
-   * Google login entry point
-   */
-  @Get("/login/google")
-  @Public()
-  @UseGuards(GoogleAuthGuard)
-  public google(): void {
-    return;
-  }
-
-  /**
    * Google callback with access token
    */
   @Get("/login/google/callback")
@@ -176,5 +188,58 @@ export class AuthController {
       "auth.GOOGLE_FRONTEND_CALLBACK_POSTFIX",
     )!;
     res.redirect(`${frontendUrl}/${postfix}?accessToken=${accessToken}`);
+  }
+
+  /**
+   * Send a verify code to a user's email
+   */
+  @Post("verify-code/send")
+  @Public()
+  public async sendCode(
+    @Body() sendCodeRequestDto: SendCodeRequestDto,
+  ): Promise<SendCodeResponseDto> {
+    const resetToken: string = await this.sendCodeUseCase.execute(
+      new EmailValueObject(sendCodeRequestDto.email),
+    );
+    return { resetToken: resetToken };
+  }
+
+  /**
+   * Verify a code
+   */
+  @Post("verify-code/verify")
+  @Public()
+  public async verifyCode(
+    @Body() verifyCodeRequestDto: VerifyCodeRequestDto,
+  ): Promise<VerifyCodeResponseDto> {
+    const { isValid } = await this.verifyCodeUseCase.execute(
+      verifyCodeRequestDto.code,
+      verifyCodeRequestDto.resetToken,
+    );
+    return { isValid: isValid };
+  }
+
+  /**
+   * Reset a user's password
+   */
+  @Post("reset-password")
+  @Public()
+  public async resetPassword(
+    @Body() resetPasswordRequestDto: ResetPasswordRequestDto,
+  ): Promise<void> {
+    // verify the code
+    const { isValid, payload } = await this.verifyCodeUseCase.execute(
+      resetPasswordRequestDto.code,
+      resetPasswordRequestDto.resetToken,
+    );
+    if (!isValid) {
+      throw new UnauthorizedException("Invalid code");
+    }
+
+    // reset the password
+    await this.resetPasswordUseCase.execute(
+      payload!,
+      resetPasswordRequestDto.password,
+    );
   }
 }

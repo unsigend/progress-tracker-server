@@ -1,5 +1,6 @@
 // import entities
 import { UserRole } from "@/modules/user/domain/entities/user.entity";
+import { JwtSignOptions, JwtVerifyOptions } from "@nestjs/jwt";
 
 /**
  * Token service token
@@ -53,4 +54,22 @@ export interface ITokenService {
    * @returns The payload if the token is valid, null otherwise
    */
   verifyRefreshToken(token: string): Promise<ITokenPayload>;
+
+  /**
+   * Sign a payload
+   * @description Sign a payload
+   * @param payload - The payload to be signed
+   * @param options - The options to be used to sign the payload (supports secret property)
+   * @returns The signed payload
+   */
+  sign<T>(payload: T, options: JwtSignOptions): Promise<string>;
+
+  /**
+   * Verify a signed payload
+   * @description Verify a signed payload
+   * @param token - The token to be verified
+   * @param options - The options to be used to verify the token
+   * @returns The verified payload of type T
+   */
+  verify<T>(token: string, options: JwtVerifyOptions): Promise<T>;
 }

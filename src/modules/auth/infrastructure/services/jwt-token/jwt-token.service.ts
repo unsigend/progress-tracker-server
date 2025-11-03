@@ -1,12 +1,8 @@
 // import dependencies
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { JwtService, JwtSignOptions } from "@nestjs/jwt";
-
-// import services
+import { JwtService, JwtSignOptions, JwtVerifyOptions } from "@nestjs/jwt";
 import { ITokenService } from "@/modules/auth/domain/services/token.service";
-
-// import interfaces
 import { ITokenPayload } from "@/modules/auth/domain/services/token.service";
 
 /**
@@ -92,5 +88,27 @@ export class JwtTokenService implements ITokenService {
     return this.jwtService.verifyAsync(token, {
       secret: this.refreshTokenSecret,
     });
+  }
+
+  /**
+   * Sign a payload
+   * @description Sign a payload
+   * @param payload - The payload to be signed
+   * @param options - The options to be used to sign the payload
+   * @returns The signed payload
+   */
+  async sign<T>(payload: T, options: JwtSignOptions): Promise<string> {
+    return this.jwtService.signAsync(payload as object, options);
+  }
+
+  /**
+   * Verify a signed payload
+   * @description Verify a signed payload
+   * @param token - The token to be verified
+   * @param options - The options to be used to verify the token
+   * @returns The verified payload
+   */
+  async verify<T>(token: string, options: JwtVerifyOptions): Promise<T> {
+    return this.jwtService.verifyAsync(token, options) as Promise<T>;
   }
 }

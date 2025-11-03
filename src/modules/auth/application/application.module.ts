@@ -5,30 +5,45 @@ import { Module } from "@nestjs/common";
 import { UserModule } from "@/modules/user/user.module";
 import { UserInfrastructureModule } from "@/modules/user/infrastructure/infrastructure.module";
 import { AuthInfrastructureModule } from "../infrastructure/infrastructure.module";
+import { InfrastructureModule } from "@/shared/infrastructure/infrastructure.module";
 
 // import use cases
 import { RegisterUseCase } from "./use-case/register.use-case";
 import { LoginUseCase } from "./use-case/login.use-case";
 import { EmailCheckUseCase } from "./use-case/email-check.use-case";
 import { ConnectUserUseCase } from "./use-case/connect.use-case";
+import { SendCodeUseCase } from "./use-case/send-code.use-case";
+import { VerifyCodeUseCase } from "./use-case/verify-code.use-case";
+import { ResetPasswordUseCase } from "./use-case/reset-password.use-case";
 
 /**
  * Auth application module
  * @description Auth application module which provides the auth application services
  */
 @Module({
-  imports: [UserModule, UserInfrastructureModule, AuthInfrastructureModule],
+  imports: [
+    UserModule,
+    UserInfrastructureModule,
+    AuthInfrastructureModule,
+    InfrastructureModule,
+  ],
   providers: [
     RegisterUseCase,
     LoginUseCase,
     EmailCheckUseCase,
     ConnectUserUseCase,
+    SendCodeUseCase,
+    VerifyCodeUseCase,
+    ResetPasswordUseCase,
   ],
   exports: [
     RegisterUseCase,
     LoginUseCase,
     EmailCheckUseCase,
     ConnectUserUseCase,
+    SendCodeUseCase,
+    VerifyCodeUseCase,
+    ResetPasswordUseCase,
   ],
 })
 export class AuthApplicationModule {}
