@@ -7,6 +7,7 @@ import { FindBookIdUseCase } from "./use-case/book/find-id.use-case";
 import { CreateBookUseCase } from "./use-case/book/create.use-case";
 import { UpdateBookUseCase } from "./use-case/book/update.use-case";
 import { DeleteBookUseCase } from "./use-case/book/delete.use-case";
+import { FindRandomBooksUseCase } from "./use-case/book/find-random.use-case";
 
 // import user book use cases
 import { CreateUserBookUseCase } from "./use-case/user-book/create.use-case";
@@ -43,6 +44,7 @@ const bookUseCases = [
   CreateBookUseCase,
   UpdateBookUseCase,
   DeleteBookUseCase,
+  FindRandomBooksUseCase,
 ];
 
 // import recording use cases

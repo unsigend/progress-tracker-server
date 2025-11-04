@@ -35,4 +35,11 @@ export interface IBookRepository extends IBaseRepository<BookEntity> {
   findByCreatedBy(
     createdById: ObjectIdValueObject,
   ): Promise<{ data: BookEntity[]; totalCount: number }>;
+
+  /**
+   * Find random books based on the date
+   * @param count - The count of the books to find
+   * @returns The random books
+   */
+  findRandom(count: number): Promise<BookEntity[]>;
 }

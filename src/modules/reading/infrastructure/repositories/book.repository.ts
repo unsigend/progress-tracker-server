@@ -156,4 +156,37 @@ export class BookRepository implements IBookRepository {
     });
     return result ? true : false;
   }
+
+  /**
+   * Generate a random seed based on the date
+   * @returns The random seed
+   */
+  private generateRandomSeed(): number {
+    const date = new Date();
+    const dateNumber = parseInt(date.toISOString().replace(/-/g, ""));
+    return (dateNumber % 100000) / 100000;
+  }
+
+  /**
+   * Find random books based on the date
+   * @param count - The count of the books to find
+   * @returns The random books
+   */
+  public async findRandom(count: number): Promise<BookEntity[]> {
+    const seed = this.generateRandomSeed();
+    // use a transaction to ensure no race condition
+    const books: BookModel[] = await this.postgresqlService.$transaction(
+      async (tx) => {
+        // set the random seed for this session
+        await tx.$executeRawUnsafe(`SELECT setseed(${seed})`);
+        // query random books with the seeded
+        return await tx.$queryRaw`
+          SELECT * FROM "Book"
+            ORDER BY random()
+            LIMIT ${count}
+        `;
+      },
+    );
+    return books.map((book: BookModel) => BookMapper.toEntity(book));
+  }
 }

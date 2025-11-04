@@ -32,6 +32,8 @@ import { DeleteBookUseCase } from "../../application/use-case/book/delete.use-ca
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 import { ApiStandardResponse } from "@/shared/platforms/decorators/api-response.decorator";
 import { BooksResponseDto } from "../dtos/book/books.response.dto";
+import { RandomBookRequestDto } from "../dtos/book/random.request.dto";
+import { FindRandomBooksUseCase } from "../../application/use-case/book/find-random.use-case";
 
 /**
  * Book controller
@@ -45,6 +47,8 @@ export class BookController {
    * @param findBookByIdUseCase - The find book by id use case
    * @param createBookUseCase - The create book use case
    * @param updateBookUseCase - The update book use case
+   * @param deleteBookUseCase - The delete book use case
+   * @param findRandomBooksUseCase - The find random books use case
    */
   constructor(
     private readonly findAllBooksUseCase: FindAllBooksUseCase,
@@ -52,6 +56,7 @@ export class BookController {
     private readonly createBookUseCase: CreateBookUseCase,
     private readonly updateBookUseCase: UpdateBookUseCase,
     private readonly deleteBookUseCase: DeleteBookUseCase,
+    private readonly findRandomBooksUseCase: FindRandomBooksUseCase,
   ) {}
 
   /**
@@ -77,6 +82,26 @@ export class BookController {
     );
     // return the books and the total count of the books
     return { books: bookResponseDtos, totalCount };
+  }
+
+  /**
+   * Find random books
+   */
+  @Get("random")
+  @ApiStandardResponse(BooksResponseDto)
+  public async findRandom(
+    @Query() query: RandomBookRequestDto,
+  ): Promise<BooksResponseDto> {
+    // find the random books
+    const books: BookEntity[] = await this.findRandomBooksUseCase.execute(
+      query.count,
+    );
+    // map the books to the book response dtos
+    const bookResponseDtos: BookResponseDto[] = books.map((book) =>
+      BookMapper.toDto(book),
+    );
+    // return the books and the total count of the books
+    return { books: bookResponseDtos, totalCount: books.length };
   }
 
   /**
