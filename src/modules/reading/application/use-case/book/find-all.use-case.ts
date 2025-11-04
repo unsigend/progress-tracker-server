@@ -11,6 +11,10 @@ import {
   FilterOperator,
   Filters,
 } from "@/shared/domain/queries/filter";
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { PermissionException } from "@/shared/domain/exceptions/permission.exception";
+import { PERMISSION_POLICY_TOKEN } from "@shared/domain/services/permission-policy.service";
+import type { IPermissionPolicy } from "@shared/domain/services/permission-policy.service";
 
 /**
  * Find all books use case
@@ -20,10 +24,13 @@ export class FindAllBooksUseCase {
   /**
    * Constructor for FindAllBooksUseCase
    * @param bookRepository - The book repository
+   * @param permissionPolicy - The permission policy
    */
   constructor(
     @Inject(BOOK_REPOSITORY_TOKEN)
     private readonly bookRepository: IBookRepository,
+    @Inject(PERMISSION_POLICY_TOKEN)
+    private readonly permissionPolicy: IPermissionPolicy<BookEntity>,
   ) {}
 
   /**
@@ -37,6 +44,7 @@ export class FindAllBooksUseCase {
    * @returns The books and the total count of the books
    */
   public async execute(
+    user: UserEntity,
     field?: string,
     value?: string,
     limit?: number,
@@ -44,6 +52,11 @@ export class FindAllBooksUseCase {
     sort?: string,
     order?: "asc" | "desc",
   ): Promise<{ data: BookEntity[]; totalCount: number }> {
+    // permission check
+    if (!(await this.permissionPolicy.canAccessCollection(user))) {
+      throw new PermissionException("Permission denied");
+    }
+
     let filters: Filters = [];
 
     /**

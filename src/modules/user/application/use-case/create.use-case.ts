@@ -18,6 +18,9 @@ import type { IImageCompress } from "@shared/domain/services/image-compress.serv
 import { IMAGE_COMPRESSOR_TOKEN } from "@shared/domain/services/image-compress.service";
 import type { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import type { ImageValueObject } from "@/shared/domain/value-object/image.vo";
+import { PERMISSION_POLICY_TOKEN } from "@shared/domain/services/permission-policy.service";
+import type { IPermissionPolicy } from "@shared/domain/services/permission-policy.service";
+import { PermissionException } from "@shared/domain/exceptions/permission.exception";
 
 /**
  * Create user use case
@@ -39,22 +42,31 @@ export class CreateUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
     @Inject(IMAGE_COMPRESSOR_TOKEN)
     private readonly imageCompressor: IImageCompress,
+    @Inject(PERMISSION_POLICY_TOKEN)
+    private readonly permissionPolicy: IPermissionPolicy<UserEntity>,
   ) {}
 
   /**
    * Execute the create user use case
+   * @param user - The user requesting the creation
    * @param username - The username of the user
    * @param email - The email of the user
    * @param password - The password of the user
    * @returns The user entity
    */
   public async execute(
+    user: UserEntity,
     username: string,
     email: EmailValueObject,
     password: PasswordValueObject,
     role?: RoleValueObject | null,
     avatarImage?: ImageValueObject | null,
   ): Promise<UserEntity> {
+    // permission check
+    if (!(await this.permissionPolicy.canModifyCollection(user))) {
+      throw new PermissionException("Permission denied");
+    }
+
     // check if the email is already in use
     const existingUser: UserEntity | null =
       await this.userRepository.findByEmail(email);

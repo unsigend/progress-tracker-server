@@ -16,6 +16,10 @@ import {
   IMAGE_COMPRESSOR_TOKEN,
   type IImageCompress,
 } from "@shared/domain/services/image-compress.service";
+import { PERMISSION_POLICY_TOKEN } from "@shared/domain/services/permission-policy.service";
+import type { IPermissionPolicy } from "@shared/domain/services/permission-policy.service";
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import { PermissionException } from "@/shared/domain/exceptions/permission.exception";
 
 /**
  * Create book use case
@@ -33,6 +37,8 @@ export class CreateBookUseCase {
     private readonly cloudService: ICloud,
     @Inject(IMAGE_COMPRESSOR_TOKEN)
     private readonly imageCompressor: IImageCompress,
+    @Inject(PERMISSION_POLICY_TOKEN)
+    private readonly permissionPolicy: IPermissionPolicy<BookEntity>,
   ) {}
 
   /**
@@ -41,6 +47,7 @@ export class CreateBookUseCase {
    * @returns The created book
    */
   public async execute(
+    user: UserEntity,
     title: string,
     pages: PagesValueObject,
     createdById: ObjectIdValueObject,
@@ -50,6 +57,11 @@ export class CreateBookUseCase {
     isbn13?: ISBNValueObject | null,
     coverImage?: ImageValueObject | null,
   ): Promise<BookEntity> {
+    // permission check
+    if (!(await this.permissionPolicy.canModifyCollection(user))) {
+      throw new PermissionException("Permission denied");
+    }
+
     // check if the book with ISBN10 exists
     if (isbn10) {
       const existingBook: BookEntity | null =

@@ -18,7 +18,12 @@ import {
 import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { ConflictException } from "@/shared/domain/exceptions/conflict.exception";
-
+import { UserEntity } from "@/modules/user/domain/entities/user.entity";
+import {
+  type IPermissionPolicy,
+  PERMISSION_POLICY_TOKEN,
+} from "@/shared/domain/services/permission-policy.service";
+import { PermissionException } from "@/shared/domain/exceptions/permission.exception";
 /**
  * Update book use case
  * @description Update book use case which is used to update a book.
@@ -27,6 +32,9 @@ export class UpdateBookUseCase {
   /**
    * Constructor for UpdateBookUseCase
    * @param bookRepository - The book repository
+   * @param cloudService - The cloud service
+   * @param imageCompressor - The image compressor
+   * @param permissionPolicy - The permission policy
    */
   constructor(
     @Inject(BOOK_REPOSITORY_TOKEN)
@@ -35,14 +43,25 @@ export class UpdateBookUseCase {
     private readonly cloudService: ICloud,
     @Inject(IMAGE_COMPRESSOR_TOKEN)
     private readonly imageCompressor: IImageCompress,
+    @Inject(PERMISSION_POLICY_TOKEN)
+    private readonly permissionPolicy: IPermissionPolicy<BookEntity>,
   ) {}
 
   /**
    * Execute the update book use case
-   * @param book - The book to update
+   * @param user - The user requesting the update
+   * @param id - The id of the book to update
+   * @param title - The title of the book to update
+   * @param pages - The pages of the book to update
+   * @param author - The author of the book to update
+   * @param description - The description of the book to update
+   * @param isbn10 - The ISBN10 of the book to update
+   * @param isbn13 - The ISBN13 of the book to update
+   * @param coverImage - The cover image of the book to update
    * @returns The updated book
    */
   public async execute(
+    user: UserEntity,
     id: ObjectIdValueObject,
     title?: string | null,
     pages?: PagesValueObject | null,
@@ -56,6 +75,11 @@ export class UpdateBookUseCase {
     const book: BookEntity | null = await this.bookRepository.findById(id);
     if (book === null) {
       throw new NotFoundException("Book not found");
+    }
+
+    // permission check
+    if (!(await this.permissionPolicy.canModify(user, book))) {
+      throw new PermissionException("Permission denied");
     }
 
     // if the title is provided

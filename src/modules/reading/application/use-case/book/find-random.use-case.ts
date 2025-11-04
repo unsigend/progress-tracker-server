@@ -25,6 +25,8 @@ export class FindRandomBooksUseCase {
    * @returns The random books
    */
   public async execute(count: number): Promise<BookEntity[]> {
+    // the random books are always public
+
     // find the random books
     const books: BookEntity[] = await this.bookRepository.findRandom(count);
 

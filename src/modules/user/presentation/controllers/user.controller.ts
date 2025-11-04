@@ -50,10 +50,15 @@ export class UserController {
    */
   @Get()
   public async findAll(
+    @Request() request: ExpressRequest,
     @Query() query: UserQueryRequestDto,
   ): Promise<{ data: UserResponseDto[]; totalCount: number }> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     // find all users
     const { data, totalCount } = await this.findAllUsersUseCase.execute(
+      userObj,
       query.field,
       query.value,
       query.limit,
@@ -77,11 +82,16 @@ export class UserController {
   @Post()
   @UseInterceptors(FileInterceptor("avatarImage"))
   public async create(
+    @Request() request: ExpressRequest,
     @Body() createUserRequestDto: UserCreateRequestDto,
     @UploadedFile() avatarImage: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     // create the user entity
     const userEntity: UserEntity = await this.createUserUseCase.execute(
+      userObj,
       createUserRequestDto.username,
       new EmailValueObject(createUserRequestDto.email),
       new PasswordValueObject(createUserRequestDto.password),
@@ -120,11 +130,11 @@ export class UserController {
   ): Promise<UserResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
-    const userId: ObjectIdValueObject = userObj.getId();
 
     // update the user
     const updatedUser: UserEntity = await this.updateUserUseCase.execute(
-      userId,
+      userObj,
+      userObj.getId(),
       updateUserRequestDto.username,
       updateUserRequestDto.email
         ? new EmailValueObject(updateUserRequestDto.email)
@@ -153,10 +163,12 @@ export class UserController {
   ): Promise<{ success: boolean }> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
-    const userId: ObjectIdValueObject = userObj.getId();
 
     // delete the user
-    const result: boolean = await this.deleteUserUseCase.execute(userId);
+    const result: boolean = await this.deleteUserUseCase.execute(
+      userObj,
+      userObj.getId(),
+    );
 
     // return the result
     return { success: result };
@@ -166,8 +178,15 @@ export class UserController {
    * Find a user by id
    */
   @Get(":id")
-  public async findById(@Param("id") id: string): Promise<UserResponseDto> {
+  public async findById(
+    @Request() request: ExpressRequest,
+    @Param("id") id: string,
+  ): Promise<UserResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     const userEntity: UserEntity = await this.findUserByIdUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
     );
     return UserMapper.toResponseDto(userEntity);
@@ -177,8 +196,15 @@ export class UserController {
    * Delete a user
    */
   @Delete(":id")
-  public async delete(@Param("id") id: string): Promise<{ success: boolean }> {
+  public async delete(
+    @Request() request: ExpressRequest,
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     const result: boolean = await this.deleteUserUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
     );
     return { success: result };
@@ -190,11 +216,17 @@ export class UserController {
   @Put(":id")
   @UseInterceptors(FileInterceptor("avatarImage"))
   public async update(
+    @Request() request: ExpressRequest,
     @Param("id") id: string,
     @Body() updateUserRequestDto: UserUpdateRequestDto,
     @UploadedFile() avatarImage: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
+    // update the user
     const userEntity: UserEntity = await this.updateUserUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
       updateUserRequestDto.username,
       updateUserRequestDto.email

@@ -12,13 +12,15 @@ import { RoleValueObject } from "../../domain/value-object/role.vo";
 import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { CLOUD_TOKEN } from "@/modules/cloud/domain/cloud.service";
-import { Inject, Logger } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import type { ICloud } from "@/modules/cloud/domain/cloud.service";
 import { IMAGE_COMPRESSOR_TOKEN } from "@shared/domain/services/image-compress.service";
 import type { IImageCompress } from "@shared/domain/services/image-compress.service";
 import { PASSWORD_HASHER_TOKEN } from "../../domain/services/password-hash.service";
 import type { IPasswordHasher } from "../../domain/services/password-hash.service";
-
+import { PERMISSION_POLICY_TOKEN } from "@shared/domain/services/permission-policy.service";
+import type { IPermissionPolicy } from "@shared/domain/services/permission-policy.service";
+import { PermissionException } from "@shared/domain/exceptions/permission.exception";
 /**
  * Update user use case
  * @description Update user use case which is used to update a user.
@@ -27,6 +29,10 @@ export class UpdateUserUseCase {
   /**
    * Constructor for UpdateUserUseCase
    * @param userRepository - The user repository
+   * @param cloudService - The cloud service
+   * @param imageCompressor - The image compressor
+   * @param passwordHasher - The password hasher
+   * @param permissionPolicy - The permission policy
    */
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
@@ -36,6 +42,8 @@ export class UpdateUserUseCase {
     private readonly imageCompressor: IImageCompress,
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
+    @Inject(PERMISSION_POLICY_TOKEN)
+    private readonly permissionPolicy: IPermissionPolicy<UserEntity>,
   ) {}
 
   /**
@@ -49,6 +57,7 @@ export class UpdateUserUseCase {
    * @returns The updated user
    */
   public async execute(
+    user: UserEntity,
     id: ObjectIdValueObject,
     username?: string | null,
     email?: EmailValueObject | null,
@@ -56,20 +65,26 @@ export class UpdateUserUseCase {
     role?: RoleValueObject | null,
     avatarImage?: ImageValueObject | null,
   ): Promise<UserEntity> {
+    // permission check
+    if (!(await this.permissionPolicy.canModify(user, id))) {
+      throw new PermissionException("Permission denied");
+    }
+
     // check if the user exists
-    const user: UserEntity | null = await this.userRepository.findById(id);
-    if (user === null) {
+    const existingUser: UserEntity | null =
+      await this.userRepository.findById(id);
+    if (existingUser === null) {
       throw new NotFoundException("User not found");
     }
 
     // if the username is provided
     if (username) {
-      user.setUsername(username);
+      existingUser.setUsername(username);
     }
 
     // if the email is provided
     if (email) {
-      user.setEmail(email);
+      existingUser.setEmail(email);
     }
 
     // if the password is provided
@@ -79,19 +94,19 @@ export class UpdateUserUseCase {
         await this.passwordHasher.hash(
           new PasswordValueObject(password.getPassword()),
         );
-      user.setPassword(hashedPassword);
+      existingUser.setPassword(hashedPassword);
     }
 
     // if the role is provided
     if (role) {
-      user.setRole(role);
+      existingUser.setRole(role);
     }
 
     // if the avatar image is provided
     if (avatarImage) {
       // delete the old avatar from the cloud
-      if (user.getAvatarUrl()) {
-        await this.cloudService.delete(user.getAvatarUrl()!);
+      if (existingUser.getAvatarUrl()) {
+        await this.cloudService.delete(existingUser.getAvatarUrl()!);
       }
 
       // compress the avatar image
@@ -103,13 +118,13 @@ export class UpdateUserUseCase {
         await this.cloudService.upload(compressedAvatar);
 
       // set the new avatar url
-      user.setAvatarUrl(avatarUrl);
+      existingUser.setAvatarUrl(avatarUrl);
     }
 
     // save the user
-    await this.userRepository.save(user);
+    await this.userRepository.save(existingUser);
 
     // return the user
-    return user;
+    return existingUser;
   }
 }
