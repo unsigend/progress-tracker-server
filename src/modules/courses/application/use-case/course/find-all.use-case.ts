@@ -12,6 +12,7 @@ import {
   Filters,
 } from "@/shared/domain/queries/filter";
 import { QueryBase } from "@/shared/domain/queries/base.query";
+import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
 
 /**
  * Find all courses use case
@@ -58,6 +59,10 @@ export class FindAllCoursesUseCase {
     const filters: Filters = [];
     if (value) {
       if (field) {
+        // for security reasons, we do not allow to filter by isPublic
+        if (field === "isPublic") {
+          throw new ValidationException("Invalid query key");
+        }
         filters.push({
           field: field,
           operator: FilterOperator.EQUALS,
@@ -72,6 +77,13 @@ export class FindAllCoursesUseCase {
         });
       }
     }
+
+    // force that only public courses are returned
+    filters.push({
+      field: "isPublic",
+      operator: FilterOperator.EQUALS,
+      value: true,
+    });
 
     // build the query object
     const query: QueryBase = new QueryBase(

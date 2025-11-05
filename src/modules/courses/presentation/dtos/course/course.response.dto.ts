@@ -9,6 +9,9 @@ export class CourseResponseDto {
   /** The name of the course */
   name: string;
 
+  /** The is public of the course */
+  isPublic: boolean;
+
   /** The description of the course */
   description: string | null;
 

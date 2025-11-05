@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { Transform } from "class-transformer";
 
 /**
  * Create course request DTO
@@ -9,6 +10,11 @@ export class CourseCreateRequestDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  /** The is public of the course */
+  @Transform(({ value }) => value === "true" || value === true)
+  @IsOptional()
+  isPublic?: boolean;
 
   /** The description of the course */
   @IsString()

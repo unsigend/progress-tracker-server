@@ -45,8 +45,13 @@ export class CoursePermissionPolicyService
     user: UserEntity,
     resource: CourseEntity | ObjectIdValueObject,
   ): boolean {
-    // always allow access to the course
-    return true;
+    if (resource instanceof ObjectIdValueObject) {
+      throw new Error(
+        "Fatal Error: Resource must be a CourseEntity to get context.",
+      );
+    }
+    // A user can access a course if they are admin or the course is public
+    return user.getRole().isAdmin() || resource.getIsPublic();
   }
 
   /**

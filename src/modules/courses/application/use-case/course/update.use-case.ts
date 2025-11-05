@@ -48,6 +48,7 @@ export class UpdateCourseUseCase {
    * @param user - The user requesting the update course
    * @param id - The id of the course to update
    * @param name - The name of the course to update
+   * @param isPublic - The is public of the course to update
    * @param description - The description of the course to update
    * @param source - The source of the course to update
    * @param officialWebsiteUrl - The official website url of the course to update
@@ -58,6 +59,7 @@ export class UpdateCourseUseCase {
     user: UserEntity,
     id: ObjectIdValueObject,
     name?: string | null,
+    isPublic?: boolean | null,
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
@@ -78,6 +80,11 @@ export class UpdateCourseUseCase {
     // if the name is provided
     if (name) {
       course.setName(name);
+    }
+
+    // if the is public is provided
+    if (isPublic) {
+      course.setIsPublic(isPublic);
     }
 
     // if the description is provided

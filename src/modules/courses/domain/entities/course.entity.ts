@@ -11,6 +11,7 @@ export class CourseEntity {
   private name: string;
   private readonly createdById: ObjectIdValueObject;
   private readonly createdAt: Date;
+  private isPublic: boolean;
 
   private description: string | null;
   private source: string | null;
@@ -23,6 +24,7 @@ export class CourseEntity {
     name: string,
     createdById: ObjectIdValueObject,
     id?: ObjectIdValueObject | null,
+    isPublic?: boolean | null,
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
@@ -35,6 +37,7 @@ export class CourseEntity {
     this.createdById = createdById;
     this.createdAt = createdAt ?? new Date();
     this.updatedAt = updatedAt ?? new Date();
+    this.isPublic = isPublic ?? false;
     this.description = description ?? null;
     this.source = source ?? null;
     this.officialWebsiteUrl = officialWebsiteUrl ?? null;
@@ -54,6 +57,7 @@ export class CourseEntity {
   public static create(
     name: string,
     createdById: ObjectIdValueObject,
+    isPublic?: boolean | null,
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
@@ -63,6 +67,7 @@ export class CourseEntity {
       name,
       createdById,
       null,
+      isPublic,
       description,
       source,
       officialWebsiteUrl,
@@ -75,6 +80,7 @@ export class CourseEntity {
    * @param id - The id of the course
    * @param name - The name of the course
    * @param createdById - The id of the user who created the course
+   * @param isPublic - The is public of the course
    * @param description - The description of the course
    * @param source - The source of the course
    * @param officialWebsiteUrl - The official website url of the course
@@ -87,6 +93,7 @@ export class CourseEntity {
     id: ObjectIdValueObject,
     name: string,
     createdById: ObjectIdValueObject,
+    isPublic: boolean,
     description: string | null,
     source: string | null,
     officialWebsiteUrl: UrlValueObject | null,
@@ -98,6 +105,7 @@ export class CourseEntity {
       name,
       createdById,
       id,
+      isPublic,
       description,
       source,
       officialWebsiteUrl,
@@ -148,6 +156,14 @@ export class CourseEntity {
   }
 
   /**
+   * Get the is public of the course
+   * @returns The is public of the course
+   */
+  public getIsPublic(): boolean {
+    return this.isPublic;
+  }
+
+  /**
    * Get the description of the course
    * @returns The description of the course
    */
@@ -177,6 +193,15 @@ export class CourseEntity {
    */
   public getCourseImageUrl(): UrlValueObject | null {
     return this.courseImageUrl;
+  }
+
+  /**
+   * Set the is public of the course
+   * @param isPublic - The is public of the course
+   */
+  public setIsPublic(isPublic: boolean): void {
+    this.isPublic = isPublic;
+    this.updatedAt = new Date();
   }
 
   /**

@@ -74,6 +74,7 @@ export class CourseController {
       userObj,
       createCourseRequestDto.name,
       userObj.getId(),
+      createCourseRequestDto.isPublic ?? false,
       createCourseRequestDto.description ?? null,
       createCourseRequestDto.source ?? null,
       createCourseRequestDto.officialWebsiteUrl
@@ -174,6 +175,7 @@ export class CourseController {
       userObj,
       new ObjectIdValueObject(id),
       updateCourseRequestDto.name,
+      updateCourseRequestDto.isPublic ?? null,
       updateCourseRequestDto.description ?? null,
       updateCourseRequestDto.source ?? null,
       updateCourseRequestDto.officialWebsiteUrl

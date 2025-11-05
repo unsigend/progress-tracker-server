@@ -20,6 +20,7 @@ export class CourseMapper {
       new ObjectIdValueObject(courseModel.id),
       courseModel.name,
       new ObjectIdValueObject(courseModel.createdById),
+      courseModel.isPublic,
       courseModel.description,
       courseModel.source,
       courseModel.officialWebsiteUrl
@@ -42,6 +43,7 @@ export class CourseMapper {
     return {
       id: course.getId().getId(),
       name: course.getName(),
+      isPublic: course.getIsPublic(),
       description: course.getDescription(),
       source: course.getSource(),
       officialWebsiteUrl: course.getOfficialWebsiteUrl()?.getUrl() ?? null,
@@ -61,6 +63,7 @@ export class CourseMapper {
     return {
       id: course.getId().getId(),
       name: course.getName(),
+      isPublic: course.getIsPublic(),
       description: course.getDescription(),
       source: course.getSource(),
       officialWebsiteUrl: course.getOfficialWebsiteUrl()?.getUrl() ?? null,

@@ -46,6 +46,7 @@ export class CreateCourseUseCase {
    * @param user - The user requesting the create course
    * @param name - The name of the course
    * @param createdById - The id of the user who created the course
+   * @param isPublic - The is public of the course
    * @param description - The description of the course
    * @param source - The source of the course
    * @param officialWebsiteUrl - The official website url of the course
@@ -56,6 +57,7 @@ export class CreateCourseUseCase {
     user: UserEntity,
     name: string,
     createdById: ObjectIdValueObject,
+    isPublic?: boolean | null,
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
@@ -81,6 +83,7 @@ export class CreateCourseUseCase {
     const courseEntity: CourseEntity = CourseEntity.create(
       name,
       createdById,
+      isPublic,
       description,
       source,
       officialWebsiteUrl,
