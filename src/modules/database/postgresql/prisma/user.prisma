@@ -28,5 +28,6 @@ model User {
 
   // relation
   userBooks UserBook[]
+  courses Course[]
   createdBooks Book[] @relation("CreatedBooks")
 }

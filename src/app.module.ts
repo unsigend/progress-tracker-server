@@ -11,6 +11,7 @@ import { InfrastructureModule } from "@shared/infrastructure/infrastructure.modu
 import { ReadingModule } from "@modules/reading/reading.module";
 import { StatisticsModule } from "@modules/statistics/statistics.module";
 import { AuthModule } from "@modules/auth/auth.module";
+import { CoursesModule } from "@modules/courses/course.module";
 
 // import guards
 import { JwtAuthGuard } from "@shared/platforms/guards/jwt-auth.guard";
@@ -47,6 +48,7 @@ import authConfig from "@modules/auth/config/auth.config";
     InfrastructureModule,
     UserModule,
     ReadingModule,
+    CoursesModule,
     CloudModule,
     StatisticsModule,
   ],

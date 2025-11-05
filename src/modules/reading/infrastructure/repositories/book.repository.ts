@@ -9,7 +9,7 @@ import { BookMapper } from "../mapper/book.mapper";
 import { Book as BookModel, Prisma } from "@prisma/client";
 import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
 import { ServerException } from "@/shared/domain/exceptions/server.exception";
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 /**
  * Book repository
@@ -129,7 +129,6 @@ export class BookRepository implements IBookRepository {
       if (error instanceof PrismaClientValidationError) {
         throw new ValidationException("Invalid query key");
       }
-      Logger.error(error);
       throw new ServerException("An unexpected error occurred");
     }
 

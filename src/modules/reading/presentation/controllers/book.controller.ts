@@ -39,7 +39,7 @@ import { FindRandomBooksUseCase } from "../../application/use-case/book/find-ran
  * Book controller
  * @description Book controller which is used to handle the book requests
  */
-@Controller("book")
+@Controller("books")
 export class BookController {
   /**
    * Constructor for BookController

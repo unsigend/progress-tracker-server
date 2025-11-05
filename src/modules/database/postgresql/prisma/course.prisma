@@ -1,0 +1,24 @@
+/*
+ * Course model
+ * @description Course model which is used to store the course information.
+ */
+model Course {
+  // primary key
+  id        String   @id @default(uuid())
+
+  // fields
+  name      String
+  description String?
+  source     String?
+  officialWebsiteUrl String?
+  courseImageUrl String?
+  createdById String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // index optimization
+  @@index([createdById])
+
+  // relation
+  createdBy User @relation(fields: [createdById], references: [id])
+}
