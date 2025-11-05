@@ -52,7 +52,7 @@ export class FindAllUserBooksUseCase {
 
     // always add the constrains for the user id
     filters.push({
-      field: "user_id",
+      field: "userId",
       operator: FilterOperator.EQUALS,
       value: userId.getId(),
     });

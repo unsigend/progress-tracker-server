@@ -19,7 +19,7 @@ export class RecordingMapper {
   public static toModel(recording: RecordingEntity): ReadingRecordModel {
     return {
       id: recording.getId().getId(),
-      user_book_id: recording.getUserBookId().getId(),
+      userBookId: recording.getUserBookId().getId(),
       date: recording.getDate(),
       pages: recording.getPages().getPages(),
       minutes: recording.getMinutes().getMinutes(),
@@ -35,7 +35,7 @@ export class RecordingMapper {
   public static toEntity(recordingModel: ReadingRecordModel): RecordingEntity {
     return RecordingEntity.reconstitute(
       new ObjectIdValueObject(recordingModel.id),
-      new ObjectIdValueObject(recordingModel.user_book_id),
+      new ObjectIdValueObject(recordingModel.userBookId),
       recordingModel.date,
       new PagesValueObject(recordingModel.pages),
       new MinutesValueObject(recordingModel.minutes),

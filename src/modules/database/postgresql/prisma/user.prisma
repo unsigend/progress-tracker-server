@@ -1,5 +1,6 @@
 /*
-  This enum is used to store the user role.
+ * User role enum
+ * @description User role enum which is used to store the user role.
 */
 enum UserRole {
   ADMIN
@@ -7,7 +8,8 @@ enum UserRole {
 }
 
 /*
-  This model is used to store the user information.
+ * User model
+ * @description User model which is used to store the user information.
 */
 model User {
   // primary key
@@ -17,7 +19,7 @@ model User {
   username  String   
   email     String   @unique
   password  String
-  avatar_url String?
+  avatarUrl String?
   provider  String[] @default(["local"])
   role      UserRole @default(USER)
   createdAt DateTime @default(now())
@@ -25,6 +27,6 @@ model User {
   deletedAt DateTime?
 
   // relation
-  user_books UserBook[]
+  userBooks UserBook[]
   createdBooks Book[] @relation("CreatedBooks")
 }

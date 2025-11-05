@@ -54,7 +54,7 @@ export class RecordingRepository implements IRecordingRepository {
     // find the recordings by user book id
     const recordingsModels: ReadingRecordModel[] =
       await this.postgresqlService.readingRecord.findMany({
-        where: { user_book_id: userBookId.getId() },
+        where: { userBookId: userBookId.getId() },
       });
     return {
       data: recordingsModels.map((recordingModel) =>
@@ -148,8 +148,8 @@ export class RecordingRepository implements IRecordingRepository {
       AND: [
         whereClause,
         {
-          user_book: {
-            user_id: userId.getId(),
+          userBook: {
+            userId: userId.getId(),
           },
         },
       ],
@@ -204,8 +204,8 @@ export class RecordingRepository implements IRecordingRepository {
       AND: [
         whereClause,
         {
-          user_book: {
-            user_id: userId.getId(),
+          userBook: {
+            userId: userId.getId(),
           },
         },
       ],
@@ -256,7 +256,7 @@ export class RecordingRepository implements IRecordingRepository {
     // delete the recordings by user book id
     const result: { count: number } =
       await this.postgresqlService.readingRecord.deleteMany({
-        where: { user_book_id: userBookId.getId() },
+        where: { userBookId: userBookId.getId() },
       });
     return result.count > 0 ? true : false;
   }

@@ -1,7 +1,8 @@
 
 /*
-  This model is used to store the book information.
-*/
+ * Book model
+ * @description Book model which is used to store the book information.
+ */
 model Book {
   // primary key
   id        String   @id @default(uuid())
@@ -13,7 +14,7 @@ model Book {
   ISBN10    String? @unique
   ISBN13    String? @unique
   pages     Int
-  cover_url String?
+  coverUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdById String
@@ -23,12 +24,13 @@ model Book {
   @@index([createdById])
 
   // relation
-  user_books UserBook[]
+  userBooks UserBook[]
   createdBy  User     @relation("CreatedBooks", fields: [createdById], references: [id])
 }
 
 /*
-  This enum is used to store the reading status.
+ * Reading status enum
+ * @description Reading status enum which is used to store the reading status.
 */
 enum ReadingStatus {
   IN_PROGRESS
@@ -36,49 +38,51 @@ enum ReadingStatus {
 }
 
 /*
-  This model is used to store the user book information.
-*/
+ * User book model
+ * @description User book model which is used to store the user book information.
+ */
 model UserBook {
   // primary key
   id        String   @id @default(uuid())
 
   // foreign key
-  book_id   String
-  user_id   String
+  bookId    String
+  userId    String
 
   // fields
   status    ReadingStatus @default(IN_PROGRESS)
-  current_page Int     @default(0)
-  start_date DateTime?  @db.Date
-  completed_date DateTime?  @db.Date
-  total_minutes Int     @default(0)
-  total_days Int     @default(0)
+  currentPage Int     @default(0)
+  startDate DateTime?  @db.Date
+  completedDate DateTime?  @db.Date
+  totalMinutes Int     @default(0)
+  totalDays Int     @default(0)
 
   // timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // relation
-  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  book      Book     @relation(fields: [book_id], references: [id], onDelete: Cascade)
-  reading_records ReadingRecord[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  readingRecords ReadingRecord[]
 
   // constraint
-  @@unique([book_id, user_id])
+  @@unique([bookId, userId])
 
   // index optimization
-  @@index([user_id, status])
+  @@index([userId, status])
 }
 
 /*
-  This model is used to store the reading record information.
+ * Reading record model
+ * @description Reading record model which is used to store the reading record information.
 */
 model ReadingRecord {
   // primary key
   id        String   @id @default(uuid())
 
   // foreign key
-  user_book_id String
+  userBookId String
 
   // fields
   date      DateTime @db.Date
@@ -87,11 +91,11 @@ model ReadingRecord {
   notes     String?
 
   // relation
-  user_book UserBook @relation(fields: [user_book_id], references: [id], onDelete: Cascade)
+  userBook UserBook @relation(fields: [userBookId], references: [id], onDelete: Cascade)
 
   // constraint
-  @@unique([user_book_id, date])
+  @@unique([userBookId, date])
 
   // index optimization
-  @@index([user_book_id, date])
+  @@index([userBookId, date])
 }

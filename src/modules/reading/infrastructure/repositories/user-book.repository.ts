@@ -57,9 +57,9 @@ export class UserBookRepository implements IUserBookRepository {
     const userBookModel: UserBookModel | null =
       await this.postgresqlService.userBook.findUnique({
         where: {
-          book_id_user_id: {
-            book_id: bookId.getId(),
-            user_id: userId.getId(),
+          bookId_userId: {
+            bookId: bookId.getId(),
+            userId: userId.getId(),
           },
         },
       });
