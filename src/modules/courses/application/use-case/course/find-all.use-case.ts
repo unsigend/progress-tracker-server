@@ -10,6 +10,7 @@ import {
   FilterLogic,
   FilterOperator,
   Filters,
+  FilterGroup,
 } from "@/shared/domain/queries/filter";
 import { QueryBase } from "@/shared/domain/queries/base.query";
 import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
@@ -58,8 +59,8 @@ export class FindAllCoursesUseCase {
 
     const filters: Filters = [];
     if (value) {
+      // if both field and value are provided then it will be field=value
       if (field) {
-        // for security reasons, we do not allow to filter by isPublic
         if (field === "isPublic") {
           throw new ValidationException("Invalid query key");
         }
@@ -69,16 +70,29 @@ export class FindAllCoursesUseCase {
           value: value,
         });
       } else {
-        // the default filters are: [name CONTAINS value]
-        filters.push({
-          field: "name",
-          operator: FilterOperator.CONTAINS,
-          value: value,
-        });
+        // default will be: (name CONTAINS value) OR (categories HAS value)
+        const searchGroup: FilterGroup = {
+          connection: FilterLogic.OR,
+          items: [
+            {
+              field: "name",
+              operator: FilterOperator.CONTAINS,
+              value: value,
+            },
+            {
+              field: "categories",
+              operator: FilterOperator.HAS,
+              value: value,
+            },
+          ],
+        };
+
+        filters.push(searchGroup);
       }
     }
 
-    // force that only public courses are returned
+    // force add constraint: isPublic EQUALS true
+    // only can access public courses
     filters.push({
       field: "isPublic",
       operator: FilterOperator.EQUALS,

@@ -4,6 +4,7 @@ import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { Course as CourseModel } from "@prisma/client";
 import { CourseResponseDto } from "../../presentation/dtos/course/course.response.dto";
+import { CategoriesValueObject } from "../../domain/value-object/categories.vo";
 
 /**
  * Course mapper
@@ -26,6 +27,9 @@ export class CourseMapper {
       courseModel.officialWebsiteUrl
         ? new UrlValueObject(courseModel.officialWebsiteUrl)
         : null,
+      courseModel.categories
+        ? new CategoriesValueObject(courseModel.categories)
+        : null,
       courseModel.courseImageUrl
         ? new UrlValueObject(courseModel.courseImageUrl)
         : null,
@@ -47,6 +51,7 @@ export class CourseMapper {
       description: course.getDescription(),
       source: course.getSource(),
       officialWebsiteUrl: course.getOfficialWebsiteUrl()?.getUrl() ?? null,
+      categories: course.getCategories().getCategories(),
       courseImageUrl: course.getCourseImageUrl()?.getUrl() ?? null,
       createdById: course.getCreatedById().getId(),
       createdAt: course.getCreatedAt(),
@@ -71,6 +76,7 @@ export class CourseMapper {
       createdAt: course.getCreatedAt(),
       updatedAt: course.getUpdatedAt(),
       createdById: course.getCreatedById().getId(),
+      categories: course.getCategories().getCategories(),
     };
   }
 }

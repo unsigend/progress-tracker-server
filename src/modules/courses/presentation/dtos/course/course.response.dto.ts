@@ -12,6 +12,9 @@ export class CourseResponseDto {
   /** The is public of the course */
   isPublic: boolean;
 
+  /** The categories of the course */
+  categories: string[];
+
   /** The description of the course */
   description: string | null;
 

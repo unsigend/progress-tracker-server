@@ -1,5 +1,6 @@
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
+import { CategoriesValueObject } from "../value-object/categories.vo";
 
 /**
  * Course entity
@@ -13,6 +14,8 @@ export class CourseEntity {
   private readonly createdAt: Date;
   private isPublic: boolean;
 
+  // optional properties
+  private categories: CategoriesValueObject;
   private description: string | null;
   private source: string | null;
   private officialWebsiteUrl: UrlValueObject | null;
@@ -28,6 +31,7 @@ export class CourseEntity {
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
+    categories?: CategoriesValueObject | null,
     courseImageUrl?: UrlValueObject | null,
     createdAt?: Date | null,
     updatedAt?: Date | null,
@@ -38,6 +42,7 @@ export class CourseEntity {
     this.createdAt = createdAt ?? new Date();
     this.updatedAt = updatedAt ?? new Date();
     this.isPublic = isPublic ?? false;
+    this.categories = categories ?? new CategoriesValueObject([]);
     this.description = description ?? null;
     this.source = source ?? null;
     this.officialWebsiteUrl = officialWebsiteUrl ?? null;
@@ -61,6 +66,7 @@ export class CourseEntity {
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
+    categories?: CategoriesValueObject | null,
     courseImageUrl?: UrlValueObject | null,
   ): CourseEntity {
     return new CourseEntity(
@@ -71,6 +77,7 @@ export class CourseEntity {
       description,
       source,
       officialWebsiteUrl,
+      categories,
       courseImageUrl,
     );
   }
@@ -97,6 +104,7 @@ export class CourseEntity {
     description: string | null,
     source: string | null,
     officialWebsiteUrl: UrlValueObject | null,
+    categories: CategoriesValueObject | null,
     courseImageUrl: UrlValueObject | null,
     createdAt: Date,
     updatedAt: Date,
@@ -109,10 +117,28 @@ export class CourseEntity {
       description,
       source,
       officialWebsiteUrl,
+      categories,
       courseImageUrl,
       createdAt,
       updatedAt,
     );
+  }
+
+  /**
+   * Get the categories of the course
+   * @returns The categories of the course
+   */
+  public getCategories(): CategoriesValueObject {
+    return this.categories;
+  }
+
+  /**
+   * Set the categories of the course
+   * @param categories - The categories to set
+   */
+  public setCategories(categories: CategoriesValueObject): void {
+    this.categories = categories;
+    this.updatedAt = new Date();
   }
 
   /**

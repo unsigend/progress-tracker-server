@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Param,
-  Inject,
   Request,
   Delete,
   Post,
@@ -16,8 +15,6 @@ import { FindCourseIdUseCase } from "@/modules/courses/application/use-case/cour
 import { DeleteCourseUseCase } from "@/modules/courses/application/use-case/course/delete.use-case";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 import { type Request as ExpressRequest } from "express";
-import { PERMISSION_POLICY_TOKEN } from "@/shared/domain/services/permission-policy.service";
-import { type IPermissionPolicy } from "@/shared/domain/services/permission-policy.service";
 import { CourseEntity } from "@/modules/courses/domain/entities/course.entity";
 import { CourseResponseDto } from "../dtos/course/course.response.dto";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
@@ -32,6 +29,7 @@ import { CoursesResponseDto } from "../dtos/course/courses.response.dto";
 import { UpdateCourseUseCase } from "@/modules/courses/application/use-case/course/update.use-case";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CourseUpdateRequestDto } from "../dtos/course/update.request.dto";
+import { CategoriesValueObject } from "../../domain/value-object/categories.vo";
 
 @Controller("courses")
 export class CourseController {
@@ -39,7 +37,6 @@ export class CourseController {
    * Constructor for CourseController
    * @param findCourseByIdUseCase - The find course by id use case
    * @param deleteCourseUseCase - The delete course use case
-   * @param permissionPolicy - The permission policy
    * @param updateCourseUseCase - The update course use case
    * @param findCourseByIdUseCase - The find course by id use case
    * @param deleteCourseUseCase - The delete course use case
@@ -52,8 +49,6 @@ export class CourseController {
     private readonly createCourseUseCase: CreateCourseUseCase,
     private readonly findAllCoursesUseCase: FindAllCoursesUseCase,
     private readonly updateCourseUseCase: UpdateCourseUseCase,
-    @Inject(PERMISSION_POLICY_TOKEN)
-    private readonly permissionPolicy: IPermissionPolicy<CourseEntity>,
   ) {}
 
   /**
@@ -79,6 +74,9 @@ export class CourseController {
       createCourseRequestDto.source ?? null,
       createCourseRequestDto.officialWebsiteUrl
         ? new UrlValueObject(createCourseRequestDto.officialWebsiteUrl)
+        : null,
+      createCourseRequestDto.categories
+        ? new CategoriesValueObject(createCourseRequestDto.categories)
         : null,
       courseImage
         ? new ImageValueObject(courseImage.buffer, courseImage.mimetype)
@@ -180,6 +178,9 @@ export class CourseController {
       updateCourseRequestDto.source ?? null,
       updateCourseRequestDto.officialWebsiteUrl
         ? new UrlValueObject(updateCourseRequestDto.officialWebsiteUrl)
+        : null,
+      updateCourseRequestDto.categories
+        ? new CategoriesValueObject(updateCourseRequestDto.categories)
         : null,
       courseImage
         ? new ImageValueObject(courseImage.buffer, courseImage.mimetype)

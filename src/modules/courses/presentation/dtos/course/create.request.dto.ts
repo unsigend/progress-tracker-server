@@ -1,5 +1,13 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from "class-validator";
 import { Transform } from "class-transformer";
+import { CategoriesValueObject } from "@/modules/courses/domain/value-object/categories.vo";
 
 /**
  * Create course request DTO
@@ -10,6 +18,12 @@ export class CourseCreateRequestDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  /** The categories of the course */
+  @IsArray()
+  @MaxLength(CategoriesValueObject.MAX_CATEGORIES)
+  @IsOptional()
+  categories?: string[];
 
   /** The is public of the course */
   @Transform(({ value }) => value === "true" || value === true)

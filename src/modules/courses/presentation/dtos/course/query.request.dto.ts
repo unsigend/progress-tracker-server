@@ -5,7 +5,7 @@ import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
  * @description Course query request DTO which is used to validate the course query request.
  */
 export class CourseQueryRequestDto {
-  /** The field to query */
+  /** The field to query default: name|categories */
   @IsOptional()
   @IsString()
   field?: string;

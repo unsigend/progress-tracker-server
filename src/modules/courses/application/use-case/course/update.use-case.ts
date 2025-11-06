@@ -18,6 +18,7 @@ import {
 } from "@shared/domain/services/image-compress.service";
 import { PermissionException } from "@shared/domain/exceptions/permission.exception";
 import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
+import { CategoriesValueObject } from "@/modules/courses/domain/value-object/categories.vo";
 
 /**
  * Update course use case
@@ -52,6 +53,7 @@ export class UpdateCourseUseCase {
    * @param description - The description of the course to update
    * @param source - The source of the course to update
    * @param officialWebsiteUrl - The official website url of the course to update
+   * @param categories - The categories of the course to update
    * @param courseImage - The course image of the course to update
    * @returns The updated course
    */
@@ -63,6 +65,7 @@ export class UpdateCourseUseCase {
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
+    categories?: CategoriesValueObject | null,
     courseImage?: ImageValueObject | null,
   ): Promise<CourseEntity> {
     // check if the course exists
@@ -80,6 +83,11 @@ export class UpdateCourseUseCase {
     // if the name is provided
     if (name) {
       course.setName(name);
+    }
+
+    // if the categories is provided
+    if (categories) {
+      course.setCategories(categories);
     }
 
     // if the is public is provided

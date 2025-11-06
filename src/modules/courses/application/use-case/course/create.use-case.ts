@@ -16,6 +16,7 @@ import {
   IMAGE_COMPRESSOR_TOKEN,
   type IImageCompress,
 } from "@shared/domain/services/image-compress.service";
+import { CategoriesValueObject } from "@/modules/courses/domain/value-object/categories.vo";
 
 /**
  * Create course use case
@@ -50,6 +51,7 @@ export class CreateCourseUseCase {
    * @param description - The description of the course
    * @param source - The source of the course
    * @param officialWebsiteUrl - The official website url of the course
+   * @param categories - The categories of the course
    * @param courseImageUrl - The course image url of the course
    * @returns The created course
    */
@@ -61,6 +63,7 @@ export class CreateCourseUseCase {
     description?: string | null,
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
+    categories?: CategoriesValueObject | null,
     courseImage?: ImageValueObject | null,
   ): Promise<CourseEntity> {
     // permission check
@@ -87,6 +90,7 @@ export class CreateCourseUseCase {
       description,
       source,
       officialWebsiteUrl,
+      categories,
       courseImageUrl,
     );
 
