@@ -9,15 +9,9 @@ import {
 } from "@/shared/domain/services/permission-policy.service";
 import { CourseEntity } from "@/modules/courses/domain/entities/course.entity";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
-import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
-import {
-  IMAGE_COMPRESSOR_TOKEN,
-  type IImageCompress,
-} from "@shared/domain/services/image-compress.service";
 import { PermissionException } from "@shared/domain/exceptions/permission.exception";
-import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 import { CategoriesValueObject } from "@/modules/courses/domain/value-object/categories.vo";
 
 /**
@@ -29,17 +23,11 @@ export class UpdateCourseUseCase {
   /**
    * Constructor for UpdateCourseUseCase
    * @param courseRepository - The course repository
-   * @param imageCompressor - The image compressor
-   * @param cloudService - The cloud service
    * @param permissionPolicy - The permission policy
    */
   constructor(
     @Inject(COURSE_REPOSITORY_TOKEN)
     private readonly courseRepository: ICourseRepository,
-    @Inject(IMAGE_COMPRESSOR_TOKEN)
-    private readonly imageCompressor: IImageCompress,
-    @Inject(CLOUD_TOKEN)
-    private readonly cloudService: ICloud,
     @Inject(PERMISSION_POLICY_TOKEN)
     private readonly permissionPolicy: IPermissionPolicy<CourseEntity>,
   ) {}
@@ -54,7 +42,6 @@ export class UpdateCourseUseCase {
    * @param source - The source of the course to update
    * @param officialWebsiteUrl - The official website url of the course to update
    * @param categories - The categories of the course to update
-   * @param courseImage - The course image of the course to update
    * @returns The updated course
    */
   public async execute(
@@ -66,7 +53,6 @@ export class UpdateCourseUseCase {
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
     categories?: CategoriesValueObject | null,
-    courseImage?: ImageValueObject | null,
   ): Promise<CourseEntity> {
     // check if the course exists
     const course: CourseEntity | null =
@@ -108,21 +94,6 @@ export class UpdateCourseUseCase {
     // if the official website url is provided
     if (officialWebsiteUrl) {
       course.setOfficialWebsiteUrl(officialWebsiteUrl);
-    }
-
-    // if the course image is provided
-    if (courseImage) {
-      // compress the course image
-      const compressedCourseImage: ImageValueObject =
-        await this.imageCompressor.compressImage(courseImage);
-
-      // upload the compressed course image to the cloud
-      const courseImageUrl: UrlValueObject = await this.cloudService.upload(
-        compressedCourseImage,
-      );
-
-      // set the new course image url
-      course.setCourseImageUrl(courseImageUrl);
     }
 
     // save the course

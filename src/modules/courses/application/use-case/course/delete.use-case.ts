@@ -8,7 +8,6 @@ import { PERMISSION_POLICY_TOKEN } from "@/shared/domain/services/permission-pol
 import { type IPermissionPolicy } from "@/shared/domain/services/permission-policy.service";
 import { PermissionException } from "@/shared/domain/exceptions/permission.exception";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
-import { CLOUD_TOKEN, type ICloud } from "@/modules/cloud/domain/cloud.service";
 
 /**
  * Delete course use case
@@ -26,8 +25,6 @@ export class DeleteCourseUseCase {
     private readonly courseRepository: ICourseRepository,
     @Inject(PERMISSION_POLICY_TOKEN)
     private readonly permissionPolicy: IPermissionPolicy<CourseEntity>,
-    @Inject(CLOUD_TOKEN)
-    private readonly cloudService: ICloud,
   ) {}
 
   /**
@@ -50,11 +47,6 @@ export class DeleteCourseUseCase {
     // permission check
     if (!(await this.permissionPolicy.canDelete(user, course))) {
       throw new PermissionException("Permission denied");
-    }
-
-    // if the course image url is not null
-    if (course.getCourseImageUrl()) {
-      await this.cloudService.delete(course.getCourseImageUrl()!);
     }
 
     // delete the course

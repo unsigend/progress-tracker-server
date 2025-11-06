@@ -82,7 +82,7 @@ export class FindAllCoursesUseCase {
             {
               field: "categories",
               operator: FilterOperator.HAS,
-              value: value,
+              value: value.toLowerCase(),
             },
           ],
         };

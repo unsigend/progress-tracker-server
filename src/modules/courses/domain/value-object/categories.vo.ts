@@ -18,7 +18,8 @@ export class CategoriesValueObject {
     if (categories.length > CategoriesValueObject.MAX_CATEGORIES) {
       throw new ValidationException("Categories must be less than 3");
     }
-    this.categories = categories;
+    // Normalize categories to lowercase for case-insensitive matching
+    this.categories = categories.map((category) => category.toLowerCase());
   }
 
   /**
@@ -37,7 +38,8 @@ export class CategoriesValueObject {
     if (this.categories.length >= CategoriesValueObject.MAX_CATEGORIES) {
       throw new ValidationException("Categories must be less than 3");
     }
-    this.categories.push(category);
+    // Normalize to lowercase for case-insensitive matching
+    this.categories.push(category.toLowerCase());
   }
 
   /**
@@ -45,7 +47,9 @@ export class CategoriesValueObject {
    * @param category - The category to remove
    */
   public removeCategory(category: string): void {
-    this.categories = this.categories.filter((c) => c !== category);
+    // Normalize to lowercase for consistent comparison
+    const normalizedCategory = category.toLowerCase();
+    this.categories = this.categories.filter((c) => c !== normalizedCategory);
   }
 
   /**
@@ -53,6 +57,7 @@ export class CategoriesValueObject {
    * @param categories - The categories to set
    */
   public setCategories(categories: string[]): void {
-    this.categories = categories;
+    // Normalize categories to lowercase for case-insensitive matching
+    this.categories = categories.map((category) => category.toLowerCase());
   }
 }

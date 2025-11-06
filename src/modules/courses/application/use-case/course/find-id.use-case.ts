@@ -39,16 +39,16 @@ export class FindCourseIdUseCase {
     user: UserEntity,
     id: ObjectIdValueObject,
   ): Promise<CourseEntity> {
-    // permission check
-    if (!(await this.permissionPolicy.canAccess(user, id))) {
-      throw new PermissionException("Permission denied");
-    }
-
     // check if the course exists
     const course: CourseEntity | null =
       await this.courseRepository.findById(id);
+
     if (course === null) {
       throw new NotFoundException("Course not found");
+    }
+    // permission check
+    if (!(await this.permissionPolicy.canAccess(user, course))) {
+      throw new PermissionException("Permission denied");
     }
     return course;
   }

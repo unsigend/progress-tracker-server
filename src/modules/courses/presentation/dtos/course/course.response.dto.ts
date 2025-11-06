@@ -24,9 +24,6 @@ export class CourseResponseDto {
   /** The official website url of the course */
   officialWebsiteUrl: string | null;
 
-  /** The course image url of the course */
-  courseImageUrl: string | null;
-
   /** The created at of the course */
   createdAt: Date;
 

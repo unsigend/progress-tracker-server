@@ -5,10 +5,8 @@ import {
   Request,
   Delete,
   Post,
-  UploadedFile,
   Body,
   Query,
-  UseInterceptors,
   Put,
 } from "@nestjs/common";
 import { FindCourseIdUseCase } from "@/modules/courses/application/use-case/course/find-id.use-case";
@@ -22,12 +20,10 @@ import { CourseMapper } from "@/modules/courses/infrastructure/mapper/course.map
 import { CourseCreateRequestDto } from "../dtos/course/create.request.dto";
 import { CreateCourseUseCase } from "@/modules/courses/application/use-case/course/create.use-case";
 import { UrlValueObject } from "@/shared/domain/value-object/url.vo";
-import { ImageValueObject } from "@/shared/domain/value-object/image.vo";
 import { FindAllCoursesUseCase } from "@/modules/courses/application/use-case/course/find-all.use-case";
 import { CourseQueryRequestDto } from "../dtos/course/query.request.dto";
 import { CoursesResponseDto } from "../dtos/course/courses.response.dto";
 import { UpdateCourseUseCase } from "@/modules/courses/application/use-case/course/update.use-case";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { CourseUpdateRequestDto } from "../dtos/course/update.request.dto";
 import { CategoriesValueObject } from "../../domain/value-object/categories.vo";
 
@@ -55,11 +51,9 @@ export class CourseController {
    * Create a course
    */
   @Post()
-  @UseInterceptors(FileInterceptor("courseImage"))
   public async create(
     @Request() request: ExpressRequest,
     @Body() createCourseRequestDto: CourseCreateRequestDto,
-    @UploadedFile() courseImage: Express.Multer.File,
   ): Promise<CourseResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
@@ -77,9 +71,6 @@ export class CourseController {
         : null,
       createCourseRequestDto.categories
         ? new CategoriesValueObject(createCourseRequestDto.categories)
-        : null,
-      courseImage
-        ? new ImageValueObject(courseImage.buffer, courseImage.mimetype)
         : null,
     );
 
@@ -158,12 +149,10 @@ export class CourseController {
    * Update a course by id
    */
   @Put(":id")
-  @UseInterceptors(FileInterceptor("courseImage"))
   public async update(
     @Request() request: ExpressRequest,
     @Param("id") id: string,
     @Body() updateCourseRequestDto: CourseUpdateRequestDto,
-    @UploadedFile() courseImage: Express.Multer.File,
   ): Promise<CourseResponseDto> {
     // get the user object from the request
     const userObj: UserEntity = request.user as UserEntity;
@@ -181,9 +170,6 @@ export class CourseController {
         : null,
       updateCourseRequestDto.categories
         ? new CategoriesValueObject(updateCourseRequestDto.categories)
-        : null,
-      courseImage
-        ? new ImageValueObject(courseImage.buffer, courseImage.mimetype)
         : null,
     );
     return CourseMapper.toDto(course);

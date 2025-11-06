@@ -19,7 +19,6 @@ export class CourseEntity {
   private description: string | null;
   private source: string | null;
   private officialWebsiteUrl: UrlValueObject | null;
-  private courseImageUrl: UrlValueObject | null;
   private updatedAt: Date;
 
   // private constructor
@@ -32,7 +31,6 @@ export class CourseEntity {
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
     categories?: CategoriesValueObject | null,
-    courseImageUrl?: UrlValueObject | null,
     createdAt?: Date | null,
     updatedAt?: Date | null,
   ) {
@@ -46,7 +44,6 @@ export class CourseEntity {
     this.description = description ?? null;
     this.source = source ?? null;
     this.officialWebsiteUrl = officialWebsiteUrl ?? null;
-    this.courseImageUrl = courseImageUrl ?? null;
   }
 
   /**
@@ -56,7 +53,6 @@ export class CourseEntity {
    * @param description - The description of the course
    * @param source - The source of the course
    * @param officialWebsiteUrl - The official website url of the course
-   * @param courseImageUrl - The course image url of the course
    * @returns The new course
    */
   public static create(
@@ -67,7 +63,6 @@ export class CourseEntity {
     source?: string | null,
     officialWebsiteUrl?: UrlValueObject | null,
     categories?: CategoriesValueObject | null,
-    courseImageUrl?: UrlValueObject | null,
   ): CourseEntity {
     return new CourseEntity(
       name,
@@ -78,7 +73,6 @@ export class CourseEntity {
       source,
       officialWebsiteUrl,
       categories,
-      courseImageUrl,
     );
   }
 
@@ -91,7 +85,6 @@ export class CourseEntity {
    * @param description - The description of the course
    * @param source - The source of the course
    * @param officialWebsiteUrl - The official website url of the course
-   * @param courseImageUrl - The course image url of the course
    * @param createdAt - The created at date of the course
    * @param updatedAt - The updated at date of the course
    * @returns The course
@@ -105,7 +98,6 @@ export class CourseEntity {
     source: string | null,
     officialWebsiteUrl: UrlValueObject | null,
     categories: CategoriesValueObject | null,
-    courseImageUrl: UrlValueObject | null,
     createdAt: Date,
     updatedAt: Date,
   ): CourseEntity {
@@ -118,7 +110,6 @@ export class CourseEntity {
       source,
       officialWebsiteUrl,
       categories,
-      courseImageUrl,
       createdAt,
       updatedAt,
     );
@@ -214,14 +205,6 @@ export class CourseEntity {
   }
 
   /**
-   * Get the course image url of the course
-   * @returns The course image url of the course
-   */
-  public getCourseImageUrl(): UrlValueObject | null {
-    return this.courseImageUrl;
-  }
-
-  /**
    * Set the is public of the course
    * @param isPublic - The is public of the course
    */
@@ -254,15 +237,6 @@ export class CourseEntity {
    */
   public setOfficialWebsiteUrl(officialWebsiteUrl: UrlValueObject): void {
     this.officialWebsiteUrl = officialWebsiteUrl;
-    this.updatedAt = new Date();
-  }
-
-  /**
-   * Set the course image url of the course
-   * @param courseImageUrl - The course image url of the course
-   */
-  public setCourseImageUrl(courseImageUrl: UrlValueObject): void {
-    this.courseImageUrl = courseImageUrl;
     this.updatedAt = new Date();
   }
 

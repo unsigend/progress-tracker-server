@@ -30,9 +30,6 @@ export class CourseMapper {
       courseModel.categories
         ? new CategoriesValueObject(courseModel.categories)
         : null,
-      courseModel.courseImageUrl
-        ? new UrlValueObject(courseModel.courseImageUrl)
-        : null,
       courseModel.createdAt,
       courseModel.updatedAt,
     );
@@ -52,7 +49,6 @@ export class CourseMapper {
       source: course.getSource(),
       officialWebsiteUrl: course.getOfficialWebsiteUrl()?.getUrl() ?? null,
       categories: course.getCategories().getCategories(),
-      courseImageUrl: course.getCourseImageUrl()?.getUrl() ?? null,
       createdById: course.getCreatedById().getId(),
       createdAt: course.getCreatedAt(),
       updatedAt: course.getUpdatedAt(),
@@ -72,7 +68,6 @@ export class CourseMapper {
       description: course.getDescription(),
       source: course.getSource(),
       officialWebsiteUrl: course.getOfficialWebsiteUrl()?.getUrl() ?? null,
-      courseImageUrl: course.getCourseImageUrl()?.getUrl() ?? null,
       createdAt: course.getCreatedAt(),
       updatedAt: course.getUpdatedAt(),
       createdById: course.getCreatedById().getId(),

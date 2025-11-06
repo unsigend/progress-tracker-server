@@ -11,7 +11,6 @@ model Course {
   description String?
   source     String?
   officialWebsiteUrl String?
-  courseImageUrl String?
   isPublic Boolean @default(false)
   createdById String
   categories String[] @default([])

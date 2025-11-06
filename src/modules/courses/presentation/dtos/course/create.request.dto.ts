@@ -4,10 +4,8 @@ import {
   IsOptional,
   IsString,
   IsUrl,
-  MaxLength,
 } from "class-validator";
 import { Transform } from "class-transformer";
-import { CategoriesValueObject } from "@/modules/courses/domain/value-object/categories.vo";
 
 /**
  * Create course request DTO
@@ -19,9 +17,8 @@ export class CourseCreateRequestDto {
   @IsNotEmpty()
   name: string;
 
-  /** The categories of the course */
+  /** The categories of the course maximum 3 categories*/
   @IsArray()
-  @MaxLength(CategoriesValueObject.MAX_CATEGORIES)
   @IsOptional()
   categories?: string[];
 
@@ -44,8 +41,4 @@ export class CourseCreateRequestDto {
   @IsUrl()
   @IsOptional()
   officialWebsiteUrl?: string;
-
-  /** The course image file of the course */
-  @IsOptional()
-  courseImage?: Express.Multer.File;
 }
