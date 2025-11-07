@@ -22,4 +22,46 @@ model Course {
 
   // relation
   createdBy User @relation(fields: [createdById], references: [id])
+  userCourses UserCourse[]
+}
+
+/*
+ * Course status enum
+ * @description Course status enum which is used to store the course status.
+ */
+enum CourseStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+/*
+ * User course model
+ * @description User course model which is used to store the user course information.
+ */
+model UserCourse {
+  // primary key
+  id String @id @default(uuid())
+
+  // foreign key
+  courseId String
+  userId String
+
+  // fields
+  status CourseStatus @default(IN_PROGRESS)
+  startDate DateTime? @db.Date
+  completedDate DateTime? @db.Date
+  totalMinutes Int @default(0)
+  totalDays Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // constraint
+  @@unique([courseId, userId])
+
+  // index optimization
+  @@index([courseId, userId])
 }

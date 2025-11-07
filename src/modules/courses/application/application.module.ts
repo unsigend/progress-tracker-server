@@ -4,12 +4,30 @@ import { Module } from "@nestjs/common";
 import { CoursesInfrastructureModule } from "../infrastructure/infrastructure.module";
 import { InfrastructureModule } from "@/shared/infrastructure/infrastructure.module";
 
-// import use cases
+// import course use cases
 import { FindCourseIdUseCase } from "./use-case/course/find-id.use-case";
 import { DeleteCourseUseCase } from "./use-case/course/delete.use-case";
 import { CreateCourseUseCase } from "./use-case/course/create.use-case";
 import { FindAllCoursesUseCase } from "./use-case/course/find-all.use-case";
 import { UpdateCourseUseCase } from "./use-case/course/update.use-case";
+
+// import user course use cases
+import { CreateUserCourseUseCase } from "./use-case/user-course/create.use-case";
+import { DeleteUserCourseUseCase } from "./use-case/user-course/delete.use-case";
+import { FindAllUserCoursesUseCase } from "./use-case/user-course/find-all.use-case";
+import { FindUserCourseIdUseCase } from "./use-case/user-course/find-id.use-case";
+import { FindUserCourseIdWithCourseUseCase } from "./use-case/user-course/find-id-with-course.use-case";
+import { FindAllUserCoursesWithCourseUseCase } from "./use-case/user-course/find-all-with-course.use-case";
+
+// import user course use cases
+const userCourseUseCases = [
+  CreateUserCourseUseCase,
+  DeleteUserCourseUseCase,
+  FindAllUserCoursesUseCase,
+  FindUserCourseIdUseCase,
+  FindUserCourseIdWithCourseUseCase,
+  FindAllUserCoursesWithCourseUseCase,
+];
 
 // import course use cases
 const courseUseCases = [
@@ -26,7 +44,7 @@ const courseUseCases = [
  */
 @Module({
   imports: [CoursesInfrastructureModule, InfrastructureModule],
-  providers: [...courseUseCases],
-  exports: [...courseUseCases],
+  providers: [...courseUseCases, ...userCourseUseCases],
+  exports: [...courseUseCases, ...userCourseUseCases],
 })
 export class CoursesApplicationModule {}
