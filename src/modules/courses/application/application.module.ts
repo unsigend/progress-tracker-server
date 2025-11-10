@@ -10,6 +10,7 @@ import { DeleteCourseUseCase } from "./use-case/course/delete.use-case";
 import { CreateCourseUseCase } from "./use-case/course/create.use-case";
 import { FindAllCoursesUseCase } from "./use-case/course/find-all.use-case";
 import { UpdateCourseUseCase } from "./use-case/course/update.use-case";
+import { MyCoursesUseCase } from "./use-case/course/my-courses.use-case";
 
 // import user course use cases
 import { CreateUserCourseUseCase } from "./use-case/user-course/create.use-case";
@@ -36,6 +37,7 @@ const courseUseCases = [
   CreateCourseUseCase,
   FindAllCoursesUseCase,
   UpdateCourseUseCase,
+  MyCoursesUseCase,
 ];
 
 /**

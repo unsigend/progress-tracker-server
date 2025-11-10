@@ -26,6 +26,7 @@ import { CoursesResponseDto } from "../dtos/course/courses.response.dto";
 import { UpdateCourseUseCase } from "@/modules/courses/application/use-case/course/update.use-case";
 import { CourseUpdateRequestDto } from "../dtos/course/update.request.dto";
 import { CategoriesValueObject } from "../../domain/value-object/categories.vo";
+import { MyCoursesUseCase } from "@/modules/courses/application/use-case/course/my-courses.use-case";
 
 @Controller("courses")
 export class CourseController {
@@ -38,6 +39,7 @@ export class CourseController {
    * @param deleteCourseUseCase - The delete course use case
    * @param createCourseUseCase - The create course use case
    * @param findAllCoursesUseCase - The find all courses use case
+   * @param myCoursesUseCase - The my courses use case
    */
   constructor(
     private readonly findCourseByIdUseCase: FindCourseIdUseCase,
@@ -45,6 +47,7 @@ export class CourseController {
     private readonly createCourseUseCase: CreateCourseUseCase,
     private readonly findAllCoursesUseCase: FindAllCoursesUseCase,
     private readonly updateCourseUseCase: UpdateCourseUseCase,
+    private readonly myCoursesUseCase: MyCoursesUseCase,
   ) {}
 
   /**
@@ -92,6 +95,38 @@ export class CourseController {
     // find all courses
     const { data, totalCount } = await this.findAllCoursesUseCase.execute(
       userObj,
+      query.field,
+      query.value,
+      query.limit,
+      query.page,
+      query.sort,
+      query.order,
+    );
+
+    // map the courses to the course response dtos
+    const courseResponseDtos: CourseResponseDto[] = data.map((course) =>
+      CourseMapper.toDto(course),
+    );
+
+    // return the courses and the total count of the courses
+    return { courses: courseResponseDtos, totalCount };
+  }
+
+  /**
+   * Find my courses
+   */
+  @Get("my-courses")
+  public async myCourses(
+    @Request() request: ExpressRequest,
+    @Query() query: CourseQueryRequestDto,
+  ): Promise<CoursesResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+    const userId: ObjectIdValueObject = userObj.getId();
+
+    // find my courses
+    const { data, totalCount } = await this.myCoursesUseCase.execute(
+      userId,
       query.field,
       query.value,
       query.limit,

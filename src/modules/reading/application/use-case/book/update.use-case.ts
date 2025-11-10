@@ -104,10 +104,13 @@ export class UpdateBookUseCase {
 
     // if the ISBN10 is provided
     if (isbn10) {
-      // check if the same book with this ISBN10 already exists
+      // check if the other book with this ISBN10 already exists
       const existingBook: BookEntity | null =
         await this.bookRepository.findByISBN10(isbn10.getISBN());
-      if (existingBook) {
+      if (
+        existingBook &&
+        existingBook.getId().getId() !== book.getId().getId()
+      ) {
         throw new ConflictException("Book with ISBN10 already exists");
       }
       book.setISBN10(isbn10);
@@ -115,10 +118,13 @@ export class UpdateBookUseCase {
 
     // if the ISBN13 is provided
     if (isbn13) {
-      // check if the same book with this ISBN13 already exists
+      // check if the other book with this ISBN13 already exists
       const existingBook: BookEntity | null =
         await this.bookRepository.findByISBN13(isbn13.getISBN());
-      if (existingBook) {
+      if (
+        existingBook &&
+        existingBook.getId().getId() !== book.getId().getId()
+      ) {
         throw new ConflictException("Book with ISBN13 already exists");
       }
       book.setISBN13(isbn13);
