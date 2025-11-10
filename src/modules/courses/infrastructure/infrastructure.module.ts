@@ -7,6 +7,7 @@ import { DatabaseModule } from "@/modules/database/database.module";
 import { COURSE_REPOSITORY_TOKEN } from "../domain/repositories/course.repository";
 import { USER_COURSE_REPOSITORY_TOKEN } from "../domain/repositories/user-course.repository";
 import { PERMISSION_POLICY_TOKEN } from "@/shared/domain/services/permission-policy.service";
+import { COURSE_RECORDING_REPOSITORY_TOKEN } from "../domain/repositories/recording.repository";
 
 // import services
 import { CoursePermissionPolicyService } from "./services/permission-policy/course-permission-policy.service";
@@ -14,6 +15,7 @@ import { CoursePermissionPolicyService } from "./services/permission-policy/cour
 // import repositories
 import { CourseRepository } from "./repositories/course.repository";
 import { UserCourseRepository } from "./repositories/user-course.repository";
+import { CourseRecordingRepository } from "./repositories/recording.repository";
 
 /**
  * Courses infrastructure module
@@ -31,6 +33,10 @@ import { UserCourseRepository } from "./repositories/user-course.repository";
       useClass: UserCourseRepository,
     },
     {
+      provide: COURSE_RECORDING_REPOSITORY_TOKEN,
+      useClass: CourseRecordingRepository,
+    },
+    {
       provide: PERMISSION_POLICY_TOKEN,
       useClass: CoursePermissionPolicyService,
     },
@@ -38,6 +44,7 @@ import { UserCourseRepository } from "./repositories/user-course.repository";
   exports: [
     COURSE_REPOSITORY_TOKEN,
     USER_COURSE_REPOSITORY_TOKEN,
+    COURSE_RECORDING_REPOSITORY_TOKEN,
     PERMISSION_POLICY_TOKEN,
   ],
 })

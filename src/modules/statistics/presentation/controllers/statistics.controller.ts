@@ -10,7 +10,7 @@ import { UserEntity } from "@/modules/user/domain/entities/user.entity";
 import { ReadingRecordingResponseDto } from "../dtos/reading-recording.response.dto";
 import { ReadingRecordingDetailResponseDto } from "../dtos/reading-recording-detail.response.dto";
 import { ReadingRecordingDetailRequestDto } from "../dtos/reading-recording-detail.request.dto";
-import { RecordingMapper } from "@/modules/reading/infrastructure/mapper/recording.mapper";
+import { BookRecordingMapper } from "@/modules/reading/infrastructure/mapper/recording.mapper";
 import { ReadingRecordingDetailUseCase } from "../../application/use-case/reading-recording-detail.use-case";
 
 /**
@@ -151,7 +151,7 @@ export class StatisticsController {
 
     // return the detailed reading recording statistics response dto
     return {
-      recordings: data.map((recording) => RecordingMapper.toDto(recording)),
+      recordings: data.map((recording) => BookRecordingMapper.toDto(recording)),
       totalCount,
     };
   }
@@ -174,7 +174,7 @@ export class StatisticsController {
 
     // return the detailed reading recording statistics response dto
     return {
-      recordings: data.map((recording) => RecordingMapper.toDto(recording)),
+      recordings: data.map((recording) => BookRecordingMapper.toDto(recording)),
       totalCount,
     };
   }
@@ -218,7 +218,7 @@ export class StatisticsController {
 
     // return the detailed reading recording statistics response dto
     return {
-      recordings: data.map((recording) => RecordingMapper.toDto(recording)),
+      recordings: data.map((recording) => BookRecordingMapper.toDto(recording)),
       totalCount,
     };
   }

@@ -2,7 +2,10 @@ import { ConflictException, Inject, Injectable } from "@nestjs/common";
 import { USER_COURSE_REPOSITORY_TOKEN } from "@/modules/courses/domain/repositories/user-course.repository";
 import { type IUserCourseRepository } from "@/modules/courses/domain/repositories/user-course.repository";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
-import { UserCourseEntity } from "@/modules/courses/domain/entities/user-course.entity";
+import {
+  UserCourseEntity,
+  UserCourseStatus,
+} from "@/modules/courses/domain/entities/user-course.entity";
 
 /**
  * Create user course use case
@@ -39,6 +42,8 @@ export class CreateUserCourseUseCase {
     const userCourseEntity: UserCourseEntity = UserCourseEntity.create(
       courseId,
       userId,
+      UserCourseStatus.IN_PROGRESS,
+      new Date(),
     );
 
     // save the user course entity

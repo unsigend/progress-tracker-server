@@ -1,5 +1,3 @@
-// import dependencies
-
 import { PagesValueObject } from "@/modules/reading/domain/object-value/pages.vo";
 import {
   BOOK_REPOSITORY_TOKEN,

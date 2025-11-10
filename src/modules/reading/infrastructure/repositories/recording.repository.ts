@@ -3,7 +3,7 @@ import { IRecordingRepository } from "@/modules/reading/domain/repositories/reco
 import { RecordingEntity } from "@/modules/reading/domain/entities/recording.entity";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { ReadingRecord as ReadingRecordModel } from "@prisma/client";
-import { RecordingMapper } from "../mapper/recording.mapper";
+import { BookRecordingMapper } from "../mapper/recording.mapper";
 import { PostgreSQLService } from "@/modules/database/postgresql/service/postgresql.service";
 import { QueryBase } from "@/shared/domain/queries/base.query";
 import { PrismaService } from "@/modules/database/postgresql/service/prisma.service";
@@ -11,7 +11,6 @@ import { Prisma } from "@prisma/client";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { ValidationException } from "@/shared/domain/exceptions/validation.exception";
 import { ServerException } from "@/shared/domain/exceptions/server.exception";
-import { Logger } from "@nestjs/common";
 import { Injectable } from "@nestjs/common";
 /**
  * Recording repository
@@ -33,7 +32,7 @@ export class RecordingRepository implements IRecordingRepository {
   public async save(recording: RecordingEntity): Promise<void> {
     // map the recording entity to the recording model
     const recordingModel: ReadingRecordModel =
-      RecordingMapper.toModel(recording);
+      BookRecordingMapper.toModel(recording);
 
     // upsert the recording model into the database
     await this.postgresqlService.readingRecord.upsert({
@@ -58,7 +57,7 @@ export class RecordingRepository implements IRecordingRepository {
       });
     return {
       data: recordingsModels.map((recordingModel) =>
-        RecordingMapper.toEntity(recordingModel),
+        BookRecordingMapper.toEntity(recordingModel),
       ),
       totalCount: recordingsModels.length,
     };
@@ -77,7 +76,7 @@ export class RecordingRepository implements IRecordingRepository {
       await this.postgresqlService.readingRecord.findUnique({
         where: { id: id.getId() },
       });
-    return recordingModel ? RecordingMapper.toEntity(recordingModel) : null;
+    return recordingModel ? BookRecordingMapper.toEntity(recordingModel) : null;
   }
 
   /**
@@ -110,7 +109,6 @@ export class RecordingRepository implements IRecordingRepository {
       if (error instanceof PrismaClientValidationError) {
         throw new ValidationException("Invalid query key");
       }
-      Logger.error(error);
       throw new ServerException("An unexpected error occurred");
     }
 
@@ -122,7 +120,7 @@ export class RecordingRepository implements IRecordingRepository {
     );
     return {
       data: recordingsModels.map((recordingModel) =>
-        RecordingMapper.toEntity(recordingModel),
+        BookRecordingMapper.toEntity(recordingModel),
       ),
       totalCount: totalCount,
     };
@@ -174,7 +172,7 @@ export class RecordingRepository implements IRecordingRepository {
 
     return {
       data: recordingsModels.map((recordingModel) =>
-        RecordingMapper.toEntity(recordingModel),
+        BookRecordingMapper.toEntity(recordingModel),
       ),
       totalCount: totalCount,
     };

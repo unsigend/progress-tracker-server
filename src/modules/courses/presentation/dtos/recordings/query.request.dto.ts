@@ -2,10 +2,10 @@
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 
 /**
- * Recording query request dto
- * @description Recording query request dto which is used to validate the recording query request.
+ * Course recording query request DTO
+ * @description Course recording query request DTO which is used to validate the course recording query request.
  */
-export class RecordingQueryRequestDto {
+export class CourseRecordingQueryRequestDto {
   /** The limit to query */
   @IsOptional()
   @IsNumber()

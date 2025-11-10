@@ -1,8 +1,8 @@
 /**
- * Recording response dto
+ * Book recording response dto
  * @description Recording response dto which is used to return the recording information.
  */
-export class RecordingResponseDto {
+export class BookRecordingResponseDto {
   /** The id of the recording */
   id: string;
 

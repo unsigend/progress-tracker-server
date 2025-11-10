@@ -20,10 +20,10 @@ import { UserBookQueryRequestDto } from "../dtos/user-book/query.request.dto";
 import { FindAllUserBooksUseCase } from "../../application/use-case/user-book/find-all.use-case";
 import { FindUserBookIdUseCase } from "../../application/use-case/user-book/find-id.use-case";
 import { FindAllRecordingsUseCase } from "../../application/use-case/recording/find-all.use-case";
-import { RecordingMapper } from "../../infrastructure/mapper/recording.mapper";
-import { RecordingResponseDto } from "../dtos/recording/recording.response.dto";
-import { RecordingQueryRequestDto } from "../dtos/recording/query.request.dto";
-import { RecordingCreateRequestDto } from "../dtos/recording/create.request.dto";
+import { BookRecordingMapper } from "../../infrastructure/mapper/recording.mapper";
+import { BookRecordingResponseDto } from "../dtos/recordings/recording.response.dto";
+import { BookRecordingQueryRequestDto } from "../dtos/recordings/query.request.dto";
+import { BookRecordingCreateRequestDto } from "../dtos/recordings/create.request.dto";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
 import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
 import { RecordingEntity } from "../../domain/entities/recording.entity";
@@ -37,7 +37,7 @@ import { FindAllUserBooksWithBookUseCase } from "../../application/use-case/user
 import { FindUserBookIdWithBookUseCase } from "../../application/use-case/user-book/find-id-with-book.use-case";
 import { BookEntity } from "../../domain/entities/book.entity";
 import { FindIdQueryRequestDto } from "../dtos/user-book/find-id-query.request.dto";
-import { RecordingsResponseDto } from "../dtos/recording/recordings.response.dto";
+import { BookRecordingsResponseDto } from "../dtos/recordings/recordings.response.dto";
 
 /**
  * User book controller
@@ -177,11 +177,11 @@ export class UserBookController {
    * Find all recordings
    */
   @Get(":id/recordings")
-  @ApiStandardResponse(RecordingsResponseDto)
+  @ApiStandardResponse(BookRecordingsResponseDto)
   public async findRecordings(
     @Param("id") id: string,
-    @Query() recordingQueryRequestDto: RecordingQueryRequestDto,
-  ): Promise<RecordingsResponseDto> {
+    @Query() recordingQueryRequestDto: BookRecordingQueryRequestDto,
+  ): Promise<BookRecordingsResponseDto> {
     // get all recordings based on the user book id
     const { data, totalCount } = await this.findAllRecordingsUseCase.execute(
       new ObjectIdValueObject(id),
@@ -192,8 +192,8 @@ export class UserBookController {
     );
 
     // map the recordings to the recording response dtos
-    const recordingResponseDtos: RecordingResponseDto[] = data.map(
-      (recording) => RecordingMapper.toDto(recording),
+    const recordingResponseDtos: BookRecordingResponseDto[] = data.map(
+      (recording) => BookRecordingMapper.toDto(recording),
     );
 
     // return the recordings and the total count of the recordings
@@ -209,8 +209,8 @@ export class UserBookController {
   @Post(":id/recordings")
   public async createRecording(
     @Param("id") id: string,
-    @Body() createRecordingRequestDto: RecordingCreateRequestDto,
-  ): Promise<RecordingResponseDto> {
+    @Body() createRecordingRequestDto: BookRecordingCreateRequestDto,
+  ): Promise<BookRecordingResponseDto> {
     const recording: RecordingEntity =
       await this.createRecordingUseCase.execute(
         new ObjectIdValueObject(id),
@@ -220,7 +220,7 @@ export class UserBookController {
         createRecordingRequestDto.notes ?? null,
       );
 
-    return RecordingMapper.toDto(recording);
+    return BookRecordingMapper.toDto(recording);
   }
 
   /**

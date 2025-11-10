@@ -26,7 +26,17 @@ import { UserCourseCreateRequestDto } from "../dtos/user-course/create.request.d
 import { UserCourseEntity } from "@/modules/courses/domain/entities/user-course.entity";
 import { CourseEntity } from "../../domain/entities/course.entity";
 import { FindIdQueryRequestDto } from "@/modules/reading/presentation/dtos/user-book/find-id-query.request.dto";
-
+import { MarkCourseCompleteUseCase } from "@/modules/courses/application/use-case/user-course/mark-complete.use-case";
+import { DeleteCourseRecordingsUseCase } from "@/modules/courses/application/use-case/recording/delete.use-case";
+import { CourseRecordingsResponseDto } from "../dtos/recordings/recordings.response.dto";
+import { CourseRecordingMapper } from "../../infrastructure/mapper/recording.mapper";
+import { CourseRecordingResponseDto } from "../dtos/recordings/recording.response.dto";
+import { CourseRecordingQueryRequestDto } from "../dtos/recordings/query.request.dto";
+import { FindAllCourseRecordingsUseCase } from "@/modules/courses/application/use-case/recording/find-all.use-case";
+import { CourseRecordingCreateRequestDto } from "../dtos/recordings/create.request.dto";
+import { CourseRecordingEntity } from "../../domain/entities/recording.entity";
+import { CreateCourseRecordingUseCase } from "../../application/use-case/recording/create.use-case";
+import { RecordTypeValueObject } from "../../domain/value-object/record-type.vo";
 /**
  * User course controller
  * @description User course controller which is used to handle the user course requests.
@@ -45,6 +55,10 @@ export class UserCourseController {
     private readonly findUserCourseIdUseCase: FindUserCourseIdUseCase,
     private readonly findUserCourseIdWithCourseUseCase: FindUserCourseIdWithCourseUseCase,
     private readonly findAllUserCoursesWithCourseUseCase: FindAllUserCoursesWithCourseUseCase,
+    private readonly markCourseCompleteUseCase: MarkCourseCompleteUseCase,
+    private readonly deleteCourseRecordingsUseCase: DeleteCourseRecordingsUseCase,
+    private readonly findAllCourseRecordingsUseCase: FindAllCourseRecordingsUseCase,
+    private readonly createCourseRecordingUseCase: CreateCourseRecordingUseCase,
   ) {}
 
   /**
@@ -164,5 +178,86 @@ export class UserCourseController {
       new ObjectIdValueObject(id),
     );
     return { success: result };
+  }
+
+  /**
+   * Mark a user course as complete
+   */
+  @Post(":id/mark-complete")
+  public async markComplete(
+    @Request() request: ExpressRequest,
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
+    // mark the user course as complete
+    await this.markCourseCompleteUseCase.execute(
+      userObj,
+      new ObjectIdValueObject(id),
+    );
+    return { success: true };
+  }
+
+  /**
+   * Delete course recordings
+   */
+  @Delete(":id/recordings")
+  public async deleteRecordings(
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    const result: boolean = await this.deleteCourseRecordingsUseCase.execute(
+      new ObjectIdValueObject(id),
+    );
+    return { success: result };
+  }
+
+  /**
+   * Find all course recordings
+   */
+  @Get(":id/recordings")
+  @ApiStandardResponse(CourseRecordingsResponseDto)
+  public async findRecordings(
+    @Param("id") id: string,
+    @Query() recordingQueryRequestDto: CourseRecordingQueryRequestDto,
+  ): Promise<CourseRecordingsResponseDto> {
+    // get all course recordings based on the user course id
+    const { data, totalCount } =
+      await this.findAllCourseRecordingsUseCase.execute(
+        new ObjectIdValueObject(id),
+        recordingQueryRequestDto.limit,
+        recordingQueryRequestDto.page,
+        recordingQueryRequestDto.sort,
+        recordingQueryRequestDto.order,
+      );
+
+    // map the course recordings to the course recording response dtos
+    const courseRecordingResponseDtos: CourseRecordingResponseDto[] = data.map(
+      (courseRecording) => CourseRecordingMapper.toResponseDto(courseRecording),
+    );
+
+    // return the course recordings and the total count of the course recordings
+    return { recordings: courseRecordingResponseDtos, totalCount };
+  }
+
+  /**
+   * Create a course recording
+   */
+  @Post(":id/recordings")
+  @ApiStandardResponse(CourseRecordingResponseDto)
+  public async createRecording(
+    @Param("id") id: string,
+    @Body() createRecordingRequestDto: CourseRecordingCreateRequestDto,
+  ): Promise<CourseRecordingResponseDto> {
+    const courseRecording: CourseRecordingEntity =
+      await this.createCourseRecordingUseCase.execute(
+        new ObjectIdValueObject(id),
+        createRecordingRequestDto.date,
+        createRecordingRequestDto.minutes,
+        new RecordTypeValueObject(createRecordingRequestDto.recordType),
+        createRecordingRequestDto.notes,
+      );
+
+    return CourseRecordingMapper.toResponseDto(courseRecording);
   }
 }

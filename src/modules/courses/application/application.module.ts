@@ -19,6 +19,12 @@ import { FindAllUserCoursesUseCase } from "./use-case/user-course/find-all.use-c
 import { FindUserCourseIdUseCase } from "./use-case/user-course/find-id.use-case";
 import { FindUserCourseIdWithCourseUseCase } from "./use-case/user-course/find-id-with-course.use-case";
 import { FindAllUserCoursesWithCourseUseCase } from "./use-case/user-course/find-all-with-course.use-case";
+import { MarkCourseCompleteUseCase } from "./use-case/user-course/mark-complete.use-case";
+
+// import course recording use cases
+import { CreateCourseRecordingUseCase } from "./use-case/recording/create.use-case";
+import { DeleteCourseRecordingsUseCase } from "./use-case/recording/delete.use-case";
+import { FindAllCourseRecordingsUseCase } from "./use-case/recording/find-all.use-case";
 
 // import user course use cases
 const userCourseUseCases = [
@@ -28,6 +34,7 @@ const userCourseUseCases = [
   FindUserCourseIdUseCase,
   FindUserCourseIdWithCourseUseCase,
   FindAllUserCoursesWithCourseUseCase,
+  MarkCourseCompleteUseCase,
 ];
 
 // import course use cases
@@ -40,13 +47,28 @@ const courseUseCases = [
   MyCoursesUseCase,
 ];
 
+// import course recording use cases
+const courseRecordingUseCases = [
+  CreateCourseRecordingUseCase,
+  DeleteCourseRecordingsUseCase,
+  FindAllCourseRecordingsUseCase,
+];
+
 /**
  * Courses application module
  * @description Courses application module which provides the courses application services
  */
 @Module({
   imports: [CoursesInfrastructureModule, InfrastructureModule],
-  providers: [...courseUseCases, ...userCourseUseCases],
-  exports: [...courseUseCases, ...userCourseUseCases],
+  providers: [
+    ...courseUseCases,
+    ...userCourseUseCases,
+    ...courseRecordingUseCases,
+  ],
+  exports: [
+    ...courseUseCases,
+    ...userCourseUseCases,
+    ...courseRecordingUseCases,
+  ],
 })
 export class CoursesApplicationModule {}

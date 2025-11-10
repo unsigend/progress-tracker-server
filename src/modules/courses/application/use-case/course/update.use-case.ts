@@ -77,7 +77,7 @@ export class UpdateCourseUseCase {
     }
 
     // if the is public is provided
-    if (isPublic) {
+    if (isPublic !== undefined && isPublic !== null) {
       course.setIsPublic(isPublic);
     }
 

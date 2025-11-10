@@ -208,4 +208,34 @@ export class UserCourseEntity {
   public getUpdatedAt(): Date {
     return this.updatedAt;
   }
+
+  /**
+   * Mark the user course as complete
+   * @returns The user course entity
+   */
+  public markAsComplete(): void {
+    if (this.status === UserCourseStatus.IN_PROGRESS && !this.completedDate) {
+      this.completedDate = new Date();
+      this.status = UserCourseStatus.COMPLETED;
+      this.updatedAt = new Date();
+    }
+  }
+
+  /**
+   * Add minutes to the user course
+   * @param minutes - The minutes to add
+   */
+  public addMinutes(minutes: number): void {
+    this.totalMinutes = this.totalMinutes + minutes;
+    this.updatedAt = new Date();
+  }
+
+  /**
+   * Add days to the user course
+   * @param days - The days to add
+   */
+  public addDays(days: number): void {
+    this.totalDays = this.totalDays + days;
+    this.updatedAt = new Date();
+  }
 }
