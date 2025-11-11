@@ -14,6 +14,8 @@ export class RecordTypeValueObject {
     "DISCUSSION",
     "QUIZ",
     "RECITATION",
+    "ASSIGNMENT",
+    "HOMEWORK",
     "OTHER",
   ] as const;
 

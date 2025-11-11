@@ -62,6 +62,10 @@ export class CreateCourseRecordingUseCase {
         },
       ],
       FilterLogic.AND,
+      1,
+      1,
+      "date",
+      "desc",
     );
     const { data, totalCount } =
       await this.courseRecordingRepository.findAll(query);

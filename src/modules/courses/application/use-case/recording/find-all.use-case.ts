@@ -49,7 +49,7 @@ export class FindAllCourseRecordingsUseCase {
       FilterLogic.AND,
       limit,
       page,
-      sort,
+      "date",
       order,
     );
 
