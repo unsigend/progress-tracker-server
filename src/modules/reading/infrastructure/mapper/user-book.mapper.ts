@@ -55,14 +55,14 @@ export class UserBookMapper {
   public static toModel(userBook: UserBookEntity): UserBookModel {
     return {
       id: userBook.getId().getId(),
-      book_id: userBook.getBookId().getId(),
-      user_id: userBook.getUserId().getId(),
+      bookId: userBook.getBookId().getId(),
+      userId: userBook.getUserId().getId(),
       status: this.toModelStatus(userBook.getStatus()),
-      current_page: userBook.getCurrentPage().getPages(),
-      start_date: userBook.getStartDate() ?? null,
-      completed_date: userBook.getCompletedDate() ?? null,
-      total_minutes: userBook.getTotalMinutes().getMinutes(),
-      total_days: userBook.getTotalDays(),
+      currentPage: userBook.getCurrentPage().getPages(),
+      startDate: userBook.getStartDate() ?? null,
+      completedDate: userBook.getCompletedDate() ?? null,
+      totalMinutes: userBook.getTotalMinutes().getMinutes(),
+      totalDays: userBook.getTotalDays(),
       createdAt: userBook.getCreatedAt(),
       updatedAt: userBook.getUpdatedAt(),
     };
@@ -76,14 +76,14 @@ export class UserBookMapper {
   public static toEntity(userBookModel: UserBookModel): UserBookEntity {
     return UserBookEntity.reconstitute(
       new ObjectIdValueObject(userBookModel.id),
-      new ObjectIdValueObject(userBookModel.book_id),
-      new ObjectIdValueObject(userBookModel.user_id),
+      new ObjectIdValueObject(userBookModel.bookId),
+      new ObjectIdValueObject(userBookModel.userId),
       this.toEntityStatus(userBookModel.status),
-      new PagesValueObject(userBookModel.current_page),
-      userBookModel.start_date,
-      userBookModel.completed_date,
-      new MinutesValueObject(userBookModel.total_minutes),
-      userBookModel.total_days,
+      new PagesValueObject(userBookModel.currentPage),
+      userBookModel.startDate,
+      userBookModel.completedDate,
+      new MinutesValueObject(userBookModel.totalMinutes),
+      userBookModel.totalDays,
       userBookModel.createdAt,
       userBookModel.updatedAt,
     );
@@ -128,9 +128,9 @@ export class UserBookMapper {
       case "updatedAt":
         return "updatedAt";
       case "completedDate":
-        return "completed_date";
+        return "completedDate";
       case "startDate":
-        return "start_date";
+        return "startDate";
     }
   }
 }

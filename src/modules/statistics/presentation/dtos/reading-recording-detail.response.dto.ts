@@ -1,5 +1,5 @@
 // import dependencies
-import { RecordingResponseDto } from "@/modules/reading/presentation/dtos/recording/recording.response.dto";
+import { BookRecordingResponseDto } from "@/modules/reading/presentation/dtos/recordings/recording.response.dto";
 
 /**
  * Reading recording detail response DTO
@@ -8,7 +8,7 @@ import { RecordingResponseDto } from "@/modules/reading/presentation/dtos/record
  */
 export class ReadingRecordingDetailResponseDto {
   /** The recordings of the reading recording detail */
-  recordings: RecordingResponseDto[];
+  recordings: BookRecordingResponseDto[];
 
   /** The total count of the recordings */
   totalCount: number;

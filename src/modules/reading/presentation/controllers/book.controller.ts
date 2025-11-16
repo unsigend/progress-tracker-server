@@ -39,7 +39,7 @@ import { FindRandomBooksUseCase } from "../../application/use-case/book/find-ran
  * Book controller
  * @description Book controller which is used to handle the book requests
  */
-@Controller("book")
+@Controller("books")
 export class BookController {
   /**
    * Constructor for BookController
@@ -65,10 +65,15 @@ export class BookController {
   @Get()
   @ApiStandardResponse(BooksResponseDto)
   public async findAll(
+    @Request() request: ExpressRequest,
     @Query() query: BookQueryRequestDto,
   ): Promise<BooksResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     // find all books
     const { data, totalCount } = await this.findAllBooksUseCase.execute(
+      userObj,
       query.field,
       query.value,
       query.limit,
@@ -120,6 +125,7 @@ export class BookController {
 
     // create the book entity
     const book: BookEntity = await this.createBookUseCase.execute(
+      userObj,
       createBookRequestDto.title,
       new PagesValueObject(createBookRequestDto.pages),
       userId,
@@ -144,8 +150,15 @@ export class BookController {
    * Find book by id
    */
   @Get(":id")
-  public async findById(@Param("id") id: string): Promise<BookResponseDto> {
+  public async findById(
+    @Request() request: ExpressRequest,
+    @Param("id") id: string,
+  ): Promise<BookResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     const book: BookEntity = await this.findBookByIdUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
     );
     // map the book entity to the book response dto
@@ -158,12 +171,17 @@ export class BookController {
   @Put(":id")
   @UseInterceptors(FileInterceptor("coverImage"))
   public async update(
+    @Request() request: ExpressRequest,
     @Param("id") id: string,
     @Body() updateBookRequestDto: BookUpdateRequestDto,
     @UploadedFile() coverImage: Express.Multer.File,
   ): Promise<BookResponseDto> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     // update the book entity
     const book: BookEntity = await this.updateBookUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
       updateBookRequestDto.title,
       updateBookRequestDto.pages
@@ -188,8 +206,15 @@ export class BookController {
    * Delete a book
    */
   @Delete(":id")
-  public async delete(@Param("id") id: string): Promise<{ success: boolean }> {
+  public async delete(
+    @Request() request: ExpressRequest,
+    @Param("id") id: string,
+  ): Promise<{ success: boolean }> {
+    // get the user object from the request
+    const userObj: UserEntity = request.user as UserEntity;
+
     const result: boolean = await this.deleteBookUseCase.execute(
+      userObj,
       new ObjectIdValueObject(id),
     );
     return { success: result };

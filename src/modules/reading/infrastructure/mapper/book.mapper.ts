@@ -27,7 +27,7 @@ export class BookMapper {
       bookModel.description,
       bookModel.ISBN10 ? new ISBNValueObject(bookModel.ISBN10) : null,
       bookModel.ISBN13 ? new ISBNValueObject(bookModel.ISBN13) : null,
-      bookModel.cover_url ? new UrlValueObject(bookModel.cover_url) : null,
+      bookModel.coverUrl ? new UrlValueObject(bookModel.coverUrl) : null,
       bookModel.createdAt,
       bookModel.updatedAt,
     );
@@ -48,7 +48,7 @@ export class BookMapper {
       description: book.getDescription(),
       ISBN10: book.getISBN10()?.getISBN() ?? null,
       ISBN13: book.getISBN13()?.getISBN() ?? null,
-      cover_url: book.getCoverUrl()?.getUrl() ?? null,
+      coverUrl: book.getCoverUrl()?.getUrl() ?? null,
       createdAt: book.getCreatedAt(),
       updatedAt: book.getUpdatedAt(),
     };

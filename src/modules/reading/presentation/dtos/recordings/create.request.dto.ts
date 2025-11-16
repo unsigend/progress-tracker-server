@@ -8,10 +8,10 @@ import {
 } from "class-validator";
 
 /**
- * Create recording request DTO
- * @description Create recording request DTO which is used to create a recording.
+ * Create book recording request DTO
+ * @description Create book recording request DTO which is used to create a book recording.
  */
-export class RecordingCreateRequestDto {
+export class BookRecordingCreateRequestDto {
   /** The date of the recording */
   @IsDate()
   @IsNotEmpty()

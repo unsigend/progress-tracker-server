@@ -87,7 +87,7 @@ export class CreateRecordingUseCase {
     const query: QueryBase = new QueryBase(
       [
         {
-          field: "user_book_id",
+          field: "userBookId",
           operator: FilterOperator.EQUALS,
           value: userBookId.getId(),
         },

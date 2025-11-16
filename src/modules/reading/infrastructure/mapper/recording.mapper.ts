@@ -4,22 +4,22 @@ import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { ReadingRecord as ReadingRecordModel } from "@prisma/client";
 import { PagesValueObject } from "../../domain/object-value/pages.vo";
 import { MinutesValueObject } from "../../domain/object-value/minutes.vo";
-import { RecordingResponseDto } from "../../presentation/dtos/recording/recording.response.dto";
+import { BookRecordingResponseDto } from "../../presentation/dtos/recordings/recording.response.dto";
 
 /**
- * Recording mapper
- * @description Recording mapper which is used to map the recording entity to the recording model and vice versa.
+ * Book recording mapper
+ * @description Book recording mapper which is used to map the book recording entity to the book recording model and vice versa.
  */
-export class RecordingMapper {
+export class BookRecordingMapper {
   /**
    * Map a recording entity to a reading record model
-   * @param recording - The recording entity to map
-   * @returns The recording model
+   * @param recording - The book recording entity to map
+   * @returns The book recording model
    */
   public static toModel(recording: RecordingEntity): ReadingRecordModel {
     return {
       id: recording.getId().getId(),
-      user_book_id: recording.getUserBookId().getId(),
+      userBookId: recording.getUserBookId().getId(),
       date: recording.getDate(),
       pages: recording.getPages().getPages(),
       minutes: recording.getMinutes().getMinutes(),
@@ -35,7 +35,7 @@ export class RecordingMapper {
   public static toEntity(recordingModel: ReadingRecordModel): RecordingEntity {
     return RecordingEntity.reconstitute(
       new ObjectIdValueObject(recordingModel.id),
-      new ObjectIdValueObject(recordingModel.user_book_id),
+      new ObjectIdValueObject(recordingModel.userBookId),
       recordingModel.date,
       new PagesValueObject(recordingModel.pages),
       new MinutesValueObject(recordingModel.minutes),
@@ -48,7 +48,7 @@ export class RecordingMapper {
    * @param recording - The recording entity to map
    * @returns The recording response dto
    */
-  public static toDto(recording: RecordingEntity): RecordingResponseDto {
+  public static toDto(recording: RecordingEntity): BookRecordingResponseDto {
     return {
       id: recording.getId().getId(),
       userBookId: recording.getUserBookId().getId(),

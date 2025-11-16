@@ -29,4 +29,12 @@ export class RoleValueObject {
   public getRole(): UserRole {
     return this.role;
   }
+
+  /**
+   * Check if the role is admin
+   * @returns True if the role is admin, false otherwise
+   */
+  public isAdmin(): boolean {
+    return this.role === UserRole.ADMIN;
+  }
 }

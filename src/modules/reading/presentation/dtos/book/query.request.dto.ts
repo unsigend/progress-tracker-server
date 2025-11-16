@@ -6,7 +6,7 @@ import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
  * @description Book query request DTO which is used to validate the book query request.
  */
 export class BookQueryRequestDto {
-  /** The field to query */
+  /** The field to query default is: title|author|ISBN10|ISBN13 */
   @IsOptional()
   @IsString()
   field?: string;

@@ -57,9 +57,9 @@ export class UserBookRepository implements IUserBookRepository {
     const userBookModel: UserBookModel | null =
       await this.postgresqlService.userBook.findUnique({
         where: {
-          book_id_user_id: {
-            book_id: bookId.getId(),
-            user_id: userId.getId(),
+          bookId_userId: {
+            bookId: bookId.getId(),
+            userId: userId.getId(),
           },
         },
       });
@@ -141,12 +141,14 @@ export class UserBookRepository implements IUserBookRepository {
   public async findByIdWithBook(
     id: ObjectIdValueObject,
   ): Promise<{ userBook: UserBookEntity; book: BookEntity } | null> {
-    const userBookWithBook = await this.postgresqlService.userBook.findUnique({
-      where: { id: id.getId() },
-      include: {
-        book: true,
-      },
-    });
+    // find the user book by id with book
+    const userBookWithBook: (UserBookModel & { book: BookModel }) | null =
+      await this.postgresqlService.userBook.findUnique({
+        where: { id: id.getId() },
+        include: {
+          book: true,
+        },
+      });
     if (!userBookWithBook || !userBookWithBook.book) {
       return null;
     }

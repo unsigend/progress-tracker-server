@@ -44,7 +44,7 @@ export class FindAllRecordingsUseCase {
   ): Promise<{ data: RecordingEntity[]; totalCount: number }> {
     const filters: Filters = [];
     filters.push({
-      field: "user_book_id",
+      field: "userBookId",
       operator: FilterOperator.EQUALS,
       value: userBookId.getId(),
     });

@@ -81,6 +81,7 @@ function setupOpenAPIDocs(
       content: document,
       layout: "classic",
       hideModels: true,
+      defaultOpenAllTags: true,
     }),
   );
 
