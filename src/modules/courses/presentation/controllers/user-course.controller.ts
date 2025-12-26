@@ -225,6 +225,8 @@ export class UserCourseController {
     const { data, totalCount } =
       await this.findAllCourseRecordingsUseCase.execute(
         new ObjectIdValueObject(id),
+        recordingQueryRequestDto.startDate,
+        recordingQueryRequestDto.endDate,
         recordingQueryRequestDto.limit,
         recordingQueryRequestDto.page,
         recordingQueryRequestDto.sort,

@@ -26,10 +26,18 @@ export class FindAllCourseRecordingsUseCase {
   /**
    * Execute the find all course recordings use case
    * @param userCourseId - The user course id
+   * @param startDate - The start date
+   * @param endDate - The end date
+   * @param limit - The limit
+   * @param page - The page
+   * @param sort - The sort
+   * @param order - The order
    * @returns The course recordings and the total count of the course recordings
    */
   public async execute(
     userCourseId: ObjectIdValueObject,
+    startDate?: Date | null,
+    endDate?: Date | null,
     limit?: number,
     page?: number,
     sort?: string,
@@ -43,13 +51,22 @@ export class FindAllCourseRecordingsUseCase {
       value: userCourseId.getId(),
     });
 
+    // add date range filter if both startDate and endDate are provided
+    if (startDate && endDate) {
+      filters.push({
+        field: "date",
+        operator: FilterOperator.BETWEEN,
+        value: [startDate, endDate],
+      });
+    }
+
     // build the query
     const query: QueryBase = new QueryBase(
       filters,
       FilterLogic.AND,
       limit,
       page,
-      "date",
+      sort ?? "date",
       order,
     );
 

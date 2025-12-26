@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["setseed"]
+  "cSpell.words": ["setseed"],
+  "prisma.pinToPrisma6": true
 }

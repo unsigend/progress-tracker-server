@@ -21,9 +21,10 @@ export class CourseRecordingEntity {
     date: Date,
     minutes: number,
     recordType: RecordTypeValueObject,
+    id?: ObjectIdValueObject | null,
     notes?: string | null,
   ) {
-    this.id = new ObjectIdValueObject();
+    this.id = id ?? new ObjectIdValueObject();
     this.userCourseId = userCourseId;
     this.date = date;
     this.minutes = new MinutesValueObject(minutes);
@@ -52,6 +53,7 @@ export class CourseRecordingEntity {
       date,
       minutes,
       recordType,
+      null,
       notes,
     );
   }
@@ -79,6 +81,7 @@ export class CourseRecordingEntity {
       date,
       minutes,
       recordType,
+      id,
       notes,
     );
   }
