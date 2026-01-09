@@ -4,8 +4,6 @@
 
 </div>
 
-# Progress Tracker Backend
-
 Backend service for Progress Tracker, a web application that helps you track your daily reading and course progress. Customize your learning journey and monitor your progress with detailed statistics and analytics.
 
 <div align="center">
@@ -18,6 +16,9 @@ Backend service for Progress Tracker, a web application that helps you track you
 ## Overview
 
 Progress Tracker Backend is an open-source RESTful API built with NestJS, following Hexagonal Architecture principles and Domain-Driven Design (DDD). The backend provides comprehensive APIs for managing reading progress, course recordings, user authentication, and statistical analytics.
+
+- [Interactive Backend API documentation](https://progress-tracker-kx97.onrender.com/api-docs)
+- [Frontend Github Repository](https://github.com/unsigend/progress-tracker-client)
 
 ## Architecture Design
 
@@ -39,7 +40,7 @@ Modules are composed through NestJS dependency injection, with each layer module
 Contains the core business logic, entities, value objects, and repository interfaces. This layer is framework-agnostic and represents the business domain model.
 
 - **Entities**: Domain entities with business logic and validation
-- **Value Objects**: Immutable domain concepts (e.g., `ObjectIdValueObject`, `UrlValueObject`, `ImageValueObject`)
+- **Value Objects**: Immutable domain concepts
 - **Repository Interfaces**: Contracts defined in domain, implemented in infrastructure
 
 ### Application Layer
@@ -95,7 +96,7 @@ The `shared` directory provides cross-cutting concerns:
 
 - Automatic image compression using Sharp
 - Support for JPEG, PNG, GIF, and WebP formats
-- Avatar-specific compression (optimized for profile pictures)
+- Avatar-specific compression
 - Image resizing with aspect ratio preservation
 
 ### Database
@@ -107,14 +108,14 @@ The `shared` directory provides cross-cutting concerns:
 
 ### Statistics & Analytics
 
-- Reading progress statistics (total minutes, pages, recordings)
+- Reading progress statistics
 - Course recording statistics with breakdown by record type
 - Daily progress tracking and aggregation
 - Time-based filtering and reporting
 
 ## Database Design
 
-The application uses Prisma ORM with a modular schema approach. The database schema is organized by domain modules (user, reading, courses) and merged at build time.
+The application uses Prisma ORM with a modular schema approach. The database schema is organized by domain modules and merged at build time.
 
 Key entities:
 
@@ -163,17 +164,6 @@ npx prisma migrate dev
 # Open Prisma Studio
 npx prisma studio
 ```
-
-## API Documentation
-
-Interactive API documentation is available at: [https://progress-tracker-kx97.onrender.com/api-docs](https://progress-tracker-kx97.onrender.com/api-docs)
-
-The API documentation includes:
-
-- Complete endpoint specifications
-- Request/response schemas
-- Authentication requirements
-- Example requests and responses
 
 ## Technology Stack
 
