@@ -4,13 +4,7 @@ import {
   COURSE_RECORDING_REPOSITORY_TOKEN,
 } from "@/modules/courses/domain/repositories/recording.repository";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
-import {
-  FilterLogic,
-  FilterOperator,
-  Filters,
-} from "@/shared/domain/queries/filter";
-import { QueryBase } from "@/shared/domain/queries/base.query";
-import { CourseRecordingEntity } from "@/modules/courses/domain/entities/recording.entity";
+import { DailyRecordValueObject } from "@/modules/courses/domain/value-object/daily-record.vo";
 
 /**
  * Find all course recordings use case
@@ -26,55 +20,30 @@ export class FindAllCourseRecordingsUseCase {
   /**
    * Execute the find all course recordings use case
    * @param userCourseId - The user course id
-   * @param startDate - The start date
-   * @param endDate - The end date
-   * @param limit - The limit
+   * @param limit - The limit (number of days)
    * @param page - The page
-   * @param sort - The sort
+   * @param sort - The sort field (default: "date")
    * @param order - The order
-   * @returns The course recordings and the total count of the course recordings
+   * @returns The daily records and the total count of distinct days
    */
   public async execute(
     userCourseId: ObjectIdValueObject,
-    startDate?: Date | null,
-    endDate?: Date | null,
     limit?: number,
     page?: number,
     sort?: string,
     order?: "asc" | "desc",
-  ): Promise<{ data: CourseRecordingEntity[]; totalCount: number }> {
-    // build the filters
-    const filters: Filters = [];
-    filters.push({
-      field: "userCourseId",
-      operator: FilterOperator.EQUALS,
-      value: userCourseId.getId(),
-    });
+  ): Promise<{ data: DailyRecordValueObject[]; totalDays: number }> {
+    // find the daily records using the new repository method
+    const { data, totalDays } =
+      await this.courseRecordingRepository.findDailyRecordsByUserCourseId(
+        userCourseId,
+        limit,
+        page,
+        sort ?? "date",
+        order,
+      );
 
-    // add date range filter if both startDate and endDate are provided
-    if (startDate && endDate) {
-      filters.push({
-        field: "date",
-        operator: FilterOperator.BETWEEN,
-        value: [startDate, endDate],
-      });
-    }
-
-    // build the query
-    const query: QueryBase = new QueryBase(
-      filters,
-      FilterLogic.AND,
-      limit,
-      page,
-      sort ?? "date",
-      order,
-    );
-
-    // find the course recordings
-    const { data, totalCount } =
-      await this.courseRecordingRepository.findAll(query);
-
-    // return the course recordings and the total count of the course recordings
-    return { data, totalCount };
+    // return the daily records and the total count of distinct days
+    return { data, totalDays };
   }
 }

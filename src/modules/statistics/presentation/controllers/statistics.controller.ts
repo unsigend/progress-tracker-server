@@ -1,17 +1,19 @@
 // import use cases
-import { ReadingRecordingUseCase } from "../../application/use-case/reading-recording.use-case";
+import { ReadingRecordingUseCase } from "../../application/use-case/reading/reading-recording.use-case";
 
 // import dependencies
-import { Controller, Get, Body, Request } from "@nestjs/common";
+import { Controller, Get, Body, Request, Param } from "@nestjs/common";
 import { type Request as ExpressRequest } from "express";
-import { ReadingRecordingRequestDto } from "../dtos/reading-recording.request.dto";
+import { ReadingRecordingRequestDto } from "../dtos/reading/reading-recording.request.dto";
 import { ObjectIdValueObject } from "@/shared/domain/value-object/object-id.vo";
 import { UserEntity } from "@/modules/user/domain/entities/user.entity";
-import { ReadingRecordingResponseDto } from "../dtos/reading-recording.response.dto";
-import { ReadingRecordingDetailResponseDto } from "../dtos/reading-recording-detail.response.dto";
-import { ReadingRecordingDetailRequestDto } from "../dtos/reading-recording-detail.request.dto";
+import { ReadingRecordingResponseDto } from "../dtos/reading/reading-recording.response.dto";
+import { ReadingRecordingDetailResponseDto } from "../dtos/reading/reading-recording-detail.response.dto";
+import { ReadingRecordingDetailRequestDto } from "../dtos/reading/reading-recording-detail.request.dto";
 import { BookRecordingMapper } from "@/modules/reading/infrastructure/mapper/recording.mapper";
-import { ReadingRecordingDetailUseCase } from "../../application/use-case/reading-recording-detail.use-case";
+import { ReadingRecordingDetailUseCase } from "../../application/use-case/reading/reading-recording-detail.use-case";
+import { CourseRecordingDetailUseCase } from "../../application/use-case/courses/course-recording-detail.use-case";
+import { CourseRecordingDetailResponseDto } from "../dtos/courses/course-recording-detail.response.dto";
 
 /**
  * Statistics controller
@@ -23,10 +25,12 @@ export class StatisticsController {
    * Constructor for StatisticsController
    * @param readingRecordingUseCase - The reading recording use case
    * @param readingRecordingDetailUseCase - The reading recording detail use case
+   * @param courseRecordingDetailUseCase - The course recording detail use case
    */
   constructor(
     private readonly readingRecordingUseCase: ReadingRecordingUseCase,
     private readonly readingRecordingDetailUseCase: ReadingRecordingDetailUseCase,
+    private readonly courseRecordingDetailUseCase: CourseRecordingDetailUseCase,
   ) {}
 
   /**
@@ -220,6 +224,26 @@ export class StatisticsController {
     return {
       recordings: data.map((recording) => BookRecordingMapper.toDto(recording)),
       totalCount,
+    };
+  }
+
+  /**
+   * Get the detailed course recording statistics by user course id
+   */
+  @Get("course-recording/:id/detail")
+  public async getCourseRecordingDetail(
+    @Param("id") id: string,
+  ): Promise<CourseRecordingDetailResponseDto> {
+    // get the course recording detail statistics
+    const { totalMinutes, minutesByType } =
+      await this.courseRecordingDetailUseCase.execute(
+        new ObjectIdValueObject(id),
+      );
+
+    // return the course recording detail statistics response dto
+    return {
+      totalMinutes,
+      minutesByType,
     };
   }
 }

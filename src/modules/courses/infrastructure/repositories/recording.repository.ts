@@ -12,6 +12,7 @@ import { ValidationException } from "@/shared/domain/exceptions/validation.excep
 import { ServerException } from "@/shared/domain/exceptions/server.exception";
 import { Injectable } from "@nestjs/common";
 import { QueryBase } from "@/shared/domain/queries/base.query";
+import { DailyRecordValueObject } from "@/modules/courses/domain/value-object/daily-record.vo";
 
 /**
  * Course recording repository
@@ -156,5 +157,122 @@ export class CourseRecordingRepository implements ICourseRecordingRepository {
         where: { id: id.getId() },
       });
     return result ? true : false;
+  }
+
+  /**
+   * Find daily records by user course id
+   * @param userCourseId - The user course id
+   * @param limit - The limit (number of days)
+   * @param page - The page number
+   * @param sort - The sort field (default: "date")
+   * @param order - The sort order (default: "desc")
+   * @returns The daily records and the total count of distinct days
+   */
+  public async findDailyRecordsByUserCourseId(
+    userCourseId: ObjectIdValueObject,
+    limit?: number,
+    page?: number,
+    sort?: string,
+    order?: "asc" | "desc",
+  ): Promise<{ data: DailyRecordValueObject[]; totalDays: number }> {
+    // Build where clause using Prisma
+    const whereClause: Prisma.CourseRecordWhereInput = {
+      userCourseId: userCourseId.getId(),
+    };
+
+    // Set defaults
+    const DEFAULT_LIMIT = 10;
+    const DEFAULT_PAGE = 1;
+    const DEFAULT_ORDER: "asc" | "desc" = "desc";
+    const sortOrder: "asc" | "desc" = order ?? DEFAULT_ORDER;
+
+    try {
+      // Step 1: Fetch all recordings for the user course
+      // We'll group by date in memory, so we fetch all matching records
+      const allRecordings: CourseRecordingModel[] =
+        await this.postgresqlService.courseRecord.findMany({
+          where: whereClause,
+          orderBy: [
+            {
+              date: sortOrder,
+            },
+            {
+              recordType: "asc",
+            },
+          ],
+        });
+
+      // Step 2: Group recordings by date in memory
+      const recordingsByDateMap = new Map<string, CourseRecordingModel[]>();
+
+      allRecordings.forEach((recording) => {
+        // Normalize date to YYYY-MM-DD format for consistent grouping
+        const date = new Date(recording.date);
+        const dateKey = date.toISOString().split("T")[0];
+
+        if (!recordingsByDateMap.has(dateKey)) {
+          recordingsByDateMap.set(dateKey, []);
+        }
+        recordingsByDateMap.get(dateKey)!.push(recording);
+      });
+
+      // Step 3: Get distinct dates and sort them
+      const distinctDates: Date[] = Array.from(recordingsByDateMap.keys())
+        .map((dateKey) => {
+          // Create date from YYYY-MM-DD string
+          const [year, month, day] = dateKey.split("-").map(Number);
+          return new Date(Date.UTC(year, month - 1, day));
+        })
+        .sort((a, b) => {
+          return sortOrder === "desc"
+            ? b.getTime() - a.getTime()
+            : a.getTime() - b.getTime();
+        });
+
+      const totalDays: number = distinctDates.length;
+
+      // Step 4: Apply pagination to distinct dates
+      // Use default limit if limit is undefined, null, or 0
+      const take: number = limit && limit > 0 ? limit : DEFAULT_LIMIT;
+      const currentPage: number = page && page > 0 ? page : DEFAULT_PAGE;
+      const skip: number = (currentPage - 1) * take;
+      const paginatedDates = distinctDates.slice(skip, skip + take);
+
+      // Step 5: Create DailyRecordValueObject instances for paginated dates
+      const dailyRecords: DailyRecordValueObject[] = paginatedDates.map(
+        (date) => {
+          const dateKey = date.toISOString().split("T")[0];
+          const dailyRecord = new DailyRecordValueObject(date);
+
+          // Add all recordings for this date
+          const recordingsForDate = recordingsByDateMap.get(dateKey) || [];
+          recordingsForDate.forEach((recording) => {
+            dailyRecord.addRecord(
+              recording.recordType,
+              recording.minutes,
+              recording.notes,
+            );
+          });
+
+          return dailyRecord;
+        },
+      );
+
+      return { data: dailyRecords, totalDays };
+    } catch (error) {
+      if (error instanceof PrismaClientValidationError) {
+        // Log the actual Prisma error for debugging
+        console.error("Prisma validation error:", error.message);
+        throw new ValidationException(
+          `Invalid query parameters: ${error.message}`,
+        );
+      }
+      // Log other errors for debugging
+      console.error(
+        "Unexpected error in findDailyRecordsByUserCourseId:",
+        error,
+      );
+      throw new ServerException("An unexpected error occurred");
+    }
   }
 }

@@ -28,8 +28,9 @@ import { CourseEntity } from "../../domain/entities/course.entity";
 import { FindIdQueryRequestDto } from "@/modules/reading/presentation/dtos/user-book/find-id-query.request.dto";
 import { MarkCourseCompleteUseCase } from "@/modules/courses/application/use-case/user-course/mark-complete.use-case";
 import { DeleteCourseRecordingsUseCase } from "@/modules/courses/application/use-case/recording/delete.use-case";
-import { CourseRecordingsResponseDto } from "../dtos/recordings/recordings.response.dto";
+import { DailyRecordsResponseDto } from "../dtos/recordings/daily-records.response.dto";
 import { CourseRecordingMapper } from "../../infrastructure/mapper/recording.mapper";
+import { DailyRecordResponseDto } from "../dtos/recordings/daily-record.response.dto";
 import { CourseRecordingResponseDto } from "../dtos/recordings/recording.response.dto";
 import { CourseRecordingQueryRequestDto } from "../dtos/recordings/query.request.dto";
 import { FindAllCourseRecordingsUseCase } from "@/modules/courses/application/use-case/recording/find-all.use-case";
@@ -216,30 +217,43 @@ export class UserCourseController {
    * Find all course recordings
    */
   @Get(":id/recordings")
-  @ApiStandardResponse(CourseRecordingsResponseDto)
+  @ApiStandardResponse(DailyRecordsResponseDto)
   public async findRecordings(
     @Param("id") id: string,
     @Query() recordingQueryRequestDto: CourseRecordingQueryRequestDto,
-  ): Promise<CourseRecordingsResponseDto> {
-    // get all course recordings based on the user course id
-    const { data, totalCount } =
-      await this.findAllCourseRecordingsUseCase.execute(
-        new ObjectIdValueObject(id),
-        recordingQueryRequestDto.startDate,
-        recordingQueryRequestDto.endDate,
-        recordingQueryRequestDto.limit,
-        recordingQueryRequestDto.page,
-        recordingQueryRequestDto.sort,
-        recordingQueryRequestDto.order,
-      );
-
-    // map the course recordings to the course recording response dtos
-    const courseRecordingResponseDtos: CourseRecordingResponseDto[] = data.map(
-      (courseRecording) => CourseRecordingMapper.toResponseDto(courseRecording),
+  ): Promise<DailyRecordsResponseDto> {
+    // get all daily records based on the user course id
+    const result = await this.findAllCourseRecordingsUseCase.execute(
+      new ObjectIdValueObject(id),
+      recordingQueryRequestDto.limit,
+      recordingQueryRequestDto.page,
+      recordingQueryRequestDto.sort,
+      recordingQueryRequestDto.order,
     );
 
-    // return the course recordings and the total count of the course recordings
-    return { recordings: courseRecordingResponseDtos, totalCount };
+    // map the daily records to the daily record response dtos
+    const dailyRecordResponseDtos: DailyRecordResponseDto[] = result.data.map(
+      (dailyRecord) =>
+        CourseRecordingMapper.toDailyRecordResponseDto(dailyRecord),
+    );
+
+    // return the daily records with pagination info
+    // Use default values if limit/page are undefined, null, or 0
+    const actualPage =
+      recordingQueryRequestDto.page && recordingQueryRequestDto.page > 0
+        ? recordingQueryRequestDto.page
+        : 1;
+    const actualPageSize =
+      recordingQueryRequestDto.limit && recordingQueryRequestDto.limit > 0
+        ? recordingQueryRequestDto.limit
+        : 10;
+
+    return {
+      dailyRecords: dailyRecordResponseDtos,
+      totalDays: result.totalDays,
+      page: actualPage,
+      pageSize: actualPageSize,
+    };
   }
 
   /**
